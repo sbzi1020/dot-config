@@ -1,0 +1,227 @@
+{
+    "Html5 template": {
+        "prefix": ["html"],
+        "body": [
+            "<!doctype html>",
+            "<html lang=\"en\">",
+            "",
+            "<head>",
+            "    <meta charset=\"utf-8\">",
+            "",
+            "    <title>${1:YOUR TITLE HERE}</title>",
+            "    <meta name=\"author\" content=\"Wison Ye\">",
+            "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+            "    ",
+            "    <!-- CSS link -->",
+            "    <link rel=\"stylesheet\" href=\"css/styles.css?v=1.0\">",
+            "",
+            "</head>",
+            "",
+            "<body>",
+            "    <!-- Load your script -->",
+            "    <script src=\"js/scripts.js\"></script>",
+            "    $0",
+            "</body>",
+            "",
+            "</html>"
+        ]
+    },
+    "<head> for TSX": {
+        "prefix": ["head"],
+        "body": [
+            "<head>$0</head>"
+        ]
+    },
+    "<div> for TSX": {
+        "prefix": ["div"],
+        "body": [
+            "<div>$0</div>"
+        ]
+    },
+    "<div> for TSX with format": {
+        "prefix": ["div-with-format"],
+        "body": [
+            "<div>",
+            "    $0",
+            "</div>"
+        ]
+    },
+    "<p> for TSX": {
+        "prefix": ["p"],
+        "body": [
+            "<p>$0</p>"
+        ]
+    },
+    "<p> for TSX with format": {
+        "prefix": ["p-with-format"],
+        "body": [
+            "<p>",
+            "    $0",
+            "</p>"
+        ]
+    },
+    "<span> for TSX": {
+        "prefix": ["span"],
+        "body": [
+            "<span>$0</span>"
+        ]
+    },
+    "<span> for TSX with format": {
+        "prefix": ["span-with-format"],
+        "body": [
+            "<span>",
+            "    $0",
+            "</span>"
+        ]
+    },
+    "<a> for TSX": {
+        "prefix": ["a"],
+        "body": [
+            "<a href=\"${1: Url link here}\">$0</a>"
+        ]
+    },
+    "<button> for TSX": {
+        "prefix": ["button"],
+        "body": [
+            "<button onClick={$0}>$1</button>"
+        ]
+    },
+    "<img> for TSX": {
+        "prefix": ["img"],
+        "body": [
+            "<img src={$0} />"
+        ]
+    },
+    "input with button for TSX": {
+        "prefix": ["input-button"],
+        "body": [
+            "<input type=\"button\"/>"
+        ]
+    },
+    "input with checkbox for TSX": {
+        "prefix": ["input-checkbox"],
+        "body": [
+            "<input type=\"checkbox\"/>"
+        ]
+    },
+    "input with color for TSX": {
+        "prefix": ["input-color"],
+        "body": [
+            "<input type=\"color\"/>"
+        ]
+    },
+    "input with date for TSX": {
+        "prefix": ["input-date"],
+        "body": [
+            "<input type=\"date\"/>"
+        ]
+    },
+    "input with datetime-local for TSX": {
+        "prefix": ["input-datetime-local"],
+        "body": [
+            "<input type=\"datetime-local\"/>"
+        ]
+    },
+    "input with email for TSX": {
+        "prefix": ["input-email"],
+        "body": [
+            "<input type=\"email\"/>"
+        ]
+    },
+    "input with file for TSX": {
+        "prefix": ["input-file"],
+        "body": [
+            "<input type=\"file\"/>"
+        ]
+    },
+    "input with hidden for TSX": {
+        "prefix": ["input-hidden"],
+        "body": [
+            "<input type=\"hidden\"/>"
+        ]
+    },
+    "input with image for TSX": {
+        "prefix": ["input-image"],
+        "body": [
+            "<input type=\"image\"/>"
+        ]
+    },
+    "input with month for TSX": {
+        "prefix": ["input-month"],
+        "body": [
+            "<input type=\"month\"/>"
+        ]
+    },
+    "input with number for TSX": {
+        "prefix": ["input-number"],
+        "body": [
+            "<input type=\"number\"/>"
+        ]
+    },
+    "input with password for TSX": {
+        "prefix": ["input-password"],
+        "body": [
+            "<input type=\"password\"/>"
+        ]
+    },
+    "input with radio for TSX": {
+        "prefix": ["input-radio"],
+        "body": [
+            "<input type=\"radio\"/>"
+        ]
+    },
+    "input with range for TSX": {
+        "prefix": ["input-range"],
+        "body": [
+            "<input type=\"range\"/>"
+        ]
+    },
+    "input with reset for TSX": {
+        "prefix": ["input-reset"],
+        "body": [
+            "<input type=\"reset\"/>"
+        ]
+    },
+    "input with search for TSX": {
+        "prefix": ["input-search"],
+        "body": [
+            "<input type=\"search\"/>"
+        ]
+    },
+    "input with submit for TSX": {
+        "prefix": ["input-submitnput-search"],
+        "body": [
+            "<input type=\"submit\"/>"
+        ]
+    },
+    "input with tel for TSX": {
+        "prefix": ["input-tel"],
+        "body": [
+            "<input type=\"tel\"/>"
+        ]
+    },
+    "input with text for TSX": {
+        "prefix": ["input-text"],
+        "body": [
+            "<input type=\"text\"/>"
+        ]
+    },
+    "input with time for TSX": {
+        "prefix": ["input-time"],
+        "body": [
+            "<input type=\"time\"/>"
+        ]
+    },
+    "input with url for TSX": {
+        "prefix": ["input-url"],
+        "body": [
+            "<input type=\"url\"/>"
+        ]
+    },
+    "input with week for TSX": {
+        "prefix": ["input-week"],
+        "body": [
+            "<input type=\"week\"/>"
+        ]
+    }
+}

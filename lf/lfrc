@@ -1,0 +1,98 @@
+# ------------------------------------------------------------------
+# How to get the settings information?
+#
+# `lf --doc | bat`
+# ------------------------------------------------------------------
+
+# Default settings
+# set info size:time
+set icons true
+set drawbox true
+# set ratios 1 2 3
+
+# Disable the original default keybindings (map to nothing!)
+map c
+map d
+map y
+map p
+map w
+map sn
+map ss
+map st
+map n down
+map e up
+map m updir
+map i open
+map o $$EDITOR "$f"
+
+
+# Go to folders
+map gh cd ~
+map g- cd -
+map gr cd ~/Rust
+map gt cd ~/temp
+map gb cd ~/my-shell/backup
+map gd cd ~/Downloads
+map gf cd ~/FinalMile/repo
+
+
+# Show hidden files
+map sh :set hidden
+
+
+# Quit
+map Q :quit
+
+
+# Copy, cut, paste and rename
+map yy :copy
+map dd :cut
+map dD :delete
+map pp :paste
+map cw :rename
+map ciw :bulk-rename
+map yp :yank-path
+
+
+# Dish usage
+map du :!clear && dust -d1
+
+
+# Sorting
+map ss :set sortby size
+map st :set sortby time
+
+
+# Image preview
+# set preview true
+# set previewer ~/.config/lf/previewer.sh
+# set cleaner ~/.config/lf/clear_img.sh
+
+
+# Rename for multiple items
+cmd bulk-rename ${{
+    old="$(mktemp)"
+    new="$(mktemp)"
+    [ -n "$fs" ] && fs="$(ls)"
+    printf '%s\n' "$fs" >"$old"
+    printf '%s\n' "$fs" >"$new"
+    $EDITOR "$new"
+    [ "$(wc -l "$new")" -ne "$(wc -l "$old")" ] && exit
+    paste "$old" "$new" | while IFS= read -r names; do
+        src="$(printf '%s' "$names" | cut -f1)"
+        dst="$(printf '%s' "$names" | cut -f2)"
+        if [ "$src" = "$dst" ] || [ -e "$dst" ]; then
+            continue
+        fi
+        mv -- "$src" "$dst"
+    done
+    rm -- "$old" "$new"
+    lf -remote "send $id unselect"
+}}
+
+
+# Copy current path for MacOS
+cmd yank-path $printf '%s' "$fx" | pbcopy
+
+# Copy current path for Linux
+# cmd yank-path $printf '%s' "$fx" | xclip -i -selection clipboard

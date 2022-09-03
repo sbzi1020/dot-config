@@ -1,0 +1,153 @@
+{
+    "console.log": {
+        "prefix": ["cl"],
+        "body": [
+            "console.log($0)"
+        ]
+    },
+    "new promise": {
+        "prefix": ["np"],
+        "body": [
+            "new Promise((resolve, reject) => {",
+            "   ${1: Your code here}",
+            "   $0",
+            "})"
+        ]
+    },
+    "Axios import": {
+        "prefix": ["axios-import"],
+        "body": [
+            "import Axios from 'axios'"
+        ]
+    },
+    "Axios return type": {
+        "prefix": ["axios-return-type"],
+        "body": [
+            "type AxiosReturnType = { config: any, data: any, headers: any, request: any, status: number, statusText: string }"
+        ]
+    },
+    "Axios post with RxJS": {
+        "prefix": ["axios-post-with-rxjs"],
+        "body": [
+            "/**",
+            " * @param {string} currentDeviceId",
+            " * @returns {Observable<any>}",
+            " */",
+            "const ${1:Function name here} = (${2:Parameteres here}): Observable<any> => {",
+            "    const url = ${3:Url here}",
+            "    const postBody = {",
+            "",
+            "    }",
+            "    const headers = {",
+            "",
+            "    }",
+            "",
+            "    return rxjs.fromPromise(Axios.post(url, postBody, { headers })).pipe(",
+            "        rxjs.take(1),",
+            "        rxjs.catchError(error => {",
+            "            const customError = Boolean(error && error.response && error.response.data)",
+            "            return rxjs.of(customError ?",
+            "                error.response.data :",
+            "                ({ errorMessage: Boolean(error.Error) ? error.Error : error.message })",
+            "            )",
+            "        }),",
+            "        rxjs.map((result: AxiosReturnType) => {",
+            "            const isSuccess = Boolean(result && result.status && result.status === 200 && result.data)",
+            "            return isSuccess ? result.data : result",
+            "        })",
+            "    )",
+            "}"
+        ]
+    },
+    "FlexBox layout in TS": {
+        "prefix": ["layout", "flexbox"],
+        "body": [
+            "export const hBoxContainer = {",
+            "    display: 'flex',",
+            "    flexDirection: 'row',",
+            "    alignItems: 'stretch',",
+            "    justifyContent: 'center'",
+            "}",
+            "",
+            "export const hBoxChild = {",
+            "    flex: 1",
+            "}",
+            "",
+            "export const vBoxContainer = {",
+            "    display: 'flex',",
+            "    flexDirection: 'column',",
+            "    alignItems: 'stretch',",
+            "    justifyContent: 'center'",
+            "}",
+            "",
+            "export const vBoxChild = {",
+            "    flex: 1",
+            "}"
+        ]
+    },
+    "State service define": {
+        "prefix": ["state-service"],
+        "body": [
+            "import * as Rx from 'rxjs'",
+            "import { startWith } from 'rxjs/operators'",
+            "// import { BehaviorSubject } from 'rxjs'",
+            "// import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject'",
+            "",
+            "",
+            "export interface ${1:State service interface here} {",
+            "    ${3:// State attributes here}",
+            "}",
+            "/** **/",
+            "const initState: ${1:State service interface name here} = ({",
+            "})",
+            "",
+            "// const stateSource: Rx.BehaviorSubject<${1:State service interface name here}> = new Rx.BehaviorSubject(initState);",
+            "const stateSource: Rx.Subject<${1:State service interface name here}> = new Rx.Subject();",
+            "",
+            "let latestState: ${1:State service interface name here} | null = null;",
+            "",
+            "/** **/",
+            "const emitNextState = (nextState: ${1:State service interface name here}) => {",
+            "    latestState = nextState",
+            "    stateSource.next(nextState)",
+            "}",
+            "",
+            "/**",
+            " * ",
+            " */",
+            "export const ${2:State service name here} = ({",
+            "    /** **/",
+            "    $state: stateSource.asObservable().pipe(startWith(initState)),",
+            "",
+            "    /** **/",
+            "    getLatest: (): ${1:State service interface name here} | null => latestState,",
+            "",
+            "    // updateUsername: (userName: string) => stateSource.next({ ...stateSource.value, userName }),",
+            "    $0",
+            "})"
+        ]
+    },
+
+    "try block": {
+        "prefix": ["try"],
+        "body": [
+            "try {",
+            "    $0",
+            "} catch (err) {",
+            "    console.log(err.message)",
+            "}"
+        ]
+    },
+
+    "switch block": {
+        "prefix": ["switch"],
+        "body": [
+            "switch ($0) {",
+            "    case $1:",
+            "        return $2;",
+            "    default:",
+            "        return $2;",
+            "}"
+        ]
+    }
+}
