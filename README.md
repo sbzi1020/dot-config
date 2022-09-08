@@ -28,3 +28,6 @@
     - `.alacritty.yml`: `cp -rvf ./dot_alacritty.yml ~/.alacritty.yml `
     - install font
 
+#### error
+Delete the plugin ----> If you enter the vim and it shows an error, you may go to the `vc` to find the `my_plugin`, and copy the delete command to delete it.
+and reopen vim to refresh and reinstall the plugin. (maybe it is old version which caches in local and newly one which just copy have conflict.)
