@@ -20,9 +20,9 @@
 - pull the `dot-config` 
 
 - copy the `dot-config` to the local
-    - `fish`: `cp -rvf ./fish ~/.config/fish `
-    - `lf`: `cp -rvf ./lf ~/.config/lf `
-    - `nvim`: `cp -rvf ./nvim ~/.config/nvim `
+    - `fish`: `cp -rvf ./fish ~/.config/ `
+    - `lf`: `cp -rvf ./lf ~/.config/ `
+    - `nvim`: `cp -rvf ./nvim ~/.config/`
     - `.tmux_line`: `cp -rvf ./dot_tmux_line ~/.tmux_line `
     - `.tmux.conf`: `cp -rvf ./dot_tmux.conf ~/.tmux.conf `
     - `.alacritty.yml`: `cp -rvf ./dot_alacritty.yml ~/.alacritty.yml `
