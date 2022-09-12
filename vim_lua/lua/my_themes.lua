@@ -13,6 +13,7 @@ After colorscheme has been load, you can run `:echo g:colors_name` command
 to show it.
 ]]
 --local current_theme = "classic_old_green"
+-- local current_theme = "obsidian"
 local current_theme = "pinkgirl"
 --local current_theme = "tron"
 --local current_theme = "onedark"
@@ -70,6 +71,9 @@ elseif current_theme == "classic_old_green" then
     vim.cmd 'let g:nvcode_termcolors=256'
 
 elseif current_theme == "pinkgirl" then
+
+    vim.cmd 'let g:nvcode_termcolors=256'
+elseif current_theme == "obsidian" then
 
     vim.cmd 'let g:nvcode_termcolors=256'
 
