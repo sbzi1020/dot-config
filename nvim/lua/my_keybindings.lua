@@ -31,7 +31,6 @@ local function set_key_mapping(mode, key, mapping_command, opts)
 end
 
 
-
 -- Leader key: <Space>
 set_key_mapping('n', '<Space>', '<NOP>', {silent=true})
 vim.g.mapleader = ' '
@@ -58,20 +57,14 @@ set_key_mapping('n', 'Y', 'y$')
 -- W: save, Q: quit, R: open Ranger/Vifm
 set_key_mapping('n', 'W', ':w<CR>')
 set_key_mapping('n', 'Q', ':q<CR>')
--- set_key_mapping('n', '<leader>r', ':RnvimrToggle<CR>')
--- set_key_mapping('n', '<silent>', '<leader>r :Vifm<CR>', {silent=true})
---
--- The `:luafile $MYVIMRC` doesn't work, as `:luafile` only reload the file itself. But all the
--- required modules (settins) are cached!!!
--- set_key_mapping('n', '<leader>r', ':luafile $MYVIMRC<CR>', {silent=true })
 
 
 -- hh: <ESC> from `insert` mode
-set_key_mapping('i', 'jj', '<ESC>')
+set_key_mapping('i', 'hh', '<ESC>')
 
 
 -- cc: `cc` instead of `ci` (change inner)
-set_key_mapping('n', 'cc', 'ci')
+set_key_mapping('n', 'cc', 'ciw')
 
 
 -- <Tab> and shift+<Tab> to cycle through the opened buffers
@@ -87,19 +80,15 @@ set_key_mapping('n', '<leader><leader>', '<c-^>', {silent=true})
 set_key_mapping('n', '<leader>th', ':%TOhtml<CR>')
 
 
--- <leader>th: save current file to HTML
 set_key_mapping('n', '<leader>e', ':Lexplore<CR>')
 
 
 
 --[[
-ctrl+s: replace all works under cursor. Do a `/pattern` which the `pattern`
+ctrl+s: replace all words under cursor. Do a `/pattern` which the `pattern`
 is the word under cursor.
-
 <c-r>(Ctrl+r), <c-w>(Ctrl+w) to Grab the word under cursor
 --]]
--- nnoremap <silent> <c-s> *:%s//
--- nnoremap <silent> <c-s> :%s/\<<C-r><C-w>\>/
 set_key_mapping('n', '<c-s>', ':%s/<C-r><C-w>//g<left><left>')
 
 
@@ -112,27 +101,12 @@ Split & window movement
 -- Vertical split
 set_key_mapping('n', '<leader>vs', ':vsplit<CR>')
 
--- Vertical split and run terminal inside
---set_key_mapping('n', '<leader>ot', ':vsplit<CR>:terminal<CR>')
-
 -- Vertical split and open vimrc, settings, keybindings, themes
 set_key_mapping('n', '<leader>ov', ':vsplit<CR>:e $MYVIMRC<CR>')
---set_key_mapping('n', '<leader>os', ':vsplit<CR>:e ~/.config/nvim/lua/settings.lua<CR>')
---set_key_mapping('n', '<leader>op', ':vsplit<CR>:e ~/.config/nvim/lua/plugins.lua<CR>')
---set_key_mapping('n', '<leader>ok', ':vsplit<CR>:e ~/.config/nvim/lua/keybindings.lua<CR>')
---set_key_mapping('n', '<leader>ot', ':vsplit<CR>:e ~/.config/nvim/lua/themes.lua<CR>')
 
 -- Move between windows
-set_key_mapping('n', '<C-h>', ':wincmd h<CR>', {silent=true})
-set_key_mapping('n', '<C-i>', ':wincmd l<CR>', {silent=true})
-set_key_mapping('n', '<C-n>', ':wincmd j<CR>', {silent=true})
-set_key_mapping('n', '<C-e>', ':wincmd k<CR>', {silent=true})
-
 set_key_mapping('n', '<leader>m', ':wincmd h<CR>', {silent=true})
 set_key_mapping('n', '<leader>i', ':wincmd l<CR>', {silent=true})
--- Can't use '<c-j>' and '<c-k>', as already used for ':cnext<CR>' and ':cNext<CR>'
--- set_key_mapping('n', '<C-j>', ':wincmd j<CR>', {silent=true})
--- set_key_mapping('n', '<C-k>', ':wincmd k<CR>', {silent=true})
 
 -- Resize windows
 set_key_mapping('n', '-', ':vertical resize -5<CR>', {silent=true})
@@ -146,15 +120,6 @@ set_key_mapping('n', '|', '<C-w>=', {silent=true})
 -----------------------------------------------------------------------
 Block and line movement
 -----------------------------------------------------------------------
-
-Visual Mode: Select and cursor enhancement
-
-After make selection on lines:
-
-shift+j: move selection down
-shift+k: move selection up
-<: move selection to left with one tab distance
->: move selection to right with one tab distance
 --]]
 set_key_mapping('v', 'N', ":m '>+1<CR>gv=gv")
 set_key_mapping('v', 'E', ":m '<-2<CR>gv=gv")
@@ -181,24 +146,15 @@ Ctrl+c: Copy
 -- vmap <Leader>p "+p
 -- vmap <Leader>P "+P
 
-
-
 --[[
 -----------------------------------------------------------------------
 Visual mode snippets
 -----------------------------------------------------------------------
-
-<lead>;: Add ; at evey end of the line
-<lead>": Add -- at evey end of the line
-<lead>/: Add // at evey begin of the line
-<lead><lead>/ - Remove // at evey begin of the line
 --]]
 set_key_mapping('v', '<leader>;', ':normal A;<ESC>')
 set_key_mapping('v', '<leader>--', ':normal A"<ESC>')
 set_key_mapping('v', '<leader>,', ':normal A,<ESC>')
 set_key_mapping('v', '<leader>/', ':CommentToggle<CR>')
-
-
 
 --[[
 -----------------------------------------------------------------------
@@ -211,22 +167,10 @@ set_key_mapping('n', '<leader><CR>', ':Goyo<CR>', {silent=true})
 
 
 -- <leader>p: Fuzzy file searching
--- set_key_mapping('n', '<leader>p', ':FZF<CR>')
--- set_key_mapping('n', '<leader>p', ':lua require(\'telescope.builtin\').find_files()<CR>')
 set_key_mapping('n', '<leader>p', ':lua require(\'telescope.builtin\').find_files({layout_strategy = \'vertical\', layout_config = {width=0.6}, previewer = false })<CR>', {silent=true})
 
-
-
--- <leader>f: Ripgrep full text searching
--- set_key_mapping('n', '<leader>f', ':Rg<space>')
-
-
 -- <leader>B: List opened files (to select)
--- set_key_mapping('n', '<leader>b', ':Buffers<CR>', {silent=true})
 set_key_mapping('n', '<leader>b', ':lua require(\'telescope.builtin\').buffers()<CR>', {silent=true})
-
-
-
 
 --[[
 -----------------------------------------------------------------------
@@ -241,135 +185,14 @@ set_key_mapping('n', '<leader>n', ':nohl<CR>')
 set_key_mapping('n', 'h', 'nzz')
 set_key_mapping('n', 'H', 'Nzz')
 
-
--- <leader>oq: Open quickfix list
--- <leader>cq: Close quickfix list
-set_key_mapping('n', '<leader>oq', ':copen<CR>')
-set_key_mapping('n', '<leader>cq', ':cclose<CR>')
-
--- <leader>ol: Open location list
--- <leader>cl: Close location list
-set_key_mapping('n', '<leader>ol', ':lopen<CR>')
-set_key_mapping('n', '<leader>cl', ':lclose<CR>')
-
 -- Help search by in Telescope
 set_key_mapping('n', '<leader>h', ':lua require(\'telescope.builtin\').help_tags()<CR>')
-
 
 --[[
 -----------------------------------------------------------------------
 Advanced searching
 -----------------------------------------------------------------------
 --]]
-
-
---[[
-<leader>f:
-
-* Run the external `grep` command with the given searching keyword
-* Auto jump to the first matching result
---]]
--- set_key_mapping('n', '<leader>f', ':silent grep ')
-
-
---[[
-<leader>f:
-
-* `silent` for hiding the `grep` standard output
-* Run the external `grep` command with the given searching keyword
-* Open the quick fix list
---]]
--- set_key_mapping('n', '<leader>f', ':silent grep!  | copen<C-Left><C-Left><C-Left>')
-
-
---[[
-<leader>f:
-
-* Use 'Telescope.builtin.grep_string()'
-* Auto jump to the first matching result
-* Open the quick fix list
---]]
---
-set_key_mapping('n', '<leader>f', ':lua require(\'telescope.builtin\').live_grep({prompt_title="Search in project", prompt_prefix="  ", shorten_path=true})<CR>')
---
---[[
-<leader>pb: Fuzzy files searching for in `~/my-shell/backup`
---]]
--- set_key_mapping('n', '<leader>pb', ':lua require(\'telescope.builtin\').find_files({ '..
---                                         'prompt_title = "< my-shell/backup files >",'..
---                                         'cmd = "~/my-shell/backup"'..
---                                     '})<CR>')
-
---[[
-<leader>c: Fuzzy searching for vim comman hisotry
---]]
-set_key_mapping('n', '<leader>ch', ':lua require(\'telescope.builtin\').command_history()<CR>')
-
-
--- `ctrl+j` and `ctrl+k`: Cycle through the quick fix list and center the current result line
-set_key_mapping('n', '<c-n>', ':cnext<CR>zz')
-set_key_mapping('n', '<c-e>', ':cNext<CR>zz')
-set_key_mapping('i', '<c-e>', '<nop>')
-set_key_mapping('i', '<c-e>', '<c-p>')
-
-
-
---[[
------------------------------------------------------------------------
-Coding and LSP related
------------------------------------------------------------------------
-
-gd:         Go to definition
-gD:         Go to declaration
-gf:         Go to file
-gi:         Implementation
-gr:         List references in current buffer
-rn:         Rename symbols
-K:          Show documentation
-<leader>ff: Format code
-
-srn:        Smart rename, it will show all matched files in a single window,
-            then I can run `%s/XXXX/YYYY/g` to do a replacement on all matched
-            files!!!
---]]
--- vim.cmd 'nmap <silent> gd <Plug>(coc-definition)'
--- vim.cmd 'nmap <silent> gy <Plug>(coc-type-definition)'
--- vim.cmd 'nmap <silent> gi <Plug>(coc-implementation)'
--- vim.cmd 'nmap <silent> gr <Plug>(coc-references)'
--- vim.cmd 'nmap <leader>rn <Plug>(coc-rename)'
--- vim.cmd 'nnoremap <leader>ff :call CocAction(\'format\')<CR>'
--- vim.cmd 'nnoremap <silent> <leader>t :<C-u>CocList -I symbols<CR>'
--- vim.cmd 'nnoremap <silent> K :call CocAction(\'doHover\')<CR>'
--- vim.cmd 'nnoremap <silent> srn :CocSearch <C-R>=expand("<cword>")<CR><CR>'
--- 
--- -- <leader>se: Show diagnostic message into location list
--- -- ctrl-n:     Go to next diagnostic position
--- -- ctrl-p:     Go to prev diagnostic position
--- vim.cmd 'nnoremap <leader>se :CocList diagnostics<CR>'
--- vim.cmd 'nmap <silent> <c-p> <Plug>(coc-diagnostic-prev)'
--- vim.cmd 'nmap <silent> <c-n> <Plug>(coc-diagnostic-next)'
-
-
-
---[[
-Rust related
-
-<leader>cc: run shell command `cargo check`
-<leader>cb: run shell command `cargo build --release`
-<leader>cr: run shell command `cargo run`
---]]
--- set_key_mapping('n', '<leader>cc', ':!cargo check<CR>')
--- set_key_mapping('n', '<leader>cb', ':!cargo build --release<CR>')
--- set_key_mapping('n', '<leader>cr', ':!cargo run <CR>')
--- set_key_mapping('n', '<leader>cw', ':!cargo watch -c -x run<CR>')
--- set_key_mapping('n', '<leader>cc', '::vsplit<CR>:terminal cargo check<CR>')
--- set_key_mapping('n', '<leader>cb', '::vsplit<CR>:terminal cargo build --release<CR>')
--- set_key_mapping('n', '<leader>cr', '::vsplit<CR>:terminal cargo run <CR>')
--- set_key_mapping('n', '<leader>ct', '::vsplit<CR>:terminal cargo test<CR>')
-
-
-
-
 
 --[[
 -----------------------------------------------------------------------
@@ -391,7 +214,6 @@ set_key_mapping('n', '<leader>sc', '<cmd>lua is_enabled_spell()<CR>')
 -----------------------------------------------------------------------
 Handy setting for coding in insert mode based on different 'FileType'
 -----------------------------------------------------------------------
-
 .js, .ts, .rs, .toml, .fish
 
 --]]
@@ -409,7 +231,6 @@ vim.cmd 'autocmd FileType javascript,typescript,rust,typescriptreact,go,cpp inor
 
 --[[
 .md
-
 nn - Go to the next '<++>' placeholder
 hh - Add Highlight content
 bb - Add Bold content
@@ -423,21 +244,6 @@ vim.cmd 'autocmd FileType markdown inoremap <buffer> /br <CR></br><CR><CR>'
 vim.cmd 'autocmd FileType markdown inoremap <buffer> ``` ```<CR><ESC>i```<ESC>kA'
 vim.cmd 'autocmd FileType markdown inoremap <buffer> { {  }<left><left>'
 
-
-
---[[
------------------------------------------------------------------------
-Handy file navigation
------------------------------------------------------------------------
---]]
-
--- `mm`: Make a gloabl mark
-
--- `gb`: Go back to the global mark
-set_key_mapping('n', 'gb', '`Mzz')
-
-
---[[
 -----------------------------------------------------------------------
 Disable arrow keys
 -----------------------------------------------------------------------
@@ -472,38 +278,9 @@ set_key_mapping('v', 'i', 'l')
 set_key_mapping('v', 'n', 'j')
 
 
---[[
------------------------------------------------------------------------
-Colemak cursor navigation mapping
-
-" Current line movement
-"
-" Beginning of line < N  I > End of line
-"
-" H --> 0 (Go to the beginning of current line)
-" I --> $ (Go to the end of current line)
------------------------------------------------------------------------
---]]
 set_key_mapping('n', 'M', '0')
 set_key_mapping('n', 'I', '$')
 
-
---[[
------------------------------------------------------------------------
-Colemak cursor navigation mapping
-
-" Screen movement
-"
-"     ^  Top of screen
-"     U
-"     E
-"     v Bottom of screen
-"
-" U --> H (Go to the top of screen)
-" E --> L (Go to the bottom of screen)
------------------------------------------------------------------------
---]]
-set_key_mapping('n', 'J', '{')
 
 
 --[[
@@ -523,10 +300,4 @@ Colemak edit mapping
 --]]
 set_key_mapping('n', 'N', '<nop>')
 
-
---[[
------------------------------------------------------------------------
-'oo' -> 'ciw'
------------------------------------------------------------------------
---]]
 

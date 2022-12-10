@@ -167,7 +167,7 @@ local custom_lsp_attach = function()
     vim.api.nvim_buf_set_keymap(0, 'n', 'se', '<cmd>Telescope diagnostics<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', '<c-n>', '<cmd>lua vim.diagnostic.goto_next({popup_opts = {border = \'rounded\'}})<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', '<c-p>', '<cmd>lua vim.diagnostic.goto_prev({popup_opts = {border = \'rounded\'}})<CR>', mapping_options)
-    -- vim.api.nvim_buf_set_keymap(0, 'n', 'qf',  '<cmd>lua vim.lsp.buf.code_action({only = \'quickfix\'})<CR>', mapping_options)
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>qf',  '<cmd>lua vim.lsp.buf.code_action({only = \'quickfix\'})<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'ca',  '<cmd>lua vim.lsp.buf.code_action()<CR>', mapping_options)
 end
 
