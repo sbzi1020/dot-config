@@ -244,6 +244,7 @@ vim.cmd 'autocmd FileType markdown inoremap <buffer> /br <CR></br><CR><CR>'
 vim.cmd 'autocmd FileType markdown inoremap <buffer> ``` ```<CR><ESC>i```<ESC>kA'
 vim.cmd 'autocmd FileType markdown inoremap <buffer> { {  }<left><left>'
 
+--[[
 -----------------------------------------------------------------------
 Disable arrow keys
 -----------------------------------------------------------------------
