@@ -27,6 +27,9 @@
     - `.tmux.conf`: `cp -rvf ./dot_tmux.conf ~/.tmux.conf `
     - `.alacritty.yml`: `cp -rvf ./dot_alacritty.yml ~/.alacritty.yml `
     - install font
+ 
+- `$ source ~/.config/fish/config.fish` to reload 
+- `$ vc` to reload the vim config
 
 #### error
 Delete the plugin ----> If you enter the vim and it shows an error, you may go to the `vc` to find the `my_plugin`, and copy the delete command to delete it.
