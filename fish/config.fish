@@ -1,7 +1,7 @@
 # vim: ft=fish
 set --export CLICOLOR "xterm-color"
 set --export LSCOLORS "gxfxcxdxbxegedabagacad"
-set --export EDITOR nvim
+set --export EDITOR lvim
 
 #--------------------------------------------------------
 # Set `man pager`
@@ -147,7 +147,7 @@ alias sshToRaspberryPi4Wifi="ssh ubuntu@192.168.1.108"
 #--------------------------------------------------------
 # ~/my-shell
 #--------------------------------------------------------
-set PATH ~/my-shell ~/my-shell/google-cloud-sdk/bin $PATH
+set PATH ~/my-shell ~/my-shell/google-cloud-sdk/bin ~/.local/bin $PATH
 
 # Clear console
 abbr c "clear"
@@ -181,10 +181,10 @@ abbr dc "docker-compose"
 abbr dm "docker-machine"
 
 # Vi config related and vifm
-# abbr vim "nvim"
+abbr vim "nvim"
 # abbr fc "nvim ~/.config/fish/config.fish"
 # abbr vc "nvim ~/.config/nvim/init.vim"
-abbr vim "nvim"
+# abbr vim "lvim"
 abbr fc "nvim ~/.config/fish/config.fish"
 abbr vc "cd ~/.config/nvim && nvim ~/.config/nvim/init.lua"
 abbr vifm "vifm -c 'colorscheme zenburn_1' -c view"
@@ -222,13 +222,20 @@ abbr tc "nvim ~/.tmux.conf"
 abbr tl "tmux ls"
 abbr ta "tmux attach-session -t 0"
 abbr ta "tmux attach-session -t dev"
-abbr tab "tmux attach-session -t 'Dropit Backend Dev'"
 abbr tal "tmux attach-session -t 'Dropit Live-Auction-App Dev'"
 abbr tav "tmux attach-session -t 'Dropit Vendor Service'"
 abbr taa "tmux attach-session -t 'Dropit Admin App Shopify'"
-abbr taf "tmux attach-session -t 'Fion workflow'"
+abbr tar "tmux attach-session -t 'Dropit Running Service'"
+abbr tac "tmux attach-session -t 'Dropit Core Service'"
+abbr taf "tmux attach-session -t 'minimal'"
+abbr taff "tmux attach-session -t 'minimal frontend paid'"
+
 abbr tk "tmux kill-server"
-abbr rvs "GOOGLE_APPLICATION_CREDENTIALS=./vendor_service_key.json IS_EMULATOR=true PORT=6801 PROJECT_ID=(gcloud config get-value project) LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=true DEBUG_LOG_VENDOR=true DEBUG_LOG_GET_VENDOR_SETTINGS=true DEBUG_LOG_UPDATE_STYLE_SETTINGS=true DEBUG_LOG_SHOPIFY_CURRENCY=true CARGO_NET_GIT_FETCH_WITH_CLI=true ./target/debug/vendor_service"
+abbr rvs "GOOGLE_APPLICATION_CREDENTIALS=./vendor_service_key.json IS_EMULATOR=true PORT=6801 PROJECT_ID=dropit-8dc33 LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=true DEBUG_LOG_VENDOR=true DEBUG_LOG_GET_VENDOR_SETTINGS=true DEBUG_LOG_UPDATE_STYLE_SETTINGS=true DEBUG_LOG_SHOPIFY_CURRENCY=true CARGO_NET_GIT_FETCH_WITH_CLI=true ./target/debug/vendor_service"
+
+abbr rcs "IS_EMULATOR=true PORT=6802 PROJECT_ID=dropit-8dc33 LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=TRUE DEBUG_LOG_CREATE_AUCTION=TRUE DEBUG_LOG_UPDATE_AUCTION=TRUE DEBUG_LOG_DELETE_AUCTION=TRUE CARGO_NET_GIT_FETCH_WITH_CLI=true cargo make --loglevel error watch_run"
+
+abbr rrs "IS_EMULATOR=true PORT=6802 PROJECT_ID=dropit-8dc33 LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=TRUE DEBUG_LOG_AUCTION_VIEWERS=TRUE DEBUG_LOG_PLACEBID=TRUE DEBUG_LOG_PASSIN=TRUE DEBUG_LOG_TIMESTAMP_UTIL=TRUE DEBUG_LOG_SHOPIFY_DISCOUNT_CODE=TRUE CARGO_NET_GIT_FETCH_WITH_CLI=true cargo make --loglevel error watch_run"
 
 # `wasm-pack`
 abbr wp "wasm-pack"

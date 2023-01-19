@@ -159,16 +159,16 @@ local custom_lsp_attach = function()
     vim.api.nvim_buf_set_keymap(0, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, "n", "<leader>ff", "<cmd>lua vim.lsp.buf.formatting()<CR>", mapping_options)
-    -- vim.api.nvim_buf_set_keymap(0, "n", "<leader>ff", "<cmd>lua vim.lsp.buf.formatting({ tabSize = 4, insertSpaces = true })<CR>", mapping_options)
+    vim.api.nvim_buf_set_keymap(0, "n", "<leader>fm", "<cmd>lua vim.lsp.buf.formatting()<CR>", mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, 'n', 'rn',  '<cmd>lua vim.lsp.buf.rename()<CR>', mapping_options)
     --vim.api.nvim_buf_set_keymap(0, 'n', 'se', '<cmd>lua vim.diagnostic.setloclist()<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, 'n', 'se', '<cmd>Telescope diagnostics<CR>', mapping_options)
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>sd', '<cmd>Telescope diagnostics<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', '<c-n>', '<cmd>lua vim.diagnostic.goto_next({popup_opts = {border = \'rounded\'}})<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', '<c-p>', '<cmd>lua vim.diagnostic.goto_prev({popup_opts = {border = \'rounded\'}})<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>qf',  '<cmd>lua vim.lsp.buf.code_action({only = \'quickfix\'})<CR>', mapping_options)
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>ff',  '<cmd>lua vim.lsp.buf.code_action({only = \'quickfix\'})<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'ca',  '<cmd>lua vim.lsp.buf.code_action()<CR>', mapping_options)
+
+    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', mapping_options)
 end
 
 
@@ -387,6 +387,16 @@ cpp_package.setup({
     }
 })
 
+nvim_lsp.cssls.setup {
+    on_attach = custom_lsp_attach,
+    capabilities = capabilities,
+}
+
+nvim_lsp.html.setup {
+    on_attach = custom_lsp_attach,
+    capabilities = capabilities,
+    filetypes = {'html' }
+}
 
 --[[
 -----------------------------------------------------------------------

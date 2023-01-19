@@ -1,0 +1,56 @@
+{
+    "console.log": {
+        "prefix": [
+            "cl"
+        ],
+        "body": [
+            "console.log($0)"
+        ]
+    },
+    "new promise": {
+        "prefix": [
+            "np"
+        ],
+        "body": [
+            "new Promise((resolve, reject) => {",
+            "   ${1: Your code here}",
+            "   $0",
+            "})"
+        ]
+    },
+    "Axios post with RxJS": {
+        "prefix": [
+            "axios-post-with-rxjs"
+        ],
+        "body": [
+            "/**",
+            " * @param {string} currentDeviceId",
+            " * @returns {Observable<any>}",
+            " */",
+            "const ${1:Function name here} = (${2:Parameteres here}): Observable<any> => {",
+            "    const url = ${3:Url here}",
+            "    const postBody = {",
+            "",
+            "    }",
+            "    const headers = {",
+            "",
+            "    }",
+            "",
+            "    return rxjs.fromPromise(Axios.post(url, postBody, { headers })).pipe(",
+            "        rxjs.take(1),",
+            "        rxjs.catchError(error => {",
+            "            const customError = Boolean(error && error.response && error.response.data)",
+            "            return rxjs.of(customError ?",
+            "                error.response.data :",
+            "                ({ errorMessage: Boolean(error.Error) ? error.Error : error.message })",
+            "            )",
+            "        }),",
+            "        rxjs.map((result: AxiosReturnType) => {",
+            "            const isSuccess = Boolean(result && result.status && result.status === 200 && result.data)",
+            "            return isSuccess ? result.data : result",
+            "        })",
+            "    )",
+            "}"
+        ]
+    },
+}

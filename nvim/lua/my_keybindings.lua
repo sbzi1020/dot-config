@@ -25,14 +25,13 @@ String value            Help page   Affected modes                              
 --]]
 
 local function set_key_mapping(mode, key, mapping_command, opts)
-    local options = {noremap = true}
+    local options = { noremap = true }
     if opts then options = vim.tbl_extend('force', options, opts) end
     vim.api.nvim_set_keymap(mode, key, mapping_command, options)
 end
 
-
 -- Leader key: <Space>
-set_key_mapping('n', '<Space>', '<NOP>', {silent=true})
+set_key_mapping('n', '<Space>', '<NOP>', { silent = true })
 vim.g.mapleader = ' '
 
 
@@ -73,7 +72,7 @@ set_key_mapping('n', '<S-Tab>', ':bp<CR>')
 
 
 -- <leader><leader>: toggles between buffers
-set_key_mapping('n', '<leader><leader>', '<c-^>', {silent=true})
+set_key_mapping('n', '<leader><leader>', '<c-^>', { silent = true })
 
 
 -- <leader>th: save current file to HTML
@@ -105,13 +104,14 @@ set_key_mapping('n', '<leader>vs', ':vsplit<CR>')
 set_key_mapping('n', '<leader>ov', ':vsplit<CR>:e $MYVIMRC<CR>')
 
 -- Move between windows
-set_key_mapping('n', '<leader>m', ':wincmd h<CR>', {silent=true})
-set_key_mapping('n', '<leader>i', ':wincmd l<CR>', {silent=true})
+set_key_mapping('n', '<leader>m', ':wincmd h<CR>', { silent = true })
+set_key_mapping('n', '<leader>i', ':wincmd l<CR>', { silent = true })
+set_key_mapping('n', '<leader>j', ':wincmd j<CR>', { silent = true })
 
 -- Resize windows
-set_key_mapping('n', '-', ':vertical resize -5<CR>', {silent=true})
-set_key_mapping('n', '=', ':vertical resize +5<CR>', {silent=true})
-set_key_mapping('n', '|', '<C-w>=', {silent=true})
+set_key_mapping('n', '-', ':vertical resize -5<CR>', { silent = true })
+set_key_mapping('n', '=', ':vertical resize +5<CR>', { silent = true })
+set_key_mapping('n', '|', '<C-w>=', { silent = true })
 
 
 
@@ -125,26 +125,6 @@ set_key_mapping('v', 'N', ":m '>+1<CR>gv=gv")
 set_key_mapping('v', 'E', ":m '<-2<CR>gv=gv")
 set_key_mapping('v', '<', '<gv')
 set_key_mapping('v', '>', '>gv')
-
-
-
---[[
------------------------------------------------------------------------
-Copy or cut to system clipboard
------------------------------------------------------------------------
-
-Ctrl+x: Cut
-Ctrl+c: Copy
---]]
--- vmap <C-x> :!pbcopy<CR>
--- vmap <C-c> :w !pbcopy<CR><CR>
-
--- vmap <Leader>y "+y
--- vmap <Leader>d "+d
--- nmap <Leader>p "+p
--- nmap <Leader>P "+P
--- vmap <Leader>p "+p
--- vmap <Leader>P "+P
 
 --[[
 -----------------------------------------------------------------------
@@ -163,14 +143,11 @@ Plugin related
 --]]
 
 -- <leader><CR>: Toggle Goyo mode(fullscreen focus mode)
-set_key_mapping('n', '<leader><CR>', ':Goyo<CR>', {silent=true})
+set_key_mapping('n', '<leader><CR>', ':Goyo<CR>', { silent = true })
 
 
--- <leader>p: Fuzzy file searching
-set_key_mapping('n', '<leader>p', ':lua require(\'telescope.builtin\').find_files({layout_strategy = \'vertical\', layout_config = {width=0.6}, previewer = false })<CR>', {silent=true})
 
 -- <leader>B: List opened files (to select)
-set_key_mapping('n', '<leader>b', ':lua require(\'telescope.builtin\').buffers()<CR>', {silent=true})
 
 --[[
 -----------------------------------------------------------------------
@@ -186,7 +163,23 @@ set_key_mapping('n', 'h', 'nzz')
 set_key_mapping('n', 'H', 'Nzz')
 
 -- Help search by in Telescope
-set_key_mapping('n', '<leader>h', ':lua require(\'telescope.builtin\').help_tags()<CR>')
+set_key_mapping('n', '<leader>sh', ':lua require(\'telescope.builtin\').help_tags()<CR>')
+
+set_key_mapping('n', '<leader>sw', ':lua require(\'telescope.builtin\').grep_string({ desc = \'[S]earch current [W]ord\'})<CR>')
+
+set_key_mapping('n', '<leader>of', ':lua require(\'telescope.builtin\').oldfiles({ desc = \'[?] Find recently opened files\'})<CR>')
+
+set_key_mapping('n', '<leader>sb', ':lua require(\'telescope.builtin\').buffers({ desc = \'[ ] Find existing buffers\'})<CR>', { silent = true })
+
+
+-- <leader>p: Fuzzy file searching
+set_key_mapping('n', '<leader>sf',
+    ':lua require(\'telescope.builtin\').find_files({layout_strategy = \'vertical\', layout_config = {width=0.6}, previewer = false })<CR>'
+    , { silent = true })
+--
+set_key_mapping('n', '<leader>sg', ':lua require(\'telescope.builtin\').live_grep({ desc = \'[S]earch by [G]rep\'})<CR>', { silent = true })
+
+set_key_mapping('n', '<leader>sd', ':lua require(\'telescope.builtin\').diagnostics({ desc = \'[S]earch [D]iagnostics\'})<CR>', { silent = true })
 
 --[[
 -----------------------------------------------------------------------
@@ -199,14 +192,14 @@ Advanced searching
 <leader>sc: Toggle spell checking
 -----------------------------------------------------------------------
 --]]
-function is_enabled_spell()
-    -- vim.wo.spell = !vim.wo.spell
-    if vim.wo.spell == true then vim.wo.spell = false
-    else vim.wo.spell = true
-    end
-end
+-- function is_enabled_spell()
+--     -- vim.wo.spell = !vim.wo.spell
+--     if vim.wo.spell == true then vim.wo.spell = false
+--     else vim.wo.spell = true
+--     end
+-- end
 
-set_key_mapping('n', '<leader>sc', '<cmd>lua is_enabled_spell()<CR>')
+-- set_key_mapping('n', '<leader>sc', '<cmd>lua is_enabled_spell()<CR>')
 
 
 
@@ -244,11 +237,8 @@ vim.cmd 'autocmd FileType markdown inoremap <buffer> /br <CR></br><CR><CR>'
 vim.cmd 'autocmd FileType markdown inoremap <buffer> ``` ```<CR><ESC>i```<ESC>kA'
 vim.cmd 'autocmd FileType markdown inoremap <buffer> { {  }<left><left>'
 
---[[
 -----------------------------------------------------------------------
-Disable arrow keys
 -----------------------------------------------------------------------
---]]
 set_key_mapping('n', '<Left>', '<nop>')
 set_key_mapping('n', '<Right>', '<nop>')
 set_key_mapping('n', '<Up>', '<nop>')
@@ -297,8 +287,6 @@ set_key_mapping('n', 'L', 'I')
 --[[
 -----------------------------------------------------------------------
 Colemak edit mapping
------------------------------------------------------------------------
+----------------------------------------------------------------------
 --]]
 set_key_mapping('n', 'N', '<nop>')
-
-
