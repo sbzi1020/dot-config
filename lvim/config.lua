@@ -11,14 +11,16 @@ an executable
 -- general
 -------------
 --------------------------------------------------------------------------
--- lvim.log.level = "warn"
 lvim.format_on_save = true
-lvim.colorscheme = "pinkgirl"
-lvim.transparent_window = true
+-- lvim.colorscheme = "pinkgirl"
+-- lvim.colorscheme = "onenord"
+lvim.colorscheme = "aquarium"
+vim.cmd 'let g:aquarium_style="dark"'
+-- lvim.colorscheme = "everforest"
+--dsasfasfdasfda
 
--- lvim.builtin.lualine.style = 'lvim'
--- no need to set style = "lvim"
--- to disable icons and use a minimalist setup, uncomment the following
+lvim.transparent_window = false
+
 lvim.use_icons = true
 
 -- status line
@@ -50,7 +52,7 @@ vim.opt.ignorecase = true -- ignore case in search patterns
 vim.opt.mouse = "a" -- allow the mouse to be used in neovim
 vim.opt.pumheight = 20 -- pop up menu height
 vim.opt.showmode = true -- we don't need to see things like -- INSERT -- anymore
-vim.opt.showtabline = 2 -- always show tabs
+vim.opt.showtabline = 4 -- always show tabs
 vim.opt.smartcase = true -- smart case
 vim.opt.smartindent = true -- make indenting smarter again
 vim.opt.splitbelow = true -- force all horizontal splits to go below current window
@@ -65,7 +67,7 @@ vim.opt.undofile = true -- enable persistent undo
 vim.opt.updatetime = 300 -- faster completion
 vim.opt.writebackup = false -- if a file is being edited by another program (or was written to file while editing with another program) it is not allowed to be edited
 vim.opt.expandtab = true -- convert tabs to spaces
-vim.opt.cursorline = false -- highlight the current line
+vim.opt.cursorline = true -- highlight the current line
 vim.opt.cursorlineopt = "both"
 vim.opt.number = true -- set numbered lines
 vim.opt.relativenumber = true -- set relative numbered lines
@@ -85,29 +87,13 @@ vim.opt.sidescrolloff = 8
 
 -- keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
--- add your own keymapping
--- lvim.keys.normal_mode["<S-l>"] = ":BufferLineCycleNext<CR>"
--- lvim.keys.normal_mode["<S-h>"] = ":BufferLineCyclePrev<CR>"
--- unmap a default keymapping
--- vim.keymap.del("n", "<C-Up>")
--- override a default keymapping
 vim.keymap.set("i", "jj", "<ESC>")
-
-
--- Open terminal
-lvim.builtin.terminal.open_mapping = "<c-t>"
-
--- lvim.keys.normal_mode["m"] = false
--- `mm`: Make a gloabl mark
--- vim.api.nvim_set_keymap('n', 'kk', 'mM', { silent = true })
--- `gb`: Go back to the global mark
--- vim.api.nvim_set_keymap('n', 'vv', 'Mzz', { silent = true })
 
 --vim.api.nvim_set_keymap('i', 'jj', '<ESC>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'W', ':w<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'Q', ':q<CR>', { noremap = true, silent = true })
 -- Search results center jump
-vim.api.nvim_set_keymap('n', '<CR>', 'Nzz', { silent = true })
+vim.api.nvim_set_keymap('n', '<c-[>', 'Nzz', { silent = true })
 --------------------------------------------------------------------------
 -- Movement
 --------------------------------------------------------------------------
@@ -120,21 +106,8 @@ vim.api.nvim_set_keymap('v', 'n', 'j', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', 'e', 'k', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', 'i', 'l', { noremap = true, silent = true })
 --------------------------------------------
------------------------------------------------------------------------
--- Block and line movement
------------------------------------------------------------------------
--- Visual Mode: Select and cursor enhancement
--- After make selection on lines:
--- shift+j: move selection down
--- shift+k: move selection up
--- <: move selection to left with one tab distance
--- >: move selection to right with one tab distance
---
--- vim.api.nvim_set_keymap('v', 'N', ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
--- vim.api.nvim_set_keymap('v', 'E', ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<', '<gv', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '>', '>gv', { noremap = true, silent = true })
-
 -----------------------------------------------------------------------
 vim.api.nvim_set_keymap('n', 'l', 'i', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'L', 'I', { noremap = true, silent = true })
@@ -142,37 +115,34 @@ vim.api.nvim_set_keymap('n', 'L', 'I', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap('n', 'cc', 'ci', { noremap = true, silent = true })
-
 -----------------------------------------------------------------------
 -- H and L instead of '^' and '$'
 vim.api.nvim_set_keymap('n', 'M', '^', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'I', '$', { noremap = true, silent = true })
-
 -----------------------------------------------------------------------
 -- between quote/paragraph
 -- vim.api.nvim_set_keymap('n', 'J', '{', { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap('n', 'K', '}', { noremap = true, silent = true })
-
 -----------------------------------------------------------------------
 -- <Tab> and shift+<Tab> to cycle through the opened buffers
 vim.api.nvim_set_keymap('n', '<Tab>', ':bn<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<S-Tab>', ':bp<CR>', { noremap = true, silent = true })
-
--- <leader><leader>: toggles between buffers
---  not working
--- vim.api.nvim_set_keymap('n', '<leader><leader>', '<c-^>', { noremap = true, silent = true })
-
 -----------------------------------------------------------------------
--- ctrl+s: replace all works under cursor. Do a `/pattern` which the `pattern`
--- is the word under cursor.
+-- ctrl+s: replace all works under cursor. Do a `/pattern` which the `pattern` is the word under cursor.
+-- vim.api.nvim_set_keymap('n', '<c-s>', ':%s/<C-r><C-w>//g<left><left>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<c-s>', ':%s/<C-r><C-w>//g<left><left>', { noremap = true, silent = true })
-
+--
 -- Resize windows
 vim.api.nvim_set_keymap('n', '-', ':vertical resize -5<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '=', ':vertical resize +5<CR>', { silent = true })
 vim.api.nvim_set_keymap('n', '|', '<C-w>=', { silent = true })
 
-
+-- move up and down window
+vim.api.nvim_set_keymap('n', '<C-j>', ':wincmd k<CR>', { silent = true })
+vim.api.nvim_set_keymap('n', '<C-k>', ':wincmd j<CR>', { silent = true })
+--
+-- open terminal
+vim.api.nvim_set_keymap('n', '<C-t>', ':ToggleTerm size=20 direction=horizontal<CR>', { silent = true })
 --
 -- Centers cursor when moving 1/2 page down
 lvim.keys.normal_mode["<C-d>"] = "<C-d>zz"
@@ -180,6 +150,11 @@ lvim.keys.normal_mode["<C-d>"] = "<C-d>zz"
 -- shift+J enter documentation puffer
 lvim.lsp.buffer_mappings.normal_mode['K'] = { vim.lsp.buf.hover, "Show documentation" }
 --
+-- open diagnostic buffer
+vim.api.nvim_set_keymap('n', '<C-n>', '<cmd>lua vim.diagnostic.goto_next({popup_opts = {border = \'rounded\'}})<CR>',
+    { silent = true })
+vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>lua vim.diagnostic.goto_prev({popup_opts = {border = \'rounded\'}})<CR>',
+    { silent = true })
 -------------------------------------------------------------------------------------------
 ------------------------
 -- Customize the `<leader>` pane
@@ -188,16 +163,6 @@ lvim.lsp.buffer_mappings.normal_mode['K'] = { vim.lsp.buf.hover, "Show documenta
 -- Use which-key to add extra bindings with the leader-key prefix
 -- Pay attention, all keybindings that start with `<leader>`, you have to
 -- use the `which_key` way to bind the key!!!
--- Example:
------------lvim.builtin.which_key.mappings["t"] = {
--- name = "Trouble",
--- r = { "<cmd>Trouble lsp_references<cr>", "References" },
--- f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
--- d = { "<cmd>Trouble lsp_document_diagnostics<cr>", "Diagnostics" },
--- q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
--- l = { "<cmd>Trouble loclist<cr>", "LocationList" },
--- w = { "<cmd>Trouble lsp_workspace_diagnostics<cr>", "Diagnostics" },
---}
 --------------------------------------------------------------------------------
 -- arrays action of `x`
 -- lvim.builtin.which_key.mappings["x"] = {
@@ -206,12 +171,13 @@ lvim.lsp.buffer_mappings.normal_mode['K'] = { vim.lsp.buf.hover, "Show documenta
 -- }
 
 lvim.builtin.which_key.mappings['/'] = {}
-lvim.builtin.which_key.mappings[';'] = {}
+-- lvim.builtin.which_key.mappings[';'] = {}
 lvim.builtin.which_key.mappings['q'] = {}
 lvim.builtin.which_key.mappings['w'] = {}
 lvim.builtin.which_key.mappings['T'] = {}
 lvim.builtin.which_key.mappings['t'] = {} -- Trouble
 lvim.builtin.which_key.mappings['d'] = {} -- Debug
+lvim.builtin.which_key.mappings['g'] = {} -- git
 --
 -- comment
 lvim.builtin.which_key.mappings["/"] = { "<Plug>(comment_toggle_linewise_visual)", "Comment" }
@@ -230,15 +196,53 @@ lvim.builtin.which_key.mappings["v"] = { ":vsplit<CR>", "split window" }
 -- move focus window
 lvim.builtin.which_key.mappings["m"] = { ":wincmd h<CR>", "move focus window" }
 lvim.builtin.which_key.mappings["i"] = { ":wincmd l<CR>", "move back window" }
-lvim.builtin.which_key.mappings["j"] = { ":wincmd j<CR>", "move back window" }
+-- lvim.builtin.which_key.mappings["j"] = { ":wincmd j<CR>", "move down window" }
+-- lvim.builtin.which_key.mappings["k"] = { ":wincmd k<CR>", "move up window" }
 
 -- QuickFix
 lvim.builtin.which_key.mappings["x"] = { "<cmd>lua vim.lsp.buf.code_action()<CR>", "fix" }
 
---
+-- telescope projects
 lvim.builtin.which_key.mappings["p"] = { "<cmd>Telescope projects<CR>", "Projects" }
 
+-- terminal
+lvim.builtin.which_key.mappings["t"] = { ":ToggleTermToggleAll<CR>", "terminal" }
 
+-- lvim.builtin.which_key.mappings["d"] = { "<cmd>TroubleToggle<cr>", "diagnostics" }
+-- trouble
+-- lvim.builtin.which_key.mappings["d"] = {
+--     name = "Diagnostics",
+--     t = { "<cmd>TroubleToggle<cr>", "trouble" },
+--     w = { "<cmd>TroubleToggle workspace_diagnostics<cr>", "workspace" },
+--     d = { "<cmd>TroubleToggle document_diagnostics<cr>", "document" },
+--     q = { "<cmd>TroubleToggle quickfix<cr>", "quickfix" },
+--     l = { "<cmd>TroubleToggle loclist<cr>", "loclist" },
+--     r = { "<cmd>TroubleToggle lsp_references<cr>", "references" },
+-- }
+--
+-- Example:
+-----------lvim.builtin.which_key.mappings["t"] = {
+-- name = "Trouble",
+-- r = { "<cmd>Trouble lsp_references<cr>", "References" },
+-- f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
+-- d = { "<cmd>Trouble lsp_document_diagnostics<cr>", "Diagnostics" },
+-- q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
+-- l = { "<cmd>Trouble loclist<cr>", "LocationList" },
+-- w = { "<cmd>Trouble lsp_workspace_diagnostics<cr>", "Diagnostics" },
+--}
+-- goto-preview
+--nnoremap gpd <cmd>lua require('goto-preview').goto_preview_definition()<CR>
+-- nnoremap gpt <cmd>lua require('goto-preview').goto_preview_type_definition()<CR>
+-- nnoremap gpi <cmd>lua require('goto-preview').goto_preview_implementation()<CR>
+-- nnoremap gP <cmd>lua require('goto-preview').close_all_win()<CR>
+-- nnoremap gpr <cmd>lua require('goto-preview').goto_preview_references()<CR>
+--vim.keymap.set("n", "gp", "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", {noremap=true})
+lvim.builtin.which_key.mappings["g"] = {
+    name = "preview",
+    d = { "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", "definition" },
+    r = { "<cmd>lua require('goto-preview').goto_preview_references()<CR>", "references" },
+    c = { "<cmd>lua require('goto-preview').close_all_win()<CR>", "close" },
+}
 -----------------------------------------------------------------------------
 ------------
 -- Telescope
@@ -261,6 +265,7 @@ lvim.builtin.telescope.defaults.mappings = {
         -- Cokemak
         ["<C-n>"] = actions.move_selection_next,
         ["<C-e>"] = actions.move_selection_previous,
+        -- ["<C-a>"] = actions.,
     },
 }
 -----------------------------------------------------------------------------
@@ -270,10 +275,8 @@ lvim.builtin.telescope.defaults.layout_config = {
     -- Popup window settings
     width = 0.90,
     height = 0.90,
-
     -- Prompt (Search bar) position
     prompt_position = "top",
-
     -- layout_strategy = "flex",
     horizontal = {
         -- The width of preview window
@@ -292,10 +295,13 @@ lvim.builtin.telescope.defaults.layout_config = {
 -----------------------------------------------------------------------------
 -- TODO: User Config for predefined plugins
 -- After changing plugin config exit and reopen LunarVim, Run :PackerInstall :PackerCompile
-lvim.builtin.alpha.active = true
-lvim.builtin.alpha.mode = "dashboard"
 -- lvim.builtin.notify.active = false
 lvim.builtin.terminal.active = true
+lvim.builtin.terminal.close_on_exit = true
+lvim.builtin.terminal.auto_scroll = true
+lvim.builtin.terminal.ToggleTermToggleAll = true
+
+
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.setup.view.width = 40
 lvim.builtin.nvimtree.setup.view.number = true
@@ -319,7 +325,6 @@ lvim.builtin.nvimtree.setup.view.mappings.list = {
     { key = "i", action = "edit" },
     { key = "d", action = "remove" },
     { key = "O", action = "collapse_all" },
-    { key = "o", action = "expand_all" },
     -- default command
     -- `<C-v>`           vsplit              open the file in a vertical split
     -- `<C-t>`           tabnew              open the file in a new tab
@@ -364,7 +369,8 @@ lvim.builtin.treesitter.ensure_installed = {
     "java",
     "yaml",
     "html",
-    "rust"
+    "rust",
+    "vim"
 }
 
 lvim.builtin.treesitter.ignore_install = { "haskell" }
@@ -389,7 +395,7 @@ formatters.setup {
     { command = "black" },
     {
         command = "prettier",
-        args = { "--print-width", "100" },
+        args = { "--print-width", "100", "--tab-width", "4", "singleQuote", "true" },
         filetypes = { "typescript", "typescriptreact" },
     },
 }
@@ -416,7 +422,7 @@ code_actions.setup {
     },
 }
 
-
+--
 --[[
 -- Snippets
 --]]
@@ -427,6 +433,10 @@ require("luasnip/loaders/from_vscode").load { paths = { "~/.config/lvim/snippets
 -- vim.cmd 'hi CursorLine guifg=NONE guibg=#493d35'
 -- vim.cmd 'hi CursorLine guifg=NONE guibg=#424141 ctermbg=NONE gui=NONE cterm=NONE'
 --
+--
+lvim.builtin.alpha.active = false
+lvim.builtin.alpha.mode = "dashboard"
+
 lvim.plugins = {
     { "lunarvim/colorschemes" },
     --
@@ -454,4 +464,82 @@ lvim.plugins = {
             require("nvim-ts-autotag").setup()
         end,
     },
+    {
+        "akinsho/toggleterm.nvim",
+        version = '*',
+        config = function()
+            require("toggleterm").setup()
+        end
+    },
+    {
+        "tpope/vim-surround",
+
+        -- make sure to change the value of `timeoutlen` if it's not triggering correctly, see https://github.com/tpope/vim-surround/issues/117
+        config = function()
+            vim.o.timeoutlen = 500
+        end
+    },
+    { "tpope/vim-repeat" },
+    {
+        "ethanholz/nvim-lastplace",
+        event = "BufRead",
+        config = function()
+            require("nvim-lastplace").setup({
+                lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
+                lastplace_ignore_filetype = {
+                    "gitcommit", "gitrebase", "svn", "hgcommit",
+                },
+                lastplace_open_folds = true,
+            })
+        end,
+    },
+    {
+        "folke/trouble.nvim",
+        cmd = "TroubleToggle",
+    },
+    {
+        "ahmedkhalf/lsp-rooter.nvim",
+        event = "BufRead",
+        config = function()
+            require("lsp-rooter").setup()
+        end,
+    },
+    {
+        "rmagatti/goto-preview",
+        config = function()
+            require('goto-preview').setup {
+                width = 100, -- Width of the floating window
+                height = 40, -- Height of the floating window
+                border = { "↖", "─", "┐", "│", "┘", "─", "└", "│" }, -- Border characters of the floating window
+                default_mappings = false, -- Bind default mappings
+                resizing_mappings = false, -- Binds arrow keys to resizing the floating window.
+                debug = false, -- Print debug information
+                opacity = nil, -- 0-100 opacity level of the floating window where 100 is fully transparent.
+                post_open_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+                references = {
+                    telescope = nil,
+                },
+                focus_on_open = true, -- Focus the floating window when opening it.
+                dismiss_on_move = false, -- Dismiss the floating window when moving the cursor.
+                force_close = true, -- passed into vim.api.nvim_win_close's second argument. See :h nvim_win_close
+                bufhidden = "wipe", -- the bufhidden option to set on the floating window. See :h bufhidden
+                stack_floating_preview_windows = true, -- Whether to nest floating windows
+            }
+        end,
+    },
+    {
+        "JoosepAlviste/nvim-ts-context-commentstring",
+        event = "BufRead",
+    },
+    {
+        'maxmx03/solarized.nvim',
+        lazy = false,
+        priority = 1000,
+        config = function()
+            vim.o.background = 'light' -- or 'light'
+        end,
+    },
+    {
+        'frenzyexists/aquarium-vim'
+    }
 }

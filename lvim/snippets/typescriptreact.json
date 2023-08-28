@@ -14,4 +14,12 @@
             "export default React.memo(${2:ComponentName})"
         ]
     },
+    "comment": {
+        "prefix": [
+            "/"
+        ],
+        "body": [
+            "{/*$0*/}"
+        ]
+    },
 }
