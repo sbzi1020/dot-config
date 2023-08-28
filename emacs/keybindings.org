@@ -801,6 +801,8 @@ For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
     (evil-define-key '(normal motion) map (kbd "=") 'nil)
     (evil-define-key '(normal motion) map (kbd "-") 'nil)
     (evil-define-key '(normal motion) map (kbd "+") 'nil)
+    (evil-define-key '(normal motion) map (kbd "_") 'nil)
+    (evil-define-key '(normal motion) map (kbd "|") 'nil)
   )
 
   (defun my-increase-window-width ()
@@ -813,13 +815,25 @@ For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
     (evil-window-increase-width -5)
   )
 
+  (defun my-increase-window-height ()
+    (interactive)
+    (evil-window-increase-height 5)
+  )
+
+  (defun my-decrease-window-height ()
+    (interactive)
+    (evil-window-increase-height -5)
+  )
+
   (dolist (map (list
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-    (define-key map (kbd "=") 'balance-windows)
-    (define-key map (kbd "+") 'my-increase-window-width)
+    (define-key map (kbd "|") 'balance-windows)
+    (define-key map (kbd "=") 'my-increase-window-width)
     (define-key map (kbd "-") 'my-decrease-window-width)
+    (define-key map (kbd "+") 'my-increase-window-height)
+    (define-key map (kbd "_") 'my-decrease-window-height)
   )
 #+END_SRC
 
