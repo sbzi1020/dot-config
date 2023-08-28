@@ -63,12 +63,6 @@ map ss :set sortby size
 map st :set sortby time
 
 
-# Image preview
-# set preview true
-# set previewer ~/.config/lf/previewer.sh
-# set cleaner ~/.config/lf/clear_img.sh
-
-
 # Rename for multiple items
 cmd bulk-rename ${{
     old="$(mktemp)"
