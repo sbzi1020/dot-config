@@ -2,6 +2,7 @@
 set --export CLICOLOR "xterm-color"
 set --export LSCOLORS "gxfxcxdxbxegedabagacad"
 set --export EDITOR lvim
+# set --export EDITOR nvim
 
 #--------------------------------------------------------
 # Set `man pager`
@@ -118,8 +119,8 @@ set -U fish_color_user ff5f5f
 
 #--------------------------------------------------------
 # 1. Enable `vi mode` key bindings
-# 2. bind `jj` to escape
-# 3. bind `ctrl+l` to accept the first suggection
+# 2. bind `hh` to escape
+# 3. bind `ctrl+i` to accept the first suggection
 #
 # Tips: When u don't know what key (or key combo) to write
 #       into the `bind` command, just run `fish_key_reader`
@@ -134,20 +135,9 @@ bind -M default e history-search-backward
 bind -M default n history-search-forward
 
 #--------------------------------------------------------
-# SSR server login related
-#--------------------------------------------------------
-alias sshToOldSSR-Server="ssh -i ~/.ssh/ssr-server wisonssr@35.236.167.115"
-alias sshToMySSR-Server="ssh -i ~/.ssh/ssr-server wisonye_ssr@35.236.162.70"
-alias sshToTTProductionServerAliUsWest="ssh -i /Users/wison/UpWorkProject/LiuGang_Project/documentation/Ali-deployment/ali-us-west-server-ssh-key.pem root@gis.totarget.net"
-alias sshToTTProductionServerAliCnShangHai="ssh -i /Users/wison/UpWorkProject/LiuGang_Project/documentation/Ali-deployment/ali-cn-shanghai-server-ssh-key.pem root@gis.ttrfid.com"
-alias sshToTkcareServer="ssh -p 28595 root@172.96.218.209"
-alias sshToRaspberryPi4="ssh ubuntu@192.168.1.100"
-alias sshToRaspberryPi4Wifi="ssh ubuntu@192.168.1.108"
-
-#--------------------------------------------------------
 # ~/my-shell
 #--------------------------------------------------------
-set PATH ~/my-shell ~/my-shell/google-cloud-sdk/bin ~/.local/bin $PATH
+set PATH /opt/homebrew/bin ~/.local/bin ~/zig/zig-nightly ~/zig/zls/zig-out/bin $PATH
 
 # Clear console
 abbr c "clear"
@@ -181,12 +171,17 @@ abbr dc "docker-compose"
 abbr dm "docker-machine"
 
 # Vi config related and vifm
-abbr vim "nvim"
+abbr vim "lvim"
+# abbr vim "nvim"
 # abbr fc "nvim ~/.config/fish/config.fish"
 # abbr vc "nvim ~/.config/nvim/init.vim"
 # abbr vim "lvim"
 abbr fc "nvim ~/.config/fish/config.fish"
 abbr vc "cd ~/.config/nvim && nvim ~/.config/nvim/init.lua"
+abbr wison_vim "nvim -u ~/.config/nvim/init_wison.lua"
+abbr wison_vc "cd ~/.config/nvim && nvim -u ~/.config/nvim/init_wison.lua ~/.config/nvim/init_wison.lua"
+abbr wison_fc "nvim -u ~/.config/nvim/init_wison.lua ~/.config/fish/config.fish"
+abbr wison_ac "nvim -u ~/.config/nvim/init_wison.lua ~/.alacritty.yml"
 abbr vifm "vifm -c 'colorscheme zenburn_1' -c view"
 
 # Git related
@@ -203,13 +198,13 @@ abbr gck "git checkout"
 abbr ci "code-insiders ."
 
 # Rust related
-abbr cn "cargo new"
-abbr cc "cargo check"
-abbr cr "cargo run"
-abbr ct "cargo test"
-abbr cw "cargo watch"
-abbr cwr "cargo watch -c --exec run"
-abbr cwt "cargo watch -c --exec 'test -- --nocapture'"
+# abbr cn "cargo new"
+# abbr cc "cargo check"
+# abbr cr "cargo run"
+# abbr ct "cargo test"
+# abbr cw "cargo watch"
+# abbr cwr "cargo watch -c --exec run"
+# abbr cwt "cargo watch -c --exec 'test -- --nocapture'"
 
 # Alacritty
 abbr al "/Applications/Alacritty.app/Contents/MacOS/alacritty --working-directory ./ &"
@@ -222,23 +217,10 @@ abbr tc "nvim ~/.tmux.conf"
 abbr tl "tmux ls"
 abbr ta "tmux attach-session -t 0"
 abbr ta "tmux attach-session -t dev"
-abbr tal "tmux attach-session -t 'Dropit Live-Auction-App Dev'"
-abbr tav "tmux attach-session -t 'Dropit Vendor Service'"
-abbr taa "tmux attach-session -t 'Dropit Admin App Shopify'"
-abbr tar "tmux attach-session -t 'Dropit Running Service'"
-abbr tac "tmux attach-session -t 'Dropit Core Service'"
-abbr taf "tmux attach-session -t 'minimal'"
-abbr taff "tmux attach-session -t 'minimal frontend paid'"
+abbr tam "tmux attach-session -t 'minimal'"
+abbr tap "tmux attach-session -t 'minimal frontend paid'"
 
 abbr tk "tmux kill-server"
-abbr rvs "GOOGLE_APPLICATION_CREDENTIALS=./vendor_service_key.json IS_EMULATOR=true PORT=6801 PROJECT_ID=dropit-8dc33 LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=true DEBUG_LOG_VENDOR=true DEBUG_LOG_GET_VENDOR_SETTINGS=true DEBUG_LOG_UPDATE_STYLE_SETTINGS=true DEBUG_LOG_SHOPIFY_CURRENCY=true CARGO_NET_GIT_FETCH_WITH_CLI=true ./target/debug/vendor_service"
-
-abbr rcs "IS_EMULATOR=true PORT=6802 PROJECT_ID=dropit-8dc33 LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=TRUE DEBUG_LOG_CREATE_AUCTION=TRUE DEBUG_LOG_UPDATE_AUCTION=TRUE DEBUG_LOG_DELETE_AUCTION=TRUE CARGO_NET_GIT_FETCH_WITH_CLI=true cargo make --loglevel error watch_run"
-
-abbr rrs "IS_EMULATOR=true PORT=6802 PROJECT_ID=dropit-8dc33 LOG_LEVEL=DEBUG DEBUG_LOG_REQUEST_BODY=TRUE DEBUG_LOG_AUCTION_VIEWERS=TRUE DEBUG_LOG_PLACEBID=TRUE DEBUG_LOG_PASSIN=TRUE DEBUG_LOG_TIMESTAMP_UTIL=TRUE DEBUG_LOG_SHOPIFY_DISCOUNT_CODE=TRUE CARGO_NET_GIT_FETCH_WITH_CLI=true cargo make --loglevel error watch_run"
-
-# `wasm-pack`
-abbr wp "wasm-pack"
 
 # iproute2 related
 abbr ip "ip"
@@ -253,8 +235,6 @@ abbr nst "lsof -nP -iTCP"
 abbr nstl "lsof -nP -iTCP | grep LISTEN"
 abbr nsu "lsof -nP -iUDP"
 
-# Shopify CLI
-abbr sh "shopify"
 
 # Kubernetes
 abbr kb "kubectl"
@@ -275,16 +255,8 @@ abbr kgns "kubectl get namespace"
 abbr fb "firebase"
 abbr fbe "firebase emulators:start"
 
-# Yabai, skhd and limelight config
-abbr yc "nvim ~/.config/yabai/yabairc"
-abbr sc "nvim ~/.config/skhd/skhdrc"
-abbr lc "nvim ~/.config/limelight/limelightrc"
-
 # Neofetch
 abbr nf "neofetch"
-
-# Screen saver
-abbr ss "rusty-rain --color 172,230,254 --shade --chars bin --head 255,175,64"
 
 # Python 2 -> 3
 abbr python "python3"
@@ -298,15 +270,21 @@ abbr gcl "gcloud config list"
 
 
 #--------------------------------------------------------
+# EMacs
+#--------------------------------------------------------
+abbr et "emacs --no-window-system"
+abbr eg "emacs &"
+
+#--------------------------------------------------------
 # Node LTS
 #--------------------------------------------------------
 #set PATH /usr/local/opt/node@10/bin $PATH
 #set LDFLAGS -L/usr/local/opt/node@10/lib
 #set CPPFLAGS -I/usr/local/opt/node@10/include
 
-set PATH /usr/local/opt/node@14/bin $PATH
-set LDFLAGS -L/usr/local/opt/node@14/lib
-set CPPFLAGS -I/usr/local/opt/node@14/include
+set PATH /opt/homebrew/opt/node@16/bin $PATH
+set LDFLAGS -L/opt/homebrew/opt/node@16/lib
+set CPPFLAGS -I/opt/homebrew/opt/node@16/include
 
 #--------------------------------------------------------
 # GO LANG
@@ -321,14 +299,6 @@ set PATH $HOME/.cargo/bin $PATH
 set LD_LIBRARY_PATH (rustc --print sysroot)"/lib"
 set RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/library"
 
-#--------------------------------------------------------
-# For Rust cross compilation
-#
-# brew install FiloSottile/musl-cross/musl-cross
-# 
-# gmake install TARGET=x86_64-linux-musl
-#--------------------------------------------------------
-set PATH /usr/local/opt/gnu-sed/libexec/gnubin $PATH
 
 #--------------------------------------------------------
 # Fuzzy file searching pluging for `vim`
@@ -340,52 +310,12 @@ set --export FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
 #--------------------------------------------------------
 # Python 3.7
 #--------------------------------------------------------
-set PATH /usr/local/opt/python@3.7/bin $PATH
-
-#--------------------------------------------------------
-# Google protocol buffer binary
-#--------------------------------------------------------
-set PATH ~/UpWorkProject/LiuGang_Project/documentation/Binary-Protoocl/protoc-4.0.0-rc-1-osx-x86_64/bin $PATH
-
-#--------------------------------------------------------
-# OpenSSL 1.1 (installed via `brew install vim`)
-#--------------------------------------------------------
-# set PATH /usr/local/opt/openssl@1.1/bin $PATH
-# set -gx LDFLAGS "-L/usr/local/opt/openssl@1.1/lib"
-# set -gx CPPFLAGS "-I/usr/local/opt/openssl@1.1/include"
-
-#--------------------------------------------------------
-# Ruby (installed via `brew install vim`)
-#--------------------------------------------------------
-# set -gx LDFLAGS "-L/usr/local/opt/ruby/lib"
-# set -gx CPPFLAGS "-I/usr/local/opt/ruby/include"
+# set PATH /usr/local/opt/python@3.7/bin $PATH
 
 #--------------------------------------------------------
 # Open JDK 11
 #--------------------------------------------------------
-set PATH /usr/local/opt/openjdk@11/bin $PATH
-
-#--------------------------------------------------------
-# QEMU(ARM) for STM32F4
-#--------------------------------------------------------
-set PATH /Users/wison/Library/xPacks/qemu-arm/2.8.0-9/bin $PATH
-
-#--------------------------------------------------------
-# OpenCV (install via 'brew install opencv')
-#--------------------------------------------------------
-set --export DYLD_FALLBACK_LIBRARY_PATH (xcode-select --print-path)/usr/lib
-
-#--------------------------------------------------------
-# Wasmtime
-#--------------------------------------------------------
-set -gx WASMTIME_HOME "$HOME/.wasmtime"
-string match -r ".wasmtime" "$PATH" > /dev/null; or set -gx PATH "$WASMTIME_HOME/bin" $PATH
-
-
-#--------------------------------------------------------
-# Google Cloud SDK
-#--------------------------------------------------------
-if [ -f '/Users/wison/my-shell/google-cloud-sdk/path.fish.inc' ]; . '/Users/wison/my-shell/google-cloud-sdk/path.fish.inc'; end
+# set PATH /usr/local/opt/openjdk@11/bin $PATH
 
 
 #--------------------------------------------------------
@@ -553,24 +483,3 @@ ex=:\
 *.pdf=:\
 *.nix=:\
 "
-
-#--------------------------------------------------------
-# Backup script and restore
-#--------------------------------------------------------
-abbr backupVimrc "cp -rvf ~/.vimrc ~/my-shell/backup/vim/vimrc"
-abbr backupNvimrc "cp -rvf ~/.config/nvim/init.vim ~/my-shell/backup/vim/init.vim"
-abbr backupNvimrcLua "cp -rvf ~/.config/nvim/* ~/my-shell/backup/vim_lua/"
-abbr backupCocConfig "cp -rvf ~/.config/nvim/coc-settings.json ~/my-shell/backup/vim/coc-settings.json"
-abbr backupFishConfig "cp -rvf ~/.config/fish/config.fish ~/my-shell/backup/fish/config.fish"
-abbr backupCocSnippets "cp -rvf ~/.config/coc/ultisnips ~/my-shell/backup/vim/"
-abbr backupAlacritty "cp -rvf ~/.alacritty.yml ~/my-shell/backup/alacritty/alacritty.yml"
-abbr backupTmux "cp -rvf ~/.tmux.conf ~/my-shell/backup/tmux/tmux.conf && cp -rvf ~/.tmux_line ~/my-shell/backup/tmux/tmux_line"
-
-abbr restoreVimrc "cp -rvf ~/my-shell/backup/vim/vimrc ~/.vimrc"
-abbr restoreNvimrc "cp -rvf ~/my-shell/backup/vim/init.vim ~/.config/nvim/init.vim"
-abbr restoreNvimrcLua "cp -rvf ~/my-shell/backup/vim_lua/* ~/.config/nvim/ "
-abbr restoreCocConfig "cp -rvf ~/my-shell/backup/vim/coc-settings.json ~/.config/nvim/coc-settings.json"
-abbr restoreFishConfig "cp -rvf ~/my-shell/backup/fish/config.fish ~/.config/fish/config.fish"
-abbr restoreCocSnippets "cp -rvf ~/my-shell/backup/vim/ultisnips ~/.config/coc/"
-abbr restoreAlacritty "cp -rvf ~/my-shell/backup/alacritty/alacritty.yml ~/.alacritty.yml"
-abbr restoreTmux "cp -rvf ~/my-shell/backup/tmux/tmux.conf ~/.tmux.conf && cp -rvf ~/my-shell/backup/tmux/tmux_line ~/.tmux_line"
