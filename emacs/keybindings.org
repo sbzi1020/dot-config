@@ -1841,3 +1841,26 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
       (define-key map (kbd "<leader>ss") 'my-open-eshell)
   )
 #+END_SRC
+
+
+*** Dired
+
+**** Go up dire by =m= and into dir or open file by =i=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+  (define-key dired-mode-map (kbd "m") nil)
+  (evil-define-key 'normal dired-mode-map (kbd "m") nil)
+  (define-key dired-mode-map (kbd "i") nil)
+  (evil-define-key 'normal dired-mode-map (kbd "i") nil)
+
+  ;;
+  ;; Rebind
+  ;;
+  (evil-define-key '(motion) dired-mode-map (kbd "m") 'dired-up-directory)
+  (evil-define-key '(motion) dired-mode-map (kbd "i") 'dired-find-file)
+  ;; (evil-define-key 'normal dired-mode-map (kbd "SPC") 'dired-mark)
+#+END_SRC
+
