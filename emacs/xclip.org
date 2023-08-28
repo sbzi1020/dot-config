@@ -1,0 +1,8 @@
+* Enable system clipboard
+
+ #+begin_src emacs-lisp
+   (use-package xclip
+   :config
+      (xclip-mode 1)
+   )
+ #+end_src

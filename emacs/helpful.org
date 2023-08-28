@@ -1,0 +1,44 @@
+* Helpful settings
+
+=Helpful= is a replacement for *help* buffers that provides much more contextual information.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helpful
+    :defer t
+      ;;
+      ;; 'counsel' related configuration
+      ;;
+      ;; :init
+      ;; (setq counsel-describe-function-function #'helpful-callable)
+      ;; (setq counsel-describe-variable-function #'helpful-variable)
+      ;; :bind
+      ;; ([remap describe-function] . counsel-describe-function)
+      ;; ([remap describe-variable] . counsel-describe-variable)
+      ;; ([remap describe-command] . helpful-command)
+      ;; ([remap describe-key] . helpful-key)
+  )
+#+END_SRC
+
+Here is what =Helpful= improved, it shows you the help information with the following patterns:
+
+
+=Signature=
+(describe-function FUNCTION)
+
+=Documentation=
+Display the full documentation of FUNCTION (a symbol).
+......
+
+=View in manual= (Click here will bring you to the detail function document)
+
+=Key Bindings=
+.....
+
+=References=
+......
+
+=Debugging=
+......
+
+=Source Code=
+......

@@ -1,0 +1,106 @@
+* Emacs Lisp README
+
+This README contains everything I should know about =Emacs Lisp=.
+
+* Lisp function
+
+Writing configuration in =~/.config/emacs/init.el=, it's basically writting or calling =Lisp function=.
+
+Here are the examples:
+
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq inhibit-startup-message t
+        use-dialog-box nil)
+#+END_SRC
+
+In =Lisp=, =(function_name value)= syntax means calling a funciton.
+
+Something you need to know about:
+
+** Some functions like =setq= accept a list of parameters.
+
+=setq= set each =SYM= to =VAL=, syntax: =(setq [SYM VAL]...)=.
+    - The symbols are variables (NOT evaluated).
+    - The values are expressions, they're evaluated, that's why you can pass another function as values.
+    - =t= means =true=, =nil= means =false=.
+    - Of course, if you like, you can separate that call into 2 function calls like below:
+
+        #+BEGIN_SRC emacs-lisp
+        (setq inhibit-startup-message t
+        (setq use-dialog-box nil)
+        #+END_SRC
+
+** Value starts with a ='= like below
+
+        #+BEGIN_SRC emacs-lisp
+        (load-theme 'doom-gruvbox t)
+        #+END_SRC
+  
+='value= means DO NOT try to evaluate it and get out a value, treat it as a value (NOT expression)!!!
+
+* How to show help on any functions or variables?
+
+There are a few ways to show help of function and variable:
+
+1. Press =<M-x>= (means =<Alt-x>= in =MacOS=) then type one of the following function name
+    - =describe-function=
+    - =describe-variable=
+
+2. Move your cursor onto any functions or variables then the following keybindings (I defined in =evil.org=)
+    - =<leader>df=
+    - =<leader>dv=
+
+    Then press =Enter= to accept the default function/variable name to show help.
+
+For example, if I want to know how the following function works:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+      :init
+      ;; Run some funciton before package has been loaded.
+      :config
+      ;; Run some funciton after package has been loaded.
+      :autoload
+      ;; Define autoloads functions to run
+      :hook
+      ;; Attach hook function to this package
+      :bind
+      ;; Bind keys etc
+#+END_SRC
+
+So, I put the cursor onto the =use-package= function and press =<leader>df= and press =Enter=, a
+new =*Help*= window shows up for the detail inforamtion.
+
+
+* Lisp comment
+
+=;;= is normal comment, =;= is for line after comment, usually at the end of the code like below:
+
+#+BEGIN_SRC emacs-lisp
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+      doom-themes-enable-italic t)   ; if nil, italics is universally disabled
+#+END_SRC
+
+* How to evalute the particular expressions
+
+You can evaluate (run) any functions or vaiables by the following steps:
+
+1. Move your cursor to =the end= of the function or variable if you want to know the result.
+2. Press =<C-x><C-e>= to evalute and the result will print at the mode line.
+   
+If your cursor is NOT at =the end= of the function or variable, then you will see the following error
+when pressing =<C-x><C-e>=:
+
+=Error: (void variable XXX)=
+
+* How to evalute the entire buffer
+
+If you want to evalute (run) all functions in current buffer, then =<Alt-x>= and type =eval-buffer=.
+
+This is very useful when want to reload the entire =~/.config/emacs/init.el=, but sometimes it doesn't work well if some packages have some kind of the =hook= to run, it might cause error or undefined result.
+
+So, the best way to reload =~/.config/emacs/init.el= is kill the =Emasc daemon= and re-launch it.

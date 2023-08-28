@@ -1,0 +1,48 @@
+* Org mode settings
+
+** Normal settings
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-mode-setup()
+    (org-indent-mode)           ;; Enable org indent mode
+    (variable-pitch-mode -1)
+    (visual-line-mode 1)
+  )
+
+  (use-package org
+    :hook (org-mode . my/org-mode-setup)
+    :config
+    (setq org-ellipsis " ......"         ; Ellipsis string when `S-TAB`
+          org-hide-emphasis-markers t    ; Show the marker (bold, link etc)
+          ))
+
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    ;;:custom
+    ;;(org-bullets-bullet-list '(">"  ">>"  ">>>"  ">>>>"  ">>>>>"  ">>>>>>"  ">>>>>>>")))
+    ;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  )
+
+#+END_SRC
+
+
+** Font size settings
+
+#+begin_src emacs-lisp 
+
+  (dolist (face '((org-level-1 . 1.5)
+                  (org-level-2 . 1.3)
+                  (org-level-3 . 1.2)
+                  (org-level-4 . 1.1)
+                  (org-level-5 . 1.0)
+                  (org-level-6 . 1.0)
+                  (org-level-7 . 1.0)))
+    (set-face-attribute (car face) nil
+                        :font "SauceCodePro Nerd Font"
+                        :weight 'regular
+                        :height (cdr face))
+  )
+#+end_src
+
+The ~(dolist (face ...))~ settings only work in =GUI= mode, nothing will happen in =Terminal= mode!!!

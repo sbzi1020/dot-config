@@ -1,0 +1,11 @@
+* Olivetti (works like =Goyo= in =Neovim=)
+
+#+BEGIN_SRC emacs-lisp
+  (use-package olivetti
+    :defer t
+    :init
+    (setq olivetti-body-width 0.6)
+  )
+#+END_SRC
+
+

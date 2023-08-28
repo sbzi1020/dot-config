@@ -1,0 +1,172 @@
+* Evil & Evil-surround settings
+
+** What is =Evil=
+
+=Evil= is an extensible =vi= layer for =Emacs=. It emulates the main features of =Vim=,
+turning =Emacs= into a modal editor. Like =Emacs= in general, =Evil= is extensible in
+=Emacs Lisp=.
+
+** Evil =modes= and =state=
+
+- =state=
+
+=Evil= uses the term =state= for what is called a =mode= in regular =vi= usage, because
+modes are understood in =Emacs= terms to mean something else.
+
+=Evil= defines a number of states by default:
+
+    - normal state (<N>)
+          
+    - insert state (<I>)
+          
+    - visual state (<V>)
+          
+    - replace state (<R>)
+          
+    - operator-pending state (<O>)
+          
+        A special state entered after launching an operator, but before specifying the
+        corresponding motion or text object.
+            
+    - motion state (<M>)
+          
+        A special state useful for buffers that are read-only, where motions are available
+        but editing operations are not.
+            
+    - Emacs state (<E>)
+          
+        All =Evil= keybindings are disabled, switch back to original =Emacs= keybindings.
+            
+    - Toggle between =Evil state= and =Emacs sate= by press =<C-z>=
+
+        Why I need to do that? For example, if =Evil= keybinding overwrites the original
+        =Emacs= hotkey, then you need to disable it temporary!!!:)
+
+
+** Evil settings
+
+Important keybindings when using =Evil=:
+
+- =:q= uses to quit the entire =Emacs= client (connection), completely different with =Vim=!!!
+       the function name is  =evil-quit=.
+
+- =:bd= uses to close the current buffer, use this instead of =:q=.
+       the function name is  =kill-current-buffer=.
+
+- =Q= binds to =evil-window-delete= which ONLY used to close the splitted window (but NOT close
+      the related buffer).
+
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Evil custom settings, you can found all settings here:
+  ;; https://evil.readthedocs.io/en/latest/settings.html
+  ;;
+
+  ;; Switch between last buffers
+  (defun switch-to-last-buffer ()
+    (interactive)
+    (switch-to-buffer nil))
+
+  ;;
+  ;; Set the following mode to 'normal state after 'evil-mode' loaded
+  ;;
+  ;; Why do this?
+  ;; 
+  ;; If the buffer switches to 'Evil-Normal-State' by default, then the upcomming
+  ;; keybindins "(evil-global-set-key 'normal)" which targets to 'normal' state will
+  ;; work automatically.
+  ;; 
+  ;; That will save a lot of keybinding settings.
+  ;;
+  (defun rune/evil-hook ()
+    (dolist (mode '(helpful-mode
+                    help-mode
+                    debugger-mode
+                    package-menu-mode
+                    term-mode
+                    custom-mode))
+        (evil-set-initial-state mode 'normal)
+    )
+  )
+
+  (use-package evil
+      :init
+        (setq evil-auto-indent t          ; Enable auto indent
+              evil-echo-state t           ; Don't show the state/mode in status bar
+              evil-want-C-u-scroll t      ; Enable <C-u> scroll up
+              evil-want-C-i-jump t        ; <C-i> inserts a tab character
+              evil-want-Y-yank-to-eol t   ; Enable `Y`: Yank to end of line
+              evil-vsplit-window-right t  ; Always vsplit window on the rigth
+              evil-want-integration t     ;This is optional since it's already set to t by default.
+              evil-want-keybinding nil
+        )
+      ;; :hook (evil-mode . rune/evil-hook)
+      :config
+        (evil-mode 1)
+
+        ;; Leader key
+        (evil-set-leader '(normal visual) (kbd "SPC"))
+        (rune/evil-hook)
+  )
+
+  (use-package evil-collection
+    :after evil
+    :config
+        (evil-collection-init))
+#+END_SRC
+
+
+* Evi-surrond settings
+
+  #+begin_src emacs-lisp
+    (use-package evil-surround
+        :init
+        (global-evil-surround-mode 1)
+        :config
+            (add-hook 'org-mode-hook (lambda ()
+                                      (push '(?= . ("=" . "=")) evil-surround-pairs-alist)))
+    )
+  #+end_src
+
+
+* Evil-goggles settings 
+
+=evil-goggles-mode= displays a visual hint when editing with =evil=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-goggles
+    :ensure t
+    :init
+       ;;
+       ;; Only enalbe yank effect, 't' by default
+       ;;
+       ;; (setq evil-goggles-enable-yank t)
+
+       ;;
+       ;; Disable the following effects
+       ;;
+       (setq evil-goggles-enable-delete nil
+             evil-goggles-enable-change nil
+             evil-goggles-enable-indent nil
+             evil-goggles-enable-join nil
+             evil-goggles-enable-fill-and-move nil
+             evil-goggles-enable-paste nil
+             evil-goggles-enable-shift nil
+             evil-goggles-enable-surround nil
+             evil-goggles-enable-commentary nil
+             evil-goggles-enable-nerd-commenter nil
+             evil-goggles-enable-replace-with-register nil
+             evil-goggles-enable-set-marker nil
+             evil-goggles-enable-undo nil
+             evil-goggles-enable-redo nil
+             evil-goggles-enable-record-macro nil)
+    :config
+    (evil-goggles-mode)
+
+    ;; optionally use diff-mode's faces; as a result, deleted text
+    ;; will be highlighed with `diff-removed` face which is typically
+    ;; some red color (as defined by the color theme)
+    ;; other faces such as `diff-added` will be used for other actions
+    (evil-goggles-use-diff-faces))
+#+END_SRC

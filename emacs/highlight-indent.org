@@ -1,0 +1,13 @@
+* Highlight Indent Settings
+
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :defer t
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :config
+        ;;(setq highlight-indent-guides-method 'character)
+        (setq highlight-indent-guides-method 'column)
+        (setq highlight-indent-guides-character ?\|)
+        ;;(setq highlight-indent-guides-responsive 'top)
+  )
+#+end_src

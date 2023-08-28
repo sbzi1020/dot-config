@@ -1,0 +1,1829 @@
+* Concepts: Key, Mode, Keymap and Hook
+
+** 1. Key
+
+Usually, you should use ~(kbd KEY)~ to present a key combination that you want to bind.
+
+One important point to note is that you must surround special keys with =<= and =>=. That includes Function-Keys, Arrow keys and Home row keys, like so: =<home>=, =<f8>=, =<up>=, =<down>=, =<tab>=, =<backtab>=, and =<return>=.
+
+And you can evalute the ~(kbd KEY)~ function to see its value like below:
+
+#+begin_src emacs-lisp
+  ;; (message "(kbd \"TAB\"): %s" (kbd "TAB"))
+  ;; (message "(kbd \"<tab>\"): %s" (kbd "<tab>"))
+
+  ;; (message "(kbd \"S-TAB\"): %s" (kbd "S-TAB"))
+  ;; (message "(kbd \"S-<tab>\"): %s" (kbd "S-<tab>"))
+  ;; (message "(kbd \"<backtab\"): %s" (kbd "<backtab"))
+
+  ;; (message "(kbd \"RET\"): %s" (kbd "RET"))
+  ;; (message "(kbd \"<return>\"): %s" (kbd "<return>"))
+
+  ;; (message "(kbd \"S-RET\"): %s" (kbd "S-RET"))
+  ;; (message "(kbd \"S-<return>\"): %s" (kbd "S-<return>"))
+#+end_src
+
+Then see its value in =*Messages*= buffer like this:
+
+=(kbd "TAB"):=
+=(kbd "<tab>"): [tab]=
+=(kbd "S-TAB"): [33554441]=
+=(kbd "S-<tab>"): [S-tab]=
+=(kbd "<backtab"): <backtab>=
+=(kbd "RET"): 
+=(kbd "<return>"): [return]=
+=(kbd "S-RET"): [33554445]=
+=(kbd "S-<return>"): [S-return]=
+
+So, there are the stuffs you lean:
+
+- ="TAB"= is different with ="<tab>"=, ="RET"= is different with ="<return>"=.
+- You should choose ="<tab>"=, ="<return>"= instead of ="TAB"= and ="RET"= for most of the cases.
+
+
+More examples:
+
+| Key                | Description         |
+|--------------------+---------------------|
+| =(kbd "<tab>")=      | Tab key             |
+| =(kbd "<backtab>")=  | Shift + Tab         |
+| =(kbd "<return>")=   | Return key          |
+| =(kbd "S-<return>")= | Shfit + Return key  |
+| =(kbd "s-m")=        | Super-m             |
+| =(kbd "H-m")=        | Hyper-m             |
+| =(kbd "A-m")=        | Alt-m               |
+| =(kbd "C-x C-o")=    | Ctrl-C, then Ctrl-O |
+| =(kbd "<leader>df")= | Space then d then f |
+
+
+** 2. Modifer keys
+
+There are a few rules when using modifer key in =Emacs=:
+
+1) Control-modified alphabetical characters are =case-insensitive=, that's why:
+
+   - =C-a= is the same with =C-A=
+   - =C-z= is the same with =C-Z=
+
+2) Control-modified non-alphabetical characters are =case-sensitive=, that's why:
+
+   - =C-2= is the NOT the same with =C-@= (even that's the key physical key but with or without a =Shift= key pressed)
+
+3) Meta-modified, Alt-modified, Hyper-modified are =case-sensitive= all the time, that's why:
+   
+   - =M-a= is different with =M-A=
+   - =A-a= is different with =A-A=
+   - =s-a= is different with =s-A=
+
+4) Not all terminal emulators support =Shift (S-)=, =Super (s-)=, =Hyper (H-)=, and =Alt (A-)=, that said you can use those modifier keys in =GUI= version but NOT in =terminal= version!!!
+
+
+ One more trick about knowing whether the given key combination is valid or not is that you can use run the ~(key-valid-p "KEY_STRING_HERE")~ function, it returns =t= if key is valid or returns =nil= if key is invalid.
+
+ For examples:
+
+ #+begin_src emacs-lisp
+   ;; (key-valid-p "b")
+   ;; (key-valid-p "C-a")
+   ;; (key-valid-p "s-a")
+   ;; (key-valid-p "X-a") ;; This returns nil!!!
+ #+end_src
+
+
+** 3. Mode
+
+=Mode= means =FileType= in =Vim=. You got different =modes= when you open different files into the buffer. For example:
+
+- =typescript-mode= is available when you open =*.ts= files
+- =c-mode= is available when you open =*.c= files
+- =org-mode= is available when you open =*.org= files
+- =message-mode= is the current buffers is =*Messages*=
+- =lisp-mode= is the current buffers is =*scratch*=
+- =help-mode= is the current buffers is =*Help*=
+- =ivy-minibuffer-map= is the current buffer is ivy minibuffer
+=- ivy-switch-buffer-map= is the current buffer is opened for switching buffer
+etc. 
+
+Different =Mode= effects the visual result in buffer, and you can turn the current buffer into any =Mode= you want, just run =xxx-mode= function.
+
+
++ What is =Major= mode and =Minor= mode???
+
+  When you open a buffer, the current buffer has =Major= mode which determined by the opened file type and =Minor= mode which means all alternative mode attached to this buffer.
+
+  For example:
+
+  1) When you open an =*.org= file and run ~describe-mode~, then you should see the following description:
+
+      #+begin_comment
+        =Minor= modes enabled in this buffer: =Command-Log= =Company=
+        =Display-Line-Numbers= =Evil-Collection-Unimpaired= =Evil-Local=
+        =Evil-Surround= =Font-Lock= =Olivetti= =Org-Indent= =Visual-Line=
+
+        The major mode is =Org= mode defined in org.el:
+      #+end_comment
+
+
+  2) When you open a =*.c= file and ~describe-mode~, then you should see the following description:
+
+      #+begin_comment
+        =Minor= modes enabled in this buffer: =Command-Log= =Company=
+        =Display-Line-Numbers= =Eldoc= =Evil-Collection-Unimpaired= =Evil-Local=
+        =Evil-Surround= =Flymake= =Font-Lock= =Highlight-Indent-Guides= =Lsp-Completion=
+        =Lsp-Diagnostics= =Lsp-Headerline-Breadcrumb= =Lsp-Managed= =Lsp=
+        =Lsp-Modeline-Code-Actions= =Lsp-Modeline-Diagnostics=
+        =Lsp-Modeline-Workspace-Status= =Lsp-Ui-Doc= =Lsp-Ui= =Lsp-Ui-Sideline=
+
+        The major mode is =C/*l= mode defined in cc-mode.el:
+
+        Major mode for editing C code.
+      #+end_comment
+
+
+    The =Major= mode is the =File type=, and the =Minor= mode is added by the packages you installed, they all work together. Usually, the =Major= mode (=xxx-mode= of the file type) should the target mode if you want to bind some keys to buffer.
+
+
+** 4. Keymap
+
+A =keymap= is a Lisp data structure that specifies key bindings for various key sequences.
+
+Its value looks like this:
+
+=(keymap=
+=(tab)=
+=(11)=
+=(normal-state keymap "Auxiliary keymap for Normal state"=
+                =(13 . org-cycle))=
+=(leader keymap=
+            =(99 keymap=
+                =(98 . org-insert-structure-template)))=
+=(67108899 . org-table-rotate-recalc-marks)=
+=(10)=
+=(13 . org-return)=
+
+Basically, it's talking about =pressing what key (combination) to call what function= and that's it:)
+
+So, different =modes= have different =keymaps=, e.g.:
+
++ =global-map= is for holding the =keys -> functions= relationship of default modes (a lot of them).
++ =typescript-mode-map= is for holding the =keys -> functions= relationship of =typescript-mode=.
++ =c-mode-map= is for holding the =keys -> functions= relationship of =c-mode= 
+
+That said when you use =global-map=, =xxx-mode-map= in the =define-key= function, you should make sure to evaluate its map value!!!!
+
+- The correct example:
+
+    (define-key =global-map= (kbd "<tab>") nil)
+    (define-key =(list global-map org-mode-map)= (kbd "<tab>") nil)
+
+    The =global-map= and =(list global-map org-mode-map)= will be evaluted to its map value!!!
+
+- The wrong example:
+
+    (define-key ='global-map= (kbd "<tab>") nil)
+    (define-key ='(global-map org-mode-map)= (kbd "<tab>") nil)
+
+    The ='global-map= and ='(global-map org-mode-map)= won't be evaluted to its map value and it will cause =(define-key YOUR_MAP "\n" YOUR_FUNCTION_OR_NIL)= error!!!
+
+
+** 5. Hook
+
+Sometimes, =xxx-mode= and =xxx-mode-map= are only available after finishing loading the file, that said the following keybinding will fail as the paritcular =mode= and =mode-map= don't exists before the file has been loaded.
+
+~(define-key (list c-mode-map typescript-mode-map) (kbd "Q") 'exit)~
+
+For solving that problem, you can use =xxx-mode-hook= to defer binding.
+
+
+* How to bind keys in Emacs
+
+** What functions you can used to bind keys
+
+Plz keep that in mide:
+
+~The following keybinding functions only can bind =KEY= to =COMMAND= (which means a function uses =(interactive)= and be able to list in the =M-x= list).~
+
+You got a serval ways to bind keys in =Emacs=:
+
+*** ~(global-set-key KEY COMMAND)~
+
+~global-set-key~ binds the ~KEY~ to the =global--map= to call the ~COMMAND~
+
+Here is the example:
+
+#+BEGIN_SRC emacs-lisp
+  ;;(global-set-key (kbd "<tab>") 'switch-to-next-buffer)
+  ;;(global-set-key (kbd "<backtab>") 'switch-to-prev-buffer)
+#+END_SRC
+
+This is a legacy function; see ~keymap-global-set~ for the recommended function to use instead.
+
+#+BEGIN_SRC emacs-lisp
+  ;; (keymap-global-set "C-c y" 'clipboard-yank)
+  ;; (keymap-global-set "C-M-q" 'query-replace)
+  ;; (keymap-global-set "<f5>" 'flyspell-mode)
+  ;; (keymap-global-set "C-<f5>" 'display-line-numbers-mode)
+  ;; (keymap-global-set "C-<right>" 'forward-sentence)
+  ;; (keymap-global-set "<mouse-2>" 'mouse-save-then-kill)
+#+END_SRC
+
+
+*** ~(define-key KEYMAP KEY DEF &optional REMOVE)~
+
+This is the better way to use, as it gives you a chance to bind to different =mode=.
+
+=global-set-key= is a shortcut for (=define-key global-map KEY COMMAND)=.
+
+Let's have a look how to bind the =Q= to =kill-current-buffer= command in all =modes=:
+
+#+BEGIN_SRC emacs-lisp
+  ;; Unbind 'Q'
+  ;; (define-key dired-mode-map (kbd "Q") nil)
+
+  ;; Re-bind 'Q'
+  ;; (define-key evil-normal-state-map (kbd "Q") 'kill-current-buffer)
+  ;; (define-key evil-motion-state-map (kbd "Q") 'kill-current-buffer)
+#+END_SRC
+
+This is a legacy function; see ~keymap-set~ for the recommended function to use instead.
+
+#+BEGIN_SRC emacs-lisp
+  ;; (keymap-set texinfo-mode-map "C-c p" 'backward-paragraph)
+  ;; (keymap-set texinfo-mode-map "C-c n" 'forward-paragraph)))
+  ;; (keymap-set texinfo-mode-map "C-c C-x x" nil)
+#+END_SRC
+
+
+*** ~(evil-define-key STATE KEYMAP KEY DEF &rest BINDINGS)~
+
+When you need to set a keybinding to the particular =state= and =mode=, you can use ~evil-define-key~, here is the example:
+
+#+BEGIN_SRC emacs-lisp
+  ;; (evil-define-key 'normal org-mode-map (kbd "RET") 'org-cycle)
+#+END_SRC
+  
+
+
+** How to unbind/disable the default keybindings that you don't use
+
+It's very important that you should know =How to disable/unbind the default keybindings that you don't use=!!!! Otherwise, your keybinding won't work as you expected!!!
+
+Here are the steps of how you can find which =mode= already have the keybindings you want to set
+
+1. Run =describe-key= and then press your key, for example =Q=
+
+    It should show the command info into a new buffer (if your key has been bound to some modes).
+
+    At the very top part, it should say what function your =Q= has been bound to already, and the =Key Bindings= section should show you that your =Q= also bound to in which =mode= like this:
+
+    --------------------------------------------------
+    =Key Bindings=
+    completion-list-mode-map z
+    evil-motion-state-map Q
+    evil-normal-state-map Q
+    --------------------------------------------------
+
+    That said, you should unbind all those 2 =modes= for your =Q= (if that's NOT what you want).
+
+
+2. But sometimes, =describe-key= doesn't list all =modes= and I don't know why
+
+   For that situation, you should run =clm/toggle-command-log-buffer= to show the command log buffer. And then, go to any UIs/modes to press your key (=Q=) and see what functions it binds to.
+
+   After that, run =describe-function= and type the function name there, help buffer should show you the =Key Bindings= section (if keybinding exists). That's how you can get the hidden =modes= in different situations.
+
+
+But how to unbind/unset keybindings? The answer is just bind it to =nil=.
+
+=(define-key YOUR_MODE_NAME_HERE (kbd YOUR_KEY_HERE) nil)=
+
+
+** How to bind key via hook
+
+Sometimes, =xxx-mode= and =xxx-mode-map= are only available after finishing loading the file, that's why you should bind key via a =hook= in those situations.
+
+*** 4.1 Bind key to =xxx-mode-map=
+
+#+begin_src emacs-lisp
+  ;; ;; Command to run when pressing 'C-c a'
+  ;; (defun print_a_message()
+  ;;     (interactive)
+  ;;     (message "Print something by pressing 'C-c a'.")
+  ;; )
+
+  ;; ;; Bind function to be called when 'org-mode' is aviable
+  ;; (defun bind-test-key-to-org-mode-via-hook()
+  ;;   (message ">>> [ org-mode-hook-test ] Set temp keybinding 'C-c a' org mode")
+  ;;   (define-key org-mode-map (kbd "C-c a") 'print_a_message)
+  ;; )
+
+  ;; ;; Add the bind function to 'org-mode-hook'
+  ;; (add-hook 'org-mode-hook #'bind-test-key-to-org-mode-via-hook)
+#+end_src
+
+If you evaluate the above functions, then run =describe-variable= on =org-mode-hook=, you should see the following value has been added to that hook:
+
+~bind-test-key-to-org-mode-via-hook my/org-mode-setup~
+
+Then when you open an =org= file or run ~org-mode~ (to reload), then run =describe-variable= on =org-mode-map=, you should see the follwing key->function relationship has been add to its keymap:
+
+=(3 keymap=
+    =(97 . print_a_message)=
+
+And then press =C-c a=, you should see the ~Print something by pressing ’C-c a’.~ debug message has been printed to the =*Messages*= buffer, that said your mode-hook settings is working:)
+
+
+*** 4.2 Bind key to local buffer
+
+The example above binds the =C-c a= to =c-mode-map=, but if you open a few =.C= files, then duplicated binding to =c-mode-map= might happen. So, if there is no special needs, you should use =xxx-mode-hook= to do defer binding to the local buffer, as this promises no duplicated bindings.
+
+#+begin_src emacs-lisp
+  ;; Command to run when pressing 'C-c a'
+  (defun print_a_message()
+      (interactive)
+      (message "Print something by pressing 'C-c a'.")
+  )
+
+  ;; Bind function to be called when 'org-mode' is aviable
+  (defun bind-test-key-to-org-mode-via-hook()
+    (message ">>> [ bind-test-key-to-org-mode-via-hook ] Set temp keybinding 'C-c a' local buffer")
+
+    ;;
+    (define-key evil-normal-state-local-map (kbd "C-c a") 'print_a_message)
+
+    ;;
+    ;; '(evil-local-set-key 'normal KEY COMMAND)' is the same with 
+    ;; '(define-key evil-normal-state-local-map KEY COMMAND)',
+    ;;
+    ;; Just pick the one you like to use
+    ;;
+    ;; (evil-local-set-key 'normal (kbd "C-c a") 'print_a_message)
+  )
+
+  ;; Add the bind function to 'org-mode-hook'
+  (add-hook 'org-mode-hook #'bind-test-key-to-org-mode-via-hook)
+#+end_src
+
+Then when you open an =org= file or run ~org-mode~ (to reload), then run =describe-variable= on =org-mode-map=, you won't see any key binding to call the ~print_a_message~ command.
+
+But if you run ~describle-bindings~ (in the org file buffer),  you will see the following setting is on the top part:
+
+~`evil-normal-state-local-minor-mode' Minor Mode Bindings:~
+    ~Key             Binding~
+    ~C-c a		print_a_message~
+
+That means the =C-c a= only bind to the current opened buffer, try to press =C-c a=, you should see the ~Print something by pressing ’C-c a’.~ debug message has been printed to the =*Messages*= buffer, that said your mode-hook settings is working:)
+
+
+* How to unbind all keybindings for the given mode
+
+If you really want to unbind all keybindings for the particular mode, do like this:
+
+  =(setf (cdr YOUR_MODE_NAME_HERE) nil)=
+
+
+* My Keybinding settings
+
+1. All keybindings below have a pattern:
+
+    =<leader>xxx= is equal to =C-c xxx=
+
+    That said I can use =s-c xxx= (means =Command-c xxx=) in terminal, as I map the =CMD-c= (from MacOS Parallels Desktop) to =C-c= (in Arch Linux VM).
+
+
+2. About =Evil state=
+
+   =Evil mode= has the following =state keymaps= you can used to set your own keybindings:
+
+   + evil-insert-state-map
+   + evil-emacs-state-map
+   + evil-normal-state-map
+   + evil-visual-state-map
+   + evil-motion-state-map
+   + evil-operator-state-map
+   + evil-outer-text-objects-map
+   + evil-inner-text-objects-map
+   + evil-replace-state-map
+   + evil-normal-state-local-map
+
+    the main reason =motion= state exists is for use with =read-only= modes where insertion keybindings aren’t useful. 
+
+    If you bind key to =montion= state, that means you bind the key to =normal, visual and operator= state as well. That's quite convenient to save a lot of bindings!!!
+
+
+** Unbind all keybindings for the following modes
+
+Why do this?
+
+For example the =help-mode-map= already have the default keybinding like =SPC= to scrollup,
+that said all =<leader>xx= evil binding won't work, as =<leader>= key is =SPC=.
+
+That's why I unbind all of those buffer mode maps I don't care, this make the evil
+binding works!!!
+
+#+begin_src emacs-lisp 
+  (setf (cdr help-mode-map) nil)
+#+end_src
+
+
+** =ESC= acts like =C-g=
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+
+
+** Disable =C-z=
+
+By default, evil bind =C-z= to toggle between =evil-state= and =emacs-state=, but I don't need that.
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-insert-state-map
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "C-z") nil)
+  )
+#+END_SRC
+
+
+** Fix =TAB= issue
+
+#+BEGIN_SRC emacs-lisp
+  (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
+#+END_SRC
+
+
+** Toggle spell checking by =<leader>sc=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>sc") 'flyspell-mode)
+    (define-key map (kbd "C-c s c") 'flyspell-mode)
+  )
+#+END_SRC
+
+
+** Kill current window by =Q= and exit =Emacs= by =<leader>q=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind 'Q'
+  ;;
+  (dolist (map (list
+                dired-mode-map
+                xref--xref-buffer-mode-map
+                ))
+        (evil-define-key 'normal map (kbd "Q") nil)
+  )
+  (define-key evil-normal-state-map (kbd "Q") nil)
+
+  ;;
+  ;; Rebind 'Q'
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "Q") 'delete-window)
+      (define-key map (kbd "<leader>q") 'save-buffers-kill-terminal)
+      (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
+      ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+** +Switch buffers by =Tab= and =Shift + TAb= (Disabled at this moment)+
+
+#+BEGIN_SRC emacs-lisp
+  ;;(global-set-key (kbd "TAB") 'switch-to-next-buffer)
+  ;;(global-set-key (kbd "S-TAB") 'switch-to-prev-buffer)
+#+END_SRC
+
+
+** Call =describe-xxxx= functions by =<leader>df/v/k/b=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>df") 'helpful-callable)
+    (define-key map (kbd "C-c df") 'helpful-callable)
+    (define-key map (kbd "<leader>dv") 'helpful-variable)
+    (define-key map (kbd "C-c dv") 'helpful-variable)
+    (define-key map (kbd "<leader>dk") 'describe-key)
+    (define-key map (kbd "C-c dk") 'helpful-key)
+    (define-key map (kbd "<leader>db") 'helpful-bindings)
+    (define-key map (kbd "C-c db") 'describe-bindings)
+    (define-key map (kbd "<leader>dm") 'describe-mode)
+    (define-key map (kbd "C-c dm") 'describe-mode)
+    ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+** Toggle-command-log-mode by =<leader>l=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>l") 'clm/toggle-command-log-buffer)
+    (define-key map (kbd "C-c l") 'clm/toggle-command-log-buffer)
+  )
+#+END_SRC
+
+
+** Evaluate lisp expression by =<leader>e=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>e") 'eval-last-sexp)
+    (define-key map (kbd "C-c e") 'eval-last-sexp)
+  )
+#+END_SRC
+
+
+** Evaluate/reload current buffer settings by =<leader>rr=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>rr") 'eval-buffer)
+    (define-key map (kbd "C-c r r") 'eval-buffer)
+  )
+#+END_SRC
+
+
+** Save buffer by =W=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "W") 'save-buffer)
+  )
+#+END_SRC
+
+
+** Go back to normal mode by =jj=
+
+#+BEGIN_SRC emacs-lisp
+  (defun xwl-jj-as-esc ()
+  (interactive)
+  (if (memq evil-state '(insert replace))
+      (let ((changed? (buffer-modified-p)))
+          (insert "j")
+          (let* ((tm (current-time))
+              (ch (read-key)))
+          (if (and (eq ch ?j)
+                  (< (time-to-seconds (time-since tm)) 0.3))
+              (save-excursion
+                  (delete-char -1)
+                  (evil-force-normal-state)
+                  (set-buffer-modified-p changed?))
+              (insert ch))))
+  (call-interactively 'evil-next-line)))
+
+  (define-key evil-insert-state-map  "j" 'xwl-jj-as-esc)
+  (define-key evil-replace-state-map "j" 'xwl-jj-as-esc)
+#+END_SRC
+
+
+** Move to beginning and ending of the line by =H= and =L=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "H") 'evil-first-non-blank)
+    (define-key map (kbd "L") 'evil-end-of-line)
+    ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+** Go back to last marked position by =gb=
+
+I can't call ~evil-set-mark~ in my custom function, as it calls ~read-char~ when the function runs, so I can't pass a char in that way.
+
+As a workaround, I can use the default evil keybinding =m= to set a =M= to current position, MAKE SURE that's an uppercase =M=, otherwise, you can go back if you jump to another buffer!!!
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-goto-last-marked-position()
+    (interactive)
+    (evil-goto-mark ?M)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "gb") 'my-goto-last-marked-position)
+      ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+
+** Open files or buffers by =<leader>p/b=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'ivy + counsel' version
+  ;;
+  ;;(dolist (map (list
+  ;;              evil-motion-state-map
+  ;;              ))
+  ;;  (define-key map (kbd "<leader>p") 'counsel-find-file)
+  ;;  (define-key map (kbd "C-c p") 'counsel-find-file)
+  ;;  (define-key map (kbd "<leader>b") 'counsel-switch-buffer)
+  ;;  (define-key map (kbd "C-c b") 'counsel-switch-buffer)
+  ;;)
+
+  ;;
+  ;; 'vertico + consult' version
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>p") 'find-file)
+    (define-key map (kbd "C-c p") 'find-file)
+    (define-key map (kbd "<leader>b") 'consult-buffer)
+    (define-key map (kbd "C-c b") 'consult-buffer)
+  )
+#+END_SRC
+
+
+** Switch between last buffers =<leader>SPC=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>SPC") 'switch-to-last-buffer)
+  )
+#+END_SRC
+
+
+** Toggle =Olivetti= mode (works like =Goyo= in =Neovim=) by =<leader>RET=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>RET") 'olivetti-mode)
+  )
+#+END_SRC
+
+
+** Search and replace cursor word by =<C-s>= 
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind the default <C-s> for 'isearch-forward'
+  ;;
+  (define-key global-map (kbd "C-s") nil)
+  
+  ;;
+  ;; Replace current word or selection using vim style for evil mode
+  ;;
+  (defun evil-replace-word-selection()
+    (interactive)
+    (if (use-region-p)
+        (let ((selection (buffer-substring-no-properties (region-beginning) (region-end))))
+            (if (= (length selection) 0)
+                (message "empty string")
+                (evil-ex (concat "'<,'>s/" selection "/"))
+            )
+        )
+        (evil-ex (concat "%s/" (thing-at-point 'word) "/"))))
+
+  ;;
+  ;; Rebind <C-s>
+  ;;
+  (define-key evil-motion-state-map (kbd "C-s") 'evil-replace-word-selection)
+#+END_SRC
+
+
+** Rg on cursor word by =<leader>f=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'ivy + counsel' version
+  ;;
+  ;;(dolist (map (list
+  ;;              evil-motion-state-map
+  ;;              ))
+  ;;  (define-key map (kbd "<leader>f") 'counsel-rg)
+  ;;  (define-key map (kbd "C-c f") 'counsel-rg)
+  ;;)
+
+  ;;
+  ;; 'vertico + consult' version
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>f") 'consult-ripgrep)
+    (define-key map (kbd "C-c f") 'consult-ripgrep)
+  )
+#+END_SRC
+
+
+** ~imenu~ (function and variable list) by =<leader>i=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'ivy + counsel version
+  ;;
+  ;;(dolist (map (list
+  ;;              evil-motion-state-map
+  ;;              ))
+  ;;  (define-key map (kbd "<leader>f") 'counsel-rg)
+  ;;  (define-key map (kbd "C-c f") 'counsel-rg)
+  ;;)
+
+  ;;
+  ;; 'vertico + consult' version
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>i") 'consult-imenu)
+    (define-key map (kbd "C-c i") 'consult-imenu)
+  )
+#+END_SRC
+
+
+** Window split by =<leader>vs=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "<leader>vs") 'evil-window-vsplit)
+    (define-key map (kbd "C-c v s") 'evil-window-vsplit)
+  )
+#+END_SRC
+
+
+** Window movement by =C-h, C-l= (Only for jumping between left and right windows, Disable the up and down windows)
+
+For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "C-l") 'evil-window-right)
+    (define-key map (kbd "C-h") 'evil-window-left)
+    ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+** Change window size by =-/+/==
+
+For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+
+  (dolist (map (list
+                dired-mode-map
+                ))
+    (evil-define-key '(normal motion) map (kbd "=") 'nil)
+    (evil-define-key '(normal motion) map (kbd "-") 'nil)
+    (evil-define-key '(normal motion) map (kbd "+") 'nil)
+  )
+
+  (defun my-increase-window-width ()
+    (interactive)
+    (evil-window-increase-width 5)
+  )
+
+  (defun my-decrease-window-width ()
+    (interactive)
+    (evil-window-increase-width -5)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+    (define-key map (kbd "=") 'balance-windows)
+    (define-key map (kbd "+") 'my-increase-window-width)
+    (define-key map (kbd "-") 'my-decrease-window-width)
+  )
+#+END_SRC
+
+        
+** Improve =<C-j>= and =<C-k>= for each mode I needed
+
+*** Disable =<C-j>= and =<C-k>= from the following modes
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'ivy + counsel' version
+  ;;
+  ;;(dolist (map (list
+  ;;              global-map
+  ;;              org-mode-map
+  ;;              ivy-minibuffer-map
+  ;;              ivy-switch-buffer-map
+  ;;              evil-window-map
+  ;;              evil-normal-state-map
+  ;;              evil-motion-state-map
+  ;;              ))
+  ;;    (define-key map (kbd "C-j") nil)
+  ;;    (define-key map (kbd "C-k") nil)
+  ;;    ;;(message "State: %s" state);
+  ;;)
+
+  ;;
+  ;; 'vertico + consult' version
+  ;;
+  (dolist (map (list
+                global-map
+                evil-window-map
+                evil-normal-state-map
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "C-j") nil)
+      (define-key map (kbd "C-k") nil)
+      ;;(message "State: %s" state);
+  )
+
+  (evil-define-key 'normal org-mode-map (kbd "C-j") nil)
+  (evil-define-key 'normal org-mode-map (kbd "C-k") nil)
+#+END_SRC
+
+
+*** Enable =<C-j>= and =<C-k>= for the following modes
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'ivy + counsel' version
+  ;;
+  ;;(dolist (map (list
+  ;;              ivy-switch-buffer-map
+  ;;              ivy-minibuffer-map ))
+  ;;  (define-key map (kbd "C-j") 'ivy-next-line)
+  ;;  (define-key map (kbd "C-k") 'ivy-previous-line)
+  ;;)
+
+  ;;
+  ;; 'vertico-mode'
+  ;;
+  (dolist (map (list
+                vertico-map
+                ))
+    (define-key map (kbd "C-j") 'vertico-next)
+    (define-key map (kbd "C-k") 'vertico-previous)
+  )
+
+  ;;
+  ;; 'org-mode'
+  ;;
+  (defun my-org-next-heading()
+    (interactive)
+    (org-forward-heading-same-level nil)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-org-previous-heading()
+    (interactive)
+    (org-backward-heading-same-level nil)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (evil-define-key 'normal org-mode-map (kbd "C-j") 'my-org-next-heading)
+  (evil-define-key 'normal org-mode-map (kbd "C-k") 'my-org-previous-heading)
+
+  ;;
+  ;; 'markdown-mode' and 'markdown-view-mode'
+  ;;
+  (defun my-markdown-next-heading()
+    (interactive)
+    (outline-next-visible-heading 1)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-markdown-previous-heading()
+    (interactive)
+    (outline-next-visible-heading -1)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (dolist (map (list
+                markdown-mode-map
+                markdown-view-mode-map
+                ))
+    (evil-define-key 'normal map (kbd "C-j") 'my-markdown-next-heading)
+    (evil-define-key 'normal map (kbd "C-k") 'my-markdown-previous-heading)
+  )
+#+END_SRC
+
+
+** Improve =n= and =N= search
+
+#+begin_src emacs-lisp
+  ;;
+  ;; Unbind 'n' and 'N'
+  ;;
+  (define-key evil-motion-state-map (kbd "n") nil)
+  (define-key evil-motion-state-map (kbd "N") nil)
+
+  (defun my-search-next()
+    (interactive)
+    (evil-search-next)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-search-previous()
+    (interactive)
+    (evil-search-previous)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (define-key evil-motion-state-map (kbd "n") 'my-search-next)
+  (define-key evil-motion-state-map (kbd "N") 'my-search-previous)
+#+end_src
+
+
+** +Improve =M-x= user experience+
+
++By default, press =M-x= to run ~execute-extended-command~, but I want the better version ~counsel-M-x~:+
+
+#+begin_src emacs-lisp
+  ;;(dolist (map (list
+  ;;              evil-motion-state-map
+  ;;              ))
+  ;;  (define-key map (kbd "M-x") 'counsel-M-x)
+  ;;)
+#+end_src
+
+After switching to =consult=, just use the default ~execute-extended-command~. 
+
+
+** Improve =dsecribe-xxx= user experience
+
+*** +Open help into (new or exists) help buffe by =C-o= inside the =ivy-minibuffer=+
+
++When you run ~describe-xxx~ then you're inside the =ivy-minibuffer= with the list of the items you might what to see help. If you press =RET= on an item, it shows the help info into a new buffer and close the =ivy-minibuffer=, as it calls the ~ivy-done~ command.+
+
++But what I want is that: when pressing =RET=, it shows me the help into (exists or new) help bufffer and DO NOT close the =ivy-minibuffer=, then I can query another vars or functions and press =RET= again to view the help info. I can close that =ivy-minibuffer= by pressing =ESC=.+
+
++But it doesn't work, as it calls switching file and buffer NOT works as expected!!! And I can't bind =C-RET= or =S-RET=, so finally, I end up with pressing =C-o= (~o~ for open) to do what I want:)+
+
+#+begin_src emacs-lisp
+  ;; (define-key ivy-minibuffer-map (kbd "C-o") 'ivy-call)
+#+end_src
+
+Switched to =consult= and it seems doesn't have this functionality.
+
+
+*** +Jump to previous =describe-xxx= query history by =<up>= or =<down>= inside the =ivy-minibuffer=++
+
+#+begin_src emacs-lisp
+  ;; (define-key ivy-minibuffer-map (kbd "<down>") 'ivy-next-history-element)
+  ;; (define-key ivy-minibuffer-map (kbd "<up>") 'ivy-previous-history-element)
+#+end_src
+
+Switched to =consult= and =savehist= package already got this functionality.
+
+
+
+** Org mode
+
+*** ~org-mode~ create and open link
+
+**** how to create link
+
+Under the hook, org link format just like this =[[LINK_URL=][DESCRIPTION_TO_DISPLAY]]=.
+
+You can type from left to right, it won't show as a =Link= until you type the final =]= character.
+
+**** How to edit created link
+
+After created a link, you CAN'T see the =[[][]]= original text as it hides by the =org-hide-emphasis-markers= settings in =~/.config/color_theme.org=.
+
+But you can go to the end of the link text and delete the last =]= character, then the original text
+shows back (as that's broken link format) like this:
+
+[[https://link][Hey]
+
+Then you can change the URL or the DESCRIPTION part and add back the final =]= character, link shows back again.
+
+
+*** ~org-mode~ insert code block by =<leader>cb=
+
+#+begin_src emacs-lisp 
+  (defun my-create-org-mode-elisp-code-block()
+    (interactive)
+    (org-insert-structure-template "SRC emacs-lisp")
+  )
+
+  (define-key org-mode-map (kbd "<leader>cb") 'my-create-org-mode-elisp-code-block)
+  (define-key org-mode-map (kbd "C-c c b") 'my-create-org-mode-elisp-code-block)
+#+end_src
+
+
+
+*** ~org-mode~ fold or unfold when cursor is on heading by =<RET>=
+
+#+begin_src emacs-lisp 
+  (evil-define-key 'normal org-mode-map (kbd "RET") 'org-cycle)
+#+end_src
+
+
+** Markdown
+
+*** ~markdown-mode~ fold or unfold when cursor is on heading by =<RET>=
+
+#+begin_src emacs-lisp 
+  (evil-define-key 'normal markdown-mode-map (kbd "RET") 'markdown-cycle)
+  (evil-define-key 'normal markdown-view-mode-map (kbd "RET") 'markdown-cycle)
+#+end_src
+
+
+** LSP
+
+
+*** Go to next or previous error by =<C-n> or <C-p>=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-error-jumping-in-local-buffer()
+    (define-key evil-normal-state-local-map (kbd "C-n") 'flymake-goto-next-error)
+    (define-key evil-normal-state-local-map (kbd "C-p") 'flymake-goto-prev-error)
+
+    (message ">>> [ my-lsp-error-jumping-in-local-buffer ] Set 'C-n' and 'C-p' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-lsp-error-jumping-in-local-buffer)
+  )
+#+END_SRC
+
+
+*** Format buffer by =<leader>ff=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-format-buffer()
+    ;;(define-key evil-normal-state-local-map (kbd "<leader>ff") 'lsp-format-buffer)
+
+    (define-key evil-normal-state-local-map (kbd "<leader>ff") 'eglot-format-buffer)
+
+    (message ">>> [ my-lsp-format-buffer ] Set '<leader>ff' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-lsp-format-buffer)
+  )
+#+END_SRC
+
+
+*** Rename by =<leader>rn=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-rename-buffer()
+    ;; (define-key evil-normal-state-local-map (kbd "<leader>rn") 'lsp-rename)
+
+    (define-key evil-normal-state-local-map (kbd "<leader>rn") 'eglot-rename)
+
+    (message ">>> [ my-lsp-rename-buffer ] Set '<leader>rn' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-lsp-rename-buffer)
+  )
+#+END_SRC
+
+
+*** +Show doc by =K=+ (only use in =lsp-mode=)
+
++If doc popup doesn't show before, then it shows up when you press =K=, otherwise, it jumps into the doc popup frame (window).+
+
++But it only works in =GUI= mode!!!+
+
++In terminal mode, the popup shows on the right-top position and you can jump into it!!!+
+
+#+BEGIN_SRC emacs-lisp
+  ;; (defun my-show-or-jump-into-doc ()
+  ;;   (interactive)
+  ;;   (if (lsp-ui-doc--visible-p)
+  ;;       (lsp-ui-doc-focus-frame)
+  ;;       (lsp-ui-doc-show)
+  ;;   )
+
+  ;;   ;; (if (lsp-ui-doc--visible-p)
+  ;;   ;;     (lsp-ui-doc-focus-frame)
+  ;;   ;;     (if (lsp-ui-doc--frame-visible-p)
+  ;;   ;;         (lsp-ui-doc-unfocus-frame)
+  ;;   ;;         (lsp-ui-doc-show))
+  ;;   ;; )
+  ;; )
+
+  ;; (defun my-lsp-toggle-doc()
+  ;;   (define-key evil-normal-state-local-map (kbd "K") 'my-show-or-jump-into-doc)
+
+  ;;   (message ">>> [ my-lsp-toggle-doc ] Set 'K' to local buffer")
+  ;; )
+
+  ;; (dolist (hook '(c-mode-hook
+  ;;                 c-ts-mode-hook
+  ;;                 c++-mode-hook
+  ;;                 c++-ts-mode-hook
+  ;;                 zig-mode-hook
+  ;;                 zig-ts-mode-hook
+  ;;                 rust-mode-hook
+  ;;                 rust-ts-mode-hook
+  ;;                 typescript-mode-hook
+  ;;               ))
+  ;;   (add-hook hook #'my-lsp-toggle-doc)
+  ;; )
+#+END_SRC
+
++The comment code block above tries to get out from the doc popup window by press =K= again (if its already inside), the logic looks correctly, but it won't work! As the =K= only bound the opened source code buffer and that popup is in another buffer, that's why there is no =K= bind to that buffer!!!+
+
++So, you have to press =C-x 4 0= (~kill-buffer-and-window~) to get out from that doc popup frame windows at this moment.+
+
+Switch to =eglot= already, =K= is the default keybinding to call =eldoc-doc-bffer=!!!
+
+
+*** Show error (diagnostics buffer) =<leader>se=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-show-error()
+    (define-key evil-normal-state-local-map (kbd "<leader>se") 'flymake-show-buffer-diagnostics)
+    (define-key evil-normal-state-local-map (kbd "C-c s e") 'flymake-show-buffer-diagnostics)
+
+    (message ">>> [ my-lsp-show-error ] Set '<leader>se' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-lsp-show-error)
+  )
+#+END_SRC
+
+
+*** Run code action =<leader>ca=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-code-action()
+    ;; (define-key evil-normal-state-local-map (kbd "<leader>ca") 'lsp-execute-code-action)
+    ;; (define-key evil-normal-state-local-map (kbd "C-c c a") 'lsp-execute-code-action)
+
+    (define-key evil-normal-state-local-map (kbd "<leader>ca") 'eglot-code-action-quickfix)
+    (define-key evil-normal-state-local-map (kbd "C-c c a") 'eglot-code-action-quickfix)
+
+    (message ">>> [ my-lsp-code-action ] Set '<leader>ca' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-lsp-code-action)
+  )
+#+END_SRC
+
+
+*** Toggle comment by =<leader>/=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-toggle-comment()
+    (define-key evil-visual-state-local-map (kbd "<leader>/") 'evilnc-comment-or-uncomment-lines)
+    (define-key evil-visual-state-local-map (kbd "C-c /") 'evilnc-comment-or-uncomment-lines)
+
+    (message ">>> [ my-lsp-toggle-comment ] Set '<leader>/' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-lsp-toggle-comment)
+  )
+#+END_SRC
+
+
+
+*** Toggle inlay hints by =<leader>th=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-toggle-inlay-hint()
+    (interactive)
+    (message ">>>>> called.")
+    (if eglot-inlay-hints-mode
+        (progn
+            (message ">>> [ my-lsp-toggle-inlay-hint ] Inlay hint is 'on', turn it 'off' now.")
+            (eglot-inlay-hints-mode -1)
+        )
+        (progn
+            (message ">>> [ my-lsp-toggle-inlay-hint ] Inlay hint is 'off', turn it 'on' now.")
+            (eglot-inlay-hints-mode 1)
+        )
+    )
+  )
+
+  (defun my-setup-toggle-inlay-hint()
+      (define-key evil-normal-state-local-map (kbd "<leader>th") 'my-lsp-toggle-inlay-hint)
+      (define-key evil-normal-state-local-map (kbd "C-c t h") 'my-lsp-toggle-inlay-hint)
+      (message ">>> [ my-setup-toggle-inlay-hint ] Set '<leader>th' to local buffer")
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                ))
+    (add-hook hook #'my-setup-toggle-inlay-hint)
+  )
+#+END_SRC
+
+
+
+** Dired
+
+*** Go up dire by =h= and into dir or open file by =l=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+  (define-key dired-mode-map (kbd "SPC") nil)
+  (evil-define-key 'normal dired-mode-map (kbd "SPC") nil)
+
+  ;;
+  ;; Rebind
+  ;;
+  (evil-define-key '(motion) dired-mode-map (kbd "h") 'dired-up-directory)
+  (evil-define-key '(motion) dired-mode-map (kbd "l") 'dired-find-file)
+  ;; (evil-define-key 'normal dired-mode-map (kbd "SPC") 'dired-mark)
+#+END_SRC
+
+
+*** Open file to other window by =o=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+  (define-key dired-mode-map (kbd "o") nil)
+  (evil-define-key 'normal dired-mode-map (kbd "o") nil)
+
+  ;;
+  ;; Rebind
+  ;;
+  (evil-define-key '(normal motion) dired-mode-map (kbd "o") 'dired-find-file-other-window)
+#+END_SRC
+
+
+*** Jump back to ~dired buffer~ corresponding to current buffer by =C-c j=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Rebind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "C-c j") 'dired-jump)
+  )
+#+END_SRC
+
+
+*** Quickly go to particular directories by =gX=
+
+- ~gh~: Go home =~/=
+- ~gb~: Go backup =~/my-shell/backup=
+- ~gc~: Go backup =~/c=
+- ~gd~: Go backup =~/Downloads=
+- ~gp~: Go Photos =~/Photos=
+- ~gr~: Go Photos =~/rust=
+- ~gt~: Go Photos =~/temp=
+- ~gz~: Go Photos =~/zig=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+  (evil-define-key '(normal) dired-mode-map (kbd "gh") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gb") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gc") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gd") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gp") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gr") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gt") 'nil)
+  (evil-define-key '(normal) dired-mode-map (kbd "gz") 'nil)
+
+  ;;(define-key evil-normal-state-map (kbd "gh") 'nil)
+  ;;(define-key evil-normal-state-map (kbd "gb") 'nil)
+  ;;(define-key evil-normal-state-map (kbd "gc") 'nil)
+  ;;(define-key evil-normal-state-map (kbd "gp") 'nil)
+  ;;(define-key evil-normal-state-map (kbd "gr") 'nil)
+  ;;(define-key evil-normal-state-map (kbd "gt") 'nil)
+  ;;(define-key evil-normal-state-map (kbd "gz") 'nil)
+
+  ;;
+  ;; Rebind
+  ;;
+  (defun my-goto-home-directory()
+     (interactive)
+     (dired "~/")
+  )
+  (defun my-goto-shell-backup-directory()
+     (interactive)
+     (dired "~/my-shell/backup")
+  )
+  (defun my-goto-c-directory()
+     (interactive)
+     (dired "~/c")
+  )
+  (defun my-goto-downloads-directory()
+     (interactive)
+     (dired "~/Downloads")
+  )
+  (defun my-goto-rust-directory()
+     (interactive)
+     (dired "~/rust")
+  )
+  (defun my-goto-zig-directory()
+     (interactive)
+     (dired "~/zig")
+  )
+  (defun my-goto-temp-directory()
+     (interactive)
+     (dired "~/temp")
+  )
+  (defun my-goto-photo-directory()
+     (interactive)
+     (dired "~/Photos")
+  )
+
+  (evil-define-key '(normal) dired-mode-map (kbd "gh") 'my-goto-home-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gb") 'my-goto-shell-backup-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gd") 'my-goto-downloads-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gc") 'my-goto-c-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gp") 'my-goto-photo-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gr") 'my-goto-rust-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gt") 'my-goto-temp-directory)
+  (evil-define-key '(normal) dired-mode-map (kbd "gz") 'my-goto-zig-directory)
+#+END_SRC
+
+
+*** Toggle hidden files by =<leader>h=
+
+Before this can work, you have to make sure that you have the following settings to show hidden files by default:
+
+~(setq dired-listing-switches "-lhta")~
+
+#+BEGIN_SRC emacs-lisp
+  (setq dired-omit-files "^\\...+$")
+
+  (evil-define-key '(normal) dired-mode-map (kbd "<leader>h") 'dired-omit-mode)
+  (evil-define-key '(normal) dired-mode-map (kbd "C-c h") 'dired-omit-mode)
+#+END_SRC
+
+
+*** Modify the READ-ONLY buffer by =<leader>m=
+
+#+BEGIN_SRC emacs-lisp
+  (evil-define-key '(normal) dired-mode-map (kbd "<leader>m") 'dired-toggle-read-only)
+  (evil-define-key '(normal) dired-mode-map (kbd "C-c m") 'dired-toggle-read-only)
+#+END_SRC
+
+After going into the =wdired-change-to-wdired-mode=, here are the default keybindgins to accept or discard changes:
+
++ =C-c C-c:= Accept changes
++ =C-c C-k:= Discard changes
+
+
+** Image Dired
+
+*** Fit the rendered image to window
+
+#+BEGIN_SRC emacs-lisp
+  (evil-define-key '(normal) image-mode-map (kbd "=") 'image-transform-fit-to-window)
+#+END_SRC
+
+
+** Fast kill buffers and windows
+
+*** Kill all helpful buffers and opend window by =<leader>kh=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Close the 'helful' window and kill its buffer
+  ;;
+  (defun kill-helpful-window-and-buffers ()
+          (interactive)
+          (message ">>> [ kill-helpful-window-and-buffers ] - ....... ")
+
+          (cl-loop for buf in (buffer-list)
+                  do (if (string-match-p "^*helpful" (buffer-name buf))
+                                  (progn
+                                          ;;
+                                          ;; Try to close its window first if exists.
+                                          ;;
+                                          (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+                                          (if window-to-be-killed
+                                                  (progn
+                                                          (delete-window window-to-be-killed)
+                                                          (message ">>> [ kill-helpful-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                                                  )
+                                          )
+
+                                          ;;
+                                          ;; Kill buffer.
+                                          ;;
+                                          (message ">>> [ kill-helpful-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+                                          (kill-buffer buf)
+                                  )
+                          )
+          )
+
+          (message ">>> [ kill-helpful-window-and-buffers ] - [done] ")
+  )
+
+  (define-key evil-motion-state-map (kbd "<leader>kh") 'kill-helpful-window-and-buffers)
+  (define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
+#+END_SRC
+
+
+
+*** Kill all eldoc buffers and opend window by =<leader>ke=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Close the 'eldoc' window and kill its buffer
+  ;;
+  (defun kill-eldoc-window-and-buffers ()
+          (interactive)
+          (message ">>> [ kill-eldoc-window-and-buffers ] - ....... ")
+
+          (cl-loop for buf in (buffer-list)
+                  do (if (string-match-p "^*eldoc" (buffer-name buf))
+                                  (progn
+                                          ;;
+                                          ;; Try to close its window first if exists.
+                                          ;;
+                                          (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+                                          (if window-to-be-killed
+                                                  (progn
+                                                          (delete-window window-to-be-killed)
+                                                          (message ">>> [ kill-eldoc-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                                                  )
+                                          )
+
+                                          ;;
+                                          ;; Kill buffer.
+                                          ;;
+                                          (message ">>> [ kill-eldoc-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+                                          (kill-buffer buf)
+                                  )
+                          )
+          )
+
+          (message ">>> [ kill-eldoc-window-and-buffers ] - [done] ")
+  )
+
+  (define-key evil-motion-state-map (kbd "<leader>ke") 'kill-eldoc-window-and-buffers)
+  (define-key evil-normal-state-map (kbd "C-c k e") 'kill-eldoc-window-and-buffers)
+#+END_SRC
+
+
+** Colemak
+
+*** Basic movement and edit
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+  (dolist (map (list
+                        evil-normal-state-map
+                        evil-visual-state-map
+                        evil-motion-state-map
+                        ))
+        (define-key map (kbd "i") nil)
+        (define-key map (kbd "I") nil)
+        (define-key map (kbd "m") nil)
+        (define-key map (kbd "l") nil)
+  )
+
+  ;;
+  ;; Rebind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "n") 'evil-next-line)
+      (define-key map (kbd "e") 'evil-previous-line)
+      (define-key map (kbd "m") 'evil-backward-char)
+      (define-key map (kbd "i") 'evil-forward-char)
+      (define-key map (kbd "l") 'evil-insert)
+      ;;(message "State: %s" state);
+  )
+
+  ;;
+  (define-key evil-normal-state-map (kbd "L") 'evil-insert-line)
+
+
+#+END_SRC
+
+
+*** Window movement
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+        (define-key map (kbd "C-n") nil)
+        (define-key map (kbd "C-p") nil)
+        (define-key map (kbd "C-i") nil)
+        (define-key map (kbd "C-m") nil)
+  )
+
+  ;;
+  ;; Rebind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "C-i") 'evil-window-right)
+      (define-key map (kbd "C-m") 'evil-window-left)
+      (define-key map (kbd "C-w n") 'evil-window-down)
+      (define-key map (kbd "C-w e") 'evil-window-up)
+      ;;(message "State: %s" state);
+  )
+
+  (defun my-rebind-window-movement-for-treemacs()
+      (interactive)
+      (define-key treemacs-mode-map (kbd "C-n") nil)
+      (define-key treemacs-mode-map (kbd "C-p") nil)
+      (define-key treemacs-mode-map (kbd "C-i") nil)
+      (define-key evil-treemacs-state-map (kbd "C-i") nil)
+      (define-key treemacs-mode-map (kbd "C-m") nil)
+
+      (define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
+      (define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
+      (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
+      (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
+  )
+
+  (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
+
+#+END_SRC
+
+
+*** Enable =<C-n>= and =<C-n>= for the following modes
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'vertico-mode'
+  ;;
+  (dolist (map (list
+                vertico-map
+                ))
+    (define-key map (kbd "C-n") 'vertico-next)
+    (define-key map (kbd "C-e") 'vertico-previous)
+  )
+
+  ;;
+  ;; 'org-mode'
+  ;;
+  (defun my-org-next-heading()
+    (interactive)
+    (org-forward-heading-same-level nil)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-org-previous-heading()
+    (interactive)
+    (org-backward-heading-same-level nil)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (evil-define-key 'normal org-mode-map (kbd "C-n") 'my-org-next-heading)
+  (evil-define-key 'normal org-mode-map (kbd "C-e") 'my-org-previous-heading)
+
+  ;;
+  ;; 'markdown-mode' and 'markdown-view-mode'
+  ;;
+  (defun my-markdown-next-heading()
+    (interactive)
+    (outline-next-visible-heading 1)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-markdown-previous-heading()
+    (interactive)
+    (outline-next-visible-heading -1)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (dolist (map (list
+                markdown-mode-map
+                markdown-view-mode-map
+                ))
+    (evil-define-key 'normal map (kbd "C-n") 'my-markdown-next-heading)
+    (evil-define-key 'normal map (kbd "C-e") 'my-markdown-previous-heading)
+  )
+#+END_SRC
+
+
+
+*** Improve =,= and =.= search
+
+#+begin_src emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+        (define-key map (kbd ".") nil)
+        (define-key map (kbd ",") nil)
+  )
+
+  ;;
+  ;; Unbind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+        (define-key map (kbd ".") 'my-search-next)
+        (define-key map (kbd ",") 'my-search-previous)
+  )
+#+end_src
+
+
+*** Toggle =treemacs=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                  evil-motion-state-map
+                  evil-normal-state-map
+                  ))
+          (define-key map (kbd "<leader>e") 'treemacs)
+  )
+
+  (defun my-rebind-toggle-treemacs()
+    (interactive)
+    (dolist (map (list
+                  evil-motion-state-map
+                  treemacs-mode-map
+                    ))
+            (define-key map (kbd "SPC") nil)
+            (define-key map (kbd "<leader>e") nil)
+    )
+
+    (dolist (map (list
+                  treemacs-mode-map
+                    ))
+            (define-key map (kbd "SPC e") 'treemacs)
+            (define-key map (kbd "<leader>e") 'treemacs)
+    )
+  )
+
+  (add-hook 'treemacs-mode-hook #'my-rebind-toggle-treemacs)
+#+END_SRC
+
+
+*** Set bookmark by =b=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "b") 'nil)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "b") 'evil-set-marker)
+      ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+*** Open your key file by =<leader>kk=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "<leader>kk") 'nil)
+  )
+
+  (defun my-open-key-file()
+     (interactive)
+     (find-file-other-window "~/sbzi/personal/keymap.org")
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "<leader>kk") 'my-open-key-file)
+      ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+*** Open EShell =<leader>s=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "<leader>ss") 'nil)
+  )
+
+  (defun my-open-eshell()
+     (interactive)
+     (split-window-below)
+     (windmove-down)
+     (eshell)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "<leader>ss") 'my-open-eshell)
+  )
+#+END_SRC

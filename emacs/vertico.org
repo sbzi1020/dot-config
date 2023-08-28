@@ -1,0 +1,176 @@
+* Vertico
+
+=Vertico= is new and lightway completion UI based on the default completion system, it uses all =Emacs= builtin functionalities, no need to add something new (heavery) on top like =Ivy=.
+
+ #+begin_src emacs-lisp
+   (use-package vertico
+     :init
+        (vertico-mode)
+        (vertico-multiform-mode)
+
+        ;;
+        ;; Configure Vertico modes per command or completion category.
+        ;;
+        ;; 'buffer' means 'vertico-buffer-mode' to display vertico in a buffer instead of minibuffer
+        ;;
+        ;; For more details, watch this video: https://www.youtube.com/watch?v=hPwDbx--Waw
+        ;;
+        (setq vertico-multiform-commands
+            '((consult-imenu buffer)
+              (consult-ripgrep buffer)
+             )
+        )
+
+        ;; How many lines needs to show in minibuffer before hit the top or bottom
+        (setq vertico-scroll-margin 3)
+
+        ;; Show more lines in minibuffer
+        (setq vertico-count 20)
+
+        ;; Grow and shrink the Vertico minibuffer
+        ;; (setq vertico-resize t)
+
+        ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+        (setq vertico-cycle t)
+
+     :config
+
+        ;;
+        ;; Auto tidy up the directory prompt when changing to '~' or '/' directory
+        ;; This works with 'file-name-shadow-mode' enabled. When you're in the sub directory, and you
+        ;; type '~' or '/' path in 'find-file' or 'dired', then 'vertico' clear the old path and keep
+        ;; the curent path.
+        ;;
+        (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+   )
+
+   (use-package savehist
+    :init
+        (savehist-mode)
+   )
+
+ #+end_src
+
+
+* Extensions
+
+** Marginalia
+
+Rich annotations in the minibuffer
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+    ;; available in the *Completions* buffer, add it to the
+    ;; `completion-list-mode-map'.
+    :bind (:map minibuffer-local-map
+           ("M-A" . marginalia-cycle))
+    :init
+       ;; Marginalia must be activated in the :init section of use-package such that
+       ;; the mode gets enabled right away. Note that this forces loading the
+       ;; package.
+       (marginalia-mode)
+  )
+#+end_src
+
+
+** Consult
+
+Useful search and navigation commands
+
+#+begin_src emacs-lisp
+  ;; Enable rich annotations using the Marginalia package
+  (use-package consult
+    :after vertico
+  )
+#+end_src
+
+
+** vertico-posframe
+
+=vertico-posframe= is an =vertico= extension, which lets =vertico= use posframe to show its candidate menu.
+
+NOTE: =vertico-posframe= requires Emacs 26 and do not support mouse click.
+
+#+begin_src emacs-lisp
+  ;;
+  ;; Only enabled in GUI mode!!!
+  ;;
+  (if (display-graphic-p nil)
+    (use-package vertico-posframe
+        :after vertico
+        :init
+            ;;
+            ;; The following setting is saying:
+            ;;
+            ;; All rest 'vertico-multiform-commands' use default popup
+            ;; except the 'consult-imenu' and 'consult-ripgrep' (use 'vertico-buffer-mode')
+            ;;
+            (setq vertico-multiform-commands
+                '(
+                   (consult-imenu buffer)     ; Uses 'vertico-buffer-mode'
+                   (consult-ripgrep buffer)   ; Uses 'vertico-buffer-mode'
+
+                   ;;
+                   ;; Use popup as default
+                   ;;
+                   (t posframe
+                       (vertico-posframe-poshandler . posframe-poshandler-frame-center)
+                       (vertico-posframe-border-width . 2)
+                   )
+                 )
+            )
+
+            ;; The popup position specified by the 'vertico-posframe-poshandler' and the
+            ;; default value is 'posframe-poshandler-frame-center'.
+            ;;
+            ;; You can change it on your own, the value defined in:
+            ;; '~/.config/emacs/elpa/posframe-20230714.227/posframe.el'
+            ;;
+            ;; The builtin poshandler functions are listed below:
+            ;;
+            ;; posframe-poshandler-frame-center
+            ;; posframe-poshandler-frame-top-center
+            ;; posframe-poshandler-frame-top-left-corner
+            ;; posframe-poshandler-frame-top-right-corner
+            ;; posframe-poshandler-frame-top-left-or-right-other-corner
+            ;; posframe-poshandler-frame-bottom-center
+            ;; posframe-poshandler-frame-bottom-left-corner
+            ;; posframe-poshandler-frame-bottom-right-corner
+            ;; posframe-poshandler-window-center
+            ;; posframe-poshandler-window-top-center
+            ;; posframe-poshandler-window-top-left-corner
+            ;; posframe-poshandler-window-top-right-corner
+            ;; posframe-poshandler-window-bottom-center
+            ;; posframe-poshandler-window-bottom-left-corner
+            ;; posframe-poshandler-window-bottom-right-corner
+            ;; posframe-poshandler-point-top-left-corner
+            ;; posframe-poshandler-point-bottom-left-corner
+            ;; posframe-poshandler-point-bottom-left-corner-upward
+            ;; posframe-poshandler-point-window-center
+            ;; posframe-poshandler-point-frame-center
+            ;;
+            ;; (setq vertico-posframe-poshandler 'posframe-poshandler-frame-center)
+
+            ;;
+            ;; Control popup left and right paddings
+            ;;
+            (setq vertico-posframe-parameters
+                '((left-fringe . 10)
+                  (right-fringe . 10)
+                 )
+            )
+
+        :config
+            (vertico-multiform-mode 1)
+
+            ;;
+            ;; When enabling 'vertico-multiform-mode', 'vertico-posframe-mode' will be
+            ;; activated/deactivated by 'vertico-multiform-mode' dynamically when you
+            ;; add ‘posframe’ setting to 'vertico-multiform-commands,' please do not
+            ;; enable 'vertico-posframe-mode' globally at the moment!!!
+            ;;
+            ;; (vertico-posframe-mode 1)
+    )
+  )
+#+end_src

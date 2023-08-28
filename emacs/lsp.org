@@ -1,0 +1,173 @@
+* LSP Settings
+
+** Enable =lsp-mode=
+
+#+begin_src emacs-lisp 
+  (defun efs/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode)
+  )
+
+  ;;
+  ;; In addition, 'lsp-mode' will automatically detect and configure the following packages:
+  ;; - 'lsp-ui'
+  ;; - 'company-mode'.
+  ;;
+  ;; To turn off that behavior you could set 'lsp-auto-configure' to 'nil'.
+  ;;
+  (use-package lsp-mode
+    :init
+        ;;
+        ;; Set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+        ;;
+        (setq lsp-keymap-prefix "C-c l")
+    :commands (lsp lsp-deferred)
+    :hook
+      (lsp-mode . efs/lsp-mode-setup)
+      (c-mode . lsp-deferred)
+      (c-ts-mode . lsp-deferred)
+      (c++-mode . lsp-deferred)
+      (C++-ts-mode . lsp-deferred)
+    :config
+      (setq tab-width 4)
+      (lsp-enable-which-key-integration t)
+  )
+
+  ;;
+  ;; Document popup and virtual line display (error, warning, hint, etc)
+  ;;
+  (use-package lsp-ui
+    :init
+        (setq lsp-ui-doc-enable t)                  ;; Enable ui-doc
+        (setq lsp-ui-doc-show-with-cursor nil)      ;; Disable auto show doc popup when cursor is on a symbol
+        (setq lsp-ui-doc--hide-on-next-command t)   ;; Auto hide doc popup
+        ;;
+        ;; Doc popup position: 'top, 'bottom, 'at-point, but 'at-point' only works in 'GUI' mode!!!
+        ;;
+        (setq lsp-ui-doc-position 'at-point)    
+
+        ;; (setq lsp-ui-sideline-enable t)             ;; Enable virtual line
+        ;; (setq lsp-ui-sideline-show-diagnostics t)   ;; Show diagnostics (error, warning), need to install
+        ;;                                             ;; 'flycheck' but I don't like it:)
+        ;; (setq lsp-ui-sideline-show-hover t)
+        ;; (setq lsp-ui-sideline-update-mode 'line)
+      :commands lsp-ui-mode
+  )
+#+end_src
+
+
+** =Company=
+
+Completion to provide a dropdown selection.
+
+#+begin_src emacs-lisp
+  (use-package company
+    :hook (lsp-mode . company-mode)
+    ;;:bind (:map company-active-map
+    ;;         ("RET" . company-complete-selection))
+    ;;      (:map lsp-mode-map
+    ;;         ("RET" . company-indent-or-complete-common))
+    :custom
+       (company-minimum-prefix-length 2)
+       (company-idel-delay 0.0)
+    :config
+        ;;
+        ;; Enable completion for all buffers
+        ;;
+        (global-company-mode 1)
+  )
+
+  ;;
+  ;; A company front-end with icons.
+  ;;
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
+#+end_src
+
+
+** =Comment/Uncomment=
+
+#+begin_src emacs-lisp
+  (use-package evil-nerd-commenter
+    :after lsp-mode
+  )
+#+end_src
+
+
+
+** Langauge mode
+
+*** =Zig=
+
+#+begin_src emacs-lisp
+  (use-package zig-mode
+    :hook (zig-mode . lsp-deferred)
+    :hook (zig-ts-mode . lsp-deferred)
+  )
+#+end_src
+ 
+
+*** =Rust=
+
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    :hook (rust-mode . lsp-deferred)
+    :hook (rust-ts-mode . lsp-deferred)
+  )
+#+end_src
+
+
+*** =Fish=
+
+#+begin_src emacs-lisp
+  (use-package fish-mode)
+#+end_src
+
+*** =TypeScript=
+
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :mode "\\.ts\\'"
+    :hook (typescript-mode . lsp-deferred)
+    :config
+    (setq typescript-indent-level 4)
+  )
+#+end_src
+
+
+** =Web=
+
+#+begin_src emacs-lisp
+  ;; (use-package web-mode
+  ;;   :config
+  ;;       (setq web-mode-markup-indent-offset 4
+  ;;             web-mode-css-indent-offset 4
+  ;;             web-mode-code-indent-offset 4
+  ;;             web-mode-style-padding 4
+  ;;             web-mode-script-padding 4
+  ;;             web-mode-enable-auto-closing t
+  ;;             web-mode-enable-auto-opening t
+  ;;             web-mode-enable-auto-pairing t
+  ;;             web-mode-enable-auto-indentation t)
+  ;;   :mode
+  ;;       (".html$" "*css$" "*.tsx")
+  ;; )
+#+end_src
+
+
+** =Python=
+
+#+begin_src emacs-lisp
+  ;; (use-package lsp-pyright
+  ;;     :hook (python-mode . (lambda ()
+  ;;             (setq indent-tabs-mode t)
+  ;;             (setq tab-width 4)
+  ;;             (setq python-indent-offset 4)
+  ;;             (company-mode 1)
+  ;;             (require 'lsp-pyright)
+  ;;             (pyvenv-autoload)
+  ;;             (lsp))
+  ;;     )
+  ;; )
+#+end_src
+ 

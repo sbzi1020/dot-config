@@ -1,0 +1,495 @@
+* =eglot=
+
+=Emacs Polyglot= is the built-in Emacs LSP client.
+
+- Github: https://github.com/joaotavora/eglot
+- Manual: https://joaotavora.github.io/eglot
+  
+** Upgrade to latest version
+
+You can run ~eglot-upgrade-eglot~ to the latest version.
+
+
+** Install language server
+
+Before you can active =eglot=, you have to install your language server separated.
+
+
+*** =clangd=
+
+#+BEGIN_SRC bash
+
+    # For Arch Linux
+    doas pacman --refresh --sync clang
+#+END_SRC
+
+  
+*** =zls=
+
+#+BEGIN_SRC bash
+
+    # Build the `zls` from source:
+
+    mkdir ~/temp/ && cd ~/temp
+    git clone --recurse-submodules https://github.com/zigtools/zls
+    cd zls
+    zig build -Doptimize=ReleaseSafe
+
+    # Then move `./zig-out/bin/zls` to your $PATH folder
+
+    # Remove the repo folder
+    cd .. && rm -rf zls
+#+END_SRC
+
+
+*** =rust-analyzer=
+
+#+BEGIN_SRC bash
+
+    # Better to upgrade =rust= to latest version (optional)
+    # rustup upgrade
+
+    # Remove the old version that comes from `rustup`
+    rm -rf ~/.cargo/bin/rust-analyzer
+
+    # Then install the latest version
+
+    # For Arch Linux
+    doas pacman --refresh --sync rust-analyzer
+#+END_SRC
+
+
+** Setup langauge server list (optional)
+
+~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
+
+Basically, the default value covers all you need already, you can check it in the github home page:
+
+https://github.com/joaotavora/eglot
+
+If you run ~describe-variable~ on ~eglot-server-programs~, you should be able to see something like the following:
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; (((rust-ts-mode rust-mode)
+  ;;   "rust-analyzer")
+  ;;  (zig-mode "zls")
+  ;;  ((cmake-mode cmake-ts-mode)
+  ;;   "cmake-language-server")
+  ;;  ((js-mode js-ts-mode tsx-ts-mode typescript-ts-mode typescript-mode)
+  ;;   "typescript-language-server" "--stdio")
+  ;;  ((dockerfile-mode dockerfile-ts-mode)
+  ;;   "docker-langserver" "--stdio")
+  ;;  ((bash-ts-mode sh-mode)
+  ;;   "bash-language-server" "start")
+  ;;  ((c-mode c-ts-mode c++-mode c++-ts-mode)
+  ;;   .
+  ;;       [("clangd" "ccls")
+  ;;   ;; ...ignore the rest
+  ;; )
+
+#+END_SRC
+
+That said, you don't need to do anything:)
+
+But if you have to use another language servers, then you can have a look at here:
+
+https://joaotavora.github.io/eglot/#Setting-Up-LSP-Servers
+
+
+** Start =eglot=
+
+*** Start =eglot= manually
+
+The most common way to start Eglot is to simply visit a source file of a given language and use the command ~M-x eglot~. This starts the language server suitable for the visited file’s =major-mode,= and attempts to connect to it. If the connection to the language server is successful, you will see the =[eglot:project]= indicator on the mode line which reflects the server that was started. 
+
+For example:
+
+#+BEGIN_SRC bash
+
+  #[eglot] Connected! Server `clangd' now managing `(c-ts-mode c-mode c++-mode c++-ts-mode)' buffers in project `ping-pong-tron-legacy'.
+
+#+END_SRC
+
+
+A single =Eglot= session for a certain =major-mode= usually serves all the buffers under that mode which visit files from the same project, so you don’t need to invoke =M-x eglot= again when you visit another file from the same project which is edited using the same =major-mode.= This is because =Eglot= uses the Emacs project infrastructure, as described in Buffers, Projects, and Eglot, and this knows about files that belong to the same project. Thus, after starting an Eglot session for some buffer, that session is automatically reused when visiting files in the same project with the same =major-mode=.
+
+
+*** Start =eglot= automatically
+
+**** Fix =tab= issue
+
+Before you setup the start hook, you better to fix the =indentation= style.
+
+***** What is a =style=
+
+A =style= is a named collection of customizations that can be used in C mode and the related modes. There are many of them with very different settings.
+
+For example, this is the default =gnu= style and =linux= style:
+#+BEGIN_SRC bash
+
+  # GNU
+  # ("gnu"
+  #  (c-basic-offset . 2)
+  #  (c-comment-only-line-offset 0 . 0)
+  #  (c-hanging-braces-alist
+  #   (substatement-open before after)
+  #   (arglist-cont-nonempty))
+  #  (c-offsets-alist
+  #   (statement-block-intro . +)
+  #   (knr-argdecl-intro . 5)
+  #   (substatement-open . +)
+  #   (substatement-label . 0)
+  #   (label . 0)
+  #   (statement-case-open . +)
+  #   (statement-cont . +)
+  #   (arglist-intro . c-lineup-arglist-intro-after-paren)
+  #   (arglist-close . c-lineup-arglist)
+  #   (inline-open . 0)
+  #   (brace-list-open . +)
+  #   (brace-list-intro first c-lineup-2nd-brace-entry-in-arglist c-lineup-class-decl-init-+ +)
+  #   (topmost-intro-cont first c-lineup-topmost-intro-cont c-lineup-gnu-DEFUN-intro-cont))
+  #  (c-special-indent-hook . c-gnu-impose-minimum)
+  #  (c-block-comment-prefix . ""))
+
+  #  Linux
+  #  ("linux"
+  #   (indent-tabs-mode . t)
+  #   (c-basic-offset . 8)
+  #   (c-comment-only-line-offset . 0)
+  #   (c-hanging-braces-alist
+  #    (brace-list-open)
+  #    (brace-entry-open)
+  #    (substatement-open after)
+  #    (block-close . c-snug-do-while)
+  #    (arglist-cont-nonempty))
+  #   (c-cleanup-list brace-else-brace)
+  #   (c-offsets-alist
+  #    (statement-block-intro . +)
+  #    (knr-argdecl-intro . 0)
+  #    (substatement-open . 0)
+  #    (substatement-label . 0)
+  #    (label . 0)
+  #    (statement-cont . +)))
+
+#+END_SRC
+As you can see, they're very different in the detail, it effects your indentation (every time you type =(, [, {= and press =<return>= to add a new line, it will cause reindentation. If you pick the wrong one, you got a mess code and it's very annoying!!!
+
+And the variable =c-default-style= to specify the default style for various major modes( NOT just for the =c-mode=), its default value looks like this:
+
+#+BEGIN_SRC bash
+
+  # ((java-mode . "java")
+  #  (awk-mode . "awk")
+  #  (other . "gnu"))
+
+#+END_SRC
+
+That said except the =java-mode= and =awk-mode=, all the other major modes apply the =gnu= style, that's why your C/C++ code gets messed up!!!
+
+For detailed information, plz take a look at the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Custom-C-Indent.html][Customizing C Indentation]] chapter.
+
+
+***** How to set default style
+
+If you only want to change the current buffer style, you can press =C-c .= then pick a style and press =<return>=. Or you can call =c-set-style= in CC mode, =c-ts-mode-set-style= in =c-ts-mode= based on tree-sitter. But keep that in mind, that setting only affects the current buffer!!!
+
+Here is the way to set the default style via the hook:
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-tab-width 4)
+
+  ;;
+  ;; 
+  ;;
+  (defun my-c-style-settings()
+      ;;
+      ;; Very important to reset!!!
+      ;;
+      (setq tab-width my-tab-width)                
+
+      ;;
+      ;;This setting ONLY for for 'c-mode'!!!
+      ;;
+      (setq c-default-style "linux")               ;; Default is 'gun'
+      (setq c-basic-offset my-tab-width)           ;; Default is 2
+
+      ;;
+      ;; In 'c-ts-mode' you have to use another settings!!!
+      ;;
+      (setq c-ts-mode-indent-style "linux")        ;; Default is 'gun'
+      (setq c-ts-mode-indent-offset my-tab-width)  ;; Default is 2
+      (message ">>> my-c-style-settings [done]")
+  )
+
+  ;; ;;
+  ;; ;; In 'c-ts-mode' you have to use another settings!!!
+  ;; ;;
+  ;; (defun my-c-treesitter-style-settings()
+  ;;     (setq c-ts-mode-indent-style "linux")        ;; Default is 'gun'
+  ;;     (setq c-ts-mode-indent-offset my-tab-width)  ;; Default is 2
+  ;;     (message ">>> my-c-treesitter-style-settings [done]")
+  ;; )
+
+  ;;
+  ;;
+  ;;
+  (defun my-emacs-lisp-style-settings()
+      (setq tab-width 4)
+      (message ">>> my-emacs-lisp-style-settings [done]")
+  )
+
+  (add-hook 'c-mode-hook #'my-c-style-settings)
+  (add-hook 'c-ts-mode-hook #'my-c-style-settings)
+  (add-hook 'c++-ts-mode-hook #'my-c-style-settings)
+  ;; (add-hook 'zig-mode-hook #'my-zig-style-settings)
+  ;; (add-hook 'rust-ts-mode-hook #'my-rust-style-settings)
+  (add-hook 'python-ts-mode-hook #'my-c-style-settings)
+  (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
+#+END_SRC
+
+
+**** Setup hook to start =eglot=
+
+Here is the way to start =eglot= automatically:
+
+#+BEGIN_SRC emacs-lisp
+
+  (defun start-eglot()
+        (eglot-ensure)
+        (message ">>> start-elogt")
+  )
+
+  (add-hook 'c-ts-mode-hook #'start-eglot)
+  (add-hook 'c++-ts-mode-hook #'start-eglot)
+  (add-hook 'rust-ts-mode-hook #'start-eglot)
+  (add-hook 'zig-mode-hook #'start-eglot)
+  (add-hook 'python-ts-mode-hook #'start-eglot)
+#+END_SRC
+
+
+** Stop =eglot=
+
+If you don't want to run the =eglot= anymore for any reasons, just run =M-x eglot-shutdown=.
+
+
+** =eglot= commands
+
+
+*** M-x eglot
+
+This command adds the current buffer and the file it visits to the group of buffers and files managed by Eglot on behalf of a suitable language server. If a language server for the buffer’s major-mode (see Major Modes in GNU Emacs Manual) is not yet running, it will be started; otherwise the buffer and its file will be added to those managed by an existing server session.
+
+
+*** M-x eglot-shutdown
+
+This command shuts down a language server. It prompts for a language server to shut down (unless there’s only one server session, and it manages the current buffer). Then the command shuts down the server and stops managing the buffers the server was used for. Emacs features (see Eglot Features) that Eglot configured to work with the language server are restored back to their original configuration.
+
+Normally, this command kills the buffers used for communicating with the language server, but if invoked with a prefix argument C-u, the command doesn’t kill those buffers, allowing them to be used for diagnostics and problem reporting (see Troubleshooting Eglot).
+
+
+*** M-x eglot-shutdown-all
+
+This command shuts down all the language servers active in the current Emacs session. As with eglot-shutdown, invoking this command with a prefix argument avoids killing the buffers used for communications with the language servers.
+
+
+*** M-x eglot-rename
+
+This command renames the program symbol (a.k.a. identifier) at point to another name. It prompts for the new name of the symbol, and then modifies all the files in the project which are managed by the language server of the current buffer to implement the renaming.
+
+
+*** M-x eglot-format
+
+This command reformats the active region according to the language-server rules. If no region is active, it reformats the entire current buffer.
+
+
+*** M-x eglot-format-buffer
+
+This command reformats the current buffer, in the same manner as eglot-format does.
+
+
+*** M-x eglot-code-actions
+
+**** M-x eglot-code-action-organize-imports
+**** M-x eglot-code-action-quickfix
+**** M-x eglot-code-action-extract
+**** M-x eglot-code-action-inline
+**** M-x eglot-code-action-rewrite
+
+
+*** M-x eglot-inlay-hints-mode
+
+This command toggles LSP inlay hints on and off for the current buffer. Inlay hints are small text annotations to specific parts of the whole buffer, not unlike diagnostics, but designed to help readability instead of indicating problems. 
+
+
+*** M-x eglot-stderr-buffer
+
+This command pops up the buffer with the debug info printed by the language server to its standard error stream.
+
+
+*** M-x eldoc
+
+Ask the ElDoc system for help at point.
+
+**** M-x eldoc-mode
+
+Toggle echo area display of Lisp objects at point (ElDoc mode), it shows the documentation (at point) in the eacho area.
+
+It's enabled by default after =eglot= has beeen executed and it should become the buffer-loca minor mode which you can see it inside the 'modeline'.
+
+If you turn off this mode, the =eldoc-doc-buffer= won't update anymore!!!
+
+
+**** M-x eldoc-doc-buffer
+
+It opens a buffer and keep updating the documentation (at point) until the buffer has been killed or you turn off the =eldoc-mode=, it's super convenient.
+
+It bounds to =K= by default.
+
+
+*** M-x flymake-show-buffer-diagnostics
+
+Ask Flymake system to display diagnostics for the current buffer.
+
+
+*** M-x flymake-show-project-diagnostics
+
+Ask Flymake to list diagnostics for all the files in the current project.
+
+
+*** M-x xref-find-definitions
+
+Ask Xref to go the definition of the identifier at point.
+
+
+*** M-x imenu
+
+Let the user navigate the program source code using buffer index, categorizing program elements by syntactic class (class, method, variable, etc.) and offering completion.
+
+Better to use =consult-imenu= instead.
+
+
+*** M-x completion-at-point
+
+Request completion of the symbol at point.
+
+
+** Company
+
+Completion to provide a dropdown selection.
+
+#+begin_src emacs-lisp
+  (use-package company
+    :custom
+       (company-minimum-prefix-length 2)
+       (company-idel-delay 0.0)
+    :config
+        ;;
+        ;; Enable completion for all buffers
+        ;;
+        (global-company-mode 1)
+  )
+
+  ;;
+  ;; A company front-end with icons.
+  ;;
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
+#+end_src
+
+
+** Yasnippet 
+
+
+** =Comment/Uncomment=
+
+#+begin_src emacs-lisp
+  (use-package evil-nerd-commenter
+    :after lsp-mode
+  )
+#+end_src
+
+
+** Langauge mode
+
+
+*** =Zig=
+
+#+begin_src emacs-lisp
+  (use-package zig-mode
+    ;; :hook (zig-mode . lsp-deferred)
+    ;; :hook (zig-ts-mode . lsp-deferred)
+  )
+#+end_src
+ 
+
+*** =Rust=
+
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    ;; :hook (rust-mode . lsp-deferred)
+    ;; :hook (rust-ts-mode . lsp-deferred)
+  )
+#+end_src
+
+
+*** =Fish=
+
+#+begin_src emacs-lisp
+  (use-package fish-mode)
+#+end_src
+
+
+*** =Markdown=
+
+#+begin_src emacs-lisp
+  (use-package markdown-mode)
+#+end_src
+
+
+*** =TypeScript=
+
+#+begin_src emacs-lisp
+  ;; (use-package typescript-mode
+  ;;   :mode "\\.ts\\'"
+  ;;   :hook (typescript-mode . lsp-deferred)
+  ;;   :config
+  ;;   (setq typescript-indent-level 4)
+  ;; )
+#+end_src
+
+
+*** =Web=
+
+#+begin_src emacs-lisp
+  ;; (use-package web-mode
+  ;;   :config
+  ;;       (setq web-mode-markup-indent-offset 4
+  ;;             web-mode-css-indent-offset 4
+  ;;             web-mode-code-indent-offset 4
+  ;;             web-mode-style-padding 4
+  ;;             web-mode-script-padding 4
+  ;;             web-mode-enable-auto-closing t
+  ;;             web-mode-enable-auto-opening t
+  ;;             web-mode-enable-auto-pairing t
+  ;;             web-mode-enable-auto-indentation t)
+  ;;   :mode
+  ;;       (".html$" "*css$" "*.tsx")
+  ;; )
+#+end_src
+
+
+*** =Python=
+
+#+begin_src emacs-lisp
+  ;; (use-package lsp-pyright
+  ;;     :hook (python-ts-mode . (lambda ()
+  ;;             (setq indent-tabs-mode t)
+  ;;             (setq tab-width 4)
+  ;;             (setq python-indent-offset 4)
+  ;;             (pyvenv-autoload)
+  ;;             )
+  ;;     )
+  
+#+end_src
+ 
