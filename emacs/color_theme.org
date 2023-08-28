@@ -3,7 +3,7 @@
 ** Nerd icons
 
 #+BEGIN_SRC emacs-lisp
-  (use-package nerd-icons)
+  ;; (use-package nerd-icons)
 #+END_SRC
 
 After =nerd-icons= has been installed, you need to run this once:
@@ -16,7 +16,8 @@ Press =<Alt-x>= then type =nerd-icons-install-fonts= to install particular icon 
 Another option you can choose is =all-the-icons= (But I disabled at this momment, as I use =nerd-icons=).
 
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :if (display-graphic-p))
 #+END_SRC
 
 After =all-the-icons= has been installed, you need to run this once:
@@ -80,10 +81,9 @@ For example, the current theme link in the theme variable help document, put you
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
     :disabled
-    :after doom-themes
     :init
         (setq doom-modeline-buffer-file-name-style 'truncate-from-project)
-        ;; (setq nerd-icons-color-icons nil)
+        (setq nerd-icons-color-icons nil)
         (doom-modeline-mode 1)
   )
 #+END_SRC
