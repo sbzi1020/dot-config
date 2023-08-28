@@ -106,6 +106,7 @@ set_key_mapping('n', '<leader>ov', ':vsplit<CR>:e $MYVIMRC<CR>')
 -- Move between windows
 set_key_mapping('n', '<leader>m', ':wincmd h<CR>', { silent = true })
 set_key_mapping('n', '<leader>i', ':wincmd l<CR>', { silent = true })
+-- move down
 set_key_mapping('n', '<leader>j', ':wincmd j<CR>', { silent = true })
 
 -- Resize windows
@@ -290,3 +291,16 @@ Colemak edit mapping
 ----------------------------------------------------------------------
 --]]
 set_key_mapping('n', 'N', '<nop>')
+
+
+--[[
+-----------------------------------------------------------------------
+Handy file navigation
+-----------------------------------------------------------------------
+--]]
+
+-- `mm`: Make a gloabl mark
+set_key_mapping('n', 'kk', 'mM')
+
+-- `gb`: Go back to the global mark
+set_key_mapping('n', 'gb', '`Mzz')

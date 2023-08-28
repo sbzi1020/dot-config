@@ -154,6 +154,9 @@ return packer.startup(function(use)
     -- CPP, clangd extension
     use 'p00f/clangd_extensions.nvim'
 
+    -- Zig
+    use 'ziglang/zig.vim'
+
     -- Auto completion
     use 'hrsh7th/nvim-cmp'      -- A completion engine plugin for neovim written in Lua.
     use 'hrsh7th/cmp-nvim-lsp'  -- nvim-cmp source for neovim's built-in language server client.
@@ -166,6 +169,26 @@ return packer.startup(function(use)
     -- Snippet
     use 'hrsh7th/cmp-vsnip'
     use 'hrsh7th/vim-vsnip'
+
+    --[[
+    ChatGPT related
+    --]]
+    use({
+        "jackMort/ChatGPT.nvim",
+        config = function()
+            require("chatgpt").setup()
+        end,
+        requires = {
+            "MunifTanjim/nui.nvim",
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim"
+        },
+        config = function()
+            require("chatgpt").setup({
+                api_key_cmd = "echo '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'"
+            })
+        end,
+    })
 
     --[[
     Automatically set up your configuration after cloning packer.nvim

@@ -24,8 +24,8 @@ function Reload_package(package_name, args)
     end
 
     if not status_ok then
-        print(">>> Fail to load package: `" .. package_name .. "`")
-        print(">>> Extra error: " .. vim.inspect(loaded_package) .. "\n")
+        --print(">>> Fail to load package: `" .. package_name .. "`")
+        --print(">>> Extra error: " .. vim.inspect(loaded_package) .. "\n")
         return
     end
 
@@ -56,11 +56,11 @@ Reload_package 'my_nvim_comment'
 
 
 -- LSP(Language Server Protocol) modules
-Reload_package 'lsp/my_lsp'
+Reload_package 'lsp/my_lsp_wison'
 -- Reload_package 'lsp/coc'
 
 -- ChatGPT
-Reload_package 'lsp/my_chatgpt'
+Reload_package 'my_chatgpt'
 
 -- Themes modules
 Reload_package 'my_themes'
@@ -75,7 +75,7 @@ easy manipulation.
 And this module HAS TO be required/loaded AFTER all plugins has been loaded,
 that can make sure the settings will override the default keybindings.
 --]]
-Reload_package 'my_keybindings'
+Reload_package 'my_keybindings_wison'
 
 -- Load pre-defined macros
 Reload_package 'my_macros'
@@ -89,7 +89,7 @@ This is the simple way to control override highlight groups whether using
 custom color theme plugins or not.
 --]]
 --vim.cmd 'hi Cursor1 guifg=#23211B guibg=green'
---vim.cmd 'hi Cursor2 guifg=#F44747 guibg=#67615d'
+vim.cmd 'hi Cursor2 guifg=#F44747 guibg=#67615d'
 vim.cmd 'hi CursorLine guifg=NONE guibg=#493d35'
 --vim.cmd 'hi Visual guifg=NONE guibg=#ced3ac'
 

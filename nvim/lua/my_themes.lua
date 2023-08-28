@@ -13,9 +13,9 @@ After colorscheme has been load, you can run `:echo g:colors_name` command
 to show it.
 ]]
 --local current_theme = "classic_old_green"
-local current_theme = "pinkgirl"
+--local current_theme = "pinkgirl"
 --local current_theme = "tron"
---local current_theme = "tron-white"
+local current_theme = "tron-white"
 --local current_theme = "cute_duck"
 --local current_theme = "golden"
 --local current_theme = "onedark"

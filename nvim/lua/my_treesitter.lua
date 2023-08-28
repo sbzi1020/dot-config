@@ -17,6 +17,8 @@ nvim-treesitter
 :TSInstall html
 :TSInstall css
 :TSInstall json
+:TSInstall cpp
+:TSInstall c
 :TSInstall markdown
 
 After that, all compiled language parsers will be placed into:
@@ -56,15 +58,17 @@ loaded_package.setup({
         "query",
         "markdown",
         "cpp",
+        "c",
         "make",
         "dockerfile",
         "proto",
         "vim",
         "yaml",
+	    "zig",
     },
 
     -- install languages synchronously (only applied to `ensure_installed`)
-    sync_install = true,
+    sync_install = false,
 
     -- List of parsers to ignore installing
     ignore_install = { "" },

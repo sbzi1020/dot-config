@@ -14,74 +14,12 @@
             "})"
         ]
     },
-    "Axios import": {
-        "prefix": ["axios-import"],
+    "function with return": {
+        "prefix": ["fn"],
         "body": [
-            "import Axios from 'axios'"
-        ]
-    },
-    "Axios return type": {
-        "prefix": ["axios-return-type"],
-        "body": [
-            "type AxiosReturnType = { config: any, data: any, headers: any, request: any, status: number, statusText: string }"
-        ]
-    },
-    "Axios post with RxJS": {
-        "prefix": ["axios-post-with-rxjs"],
-        "body": [
-            "/**",
-            " * @param {string} currentDeviceId",
-            " * @returns {Observable<any>}",
-            " */",
-            "const ${1:Function name here} = (${2:Parameteres here}): Observable<any> => {",
-            "    const url = ${3:Url here}",
-            "    const postBody = {",
-            "",
-            "    }",
-            "    const headers = {",
-            "",
-            "    }",
-            "",
-            "    return rxjs.fromPromise(Axios.post(url, postBody, { headers })).pipe(",
-            "        rxjs.take(1),",
-            "        rxjs.catchError(error => {",
-            "            const customError = Boolean(error && error.response && error.response.data)",
-            "            return rxjs.of(customError ?",
-            "                error.response.data :",
-            "                ({ errorMessage: Boolean(error.Error) ? error.Error : error.message })",
-            "            )",
-            "        }),",
-            "        rxjs.map((result: AxiosReturnType) => {",
-            "            const isSuccess = Boolean(result && result.status && result.status === 200 && result.data)",
-            "            return isSuccess ? result.data : result",
-            "        })",
-            "    )",
-            "}"
-        ]
-    },
-    "FlexBox layout in TS": {
-        "prefix": ["layout", "flexbox"],
-        "body": [
-            "export const hBoxContainer = {",
-            "    display: 'flex',",
-            "    flexDirection: 'row',",
-            "    alignItems: 'stretch',",
-            "    justifyContent: 'center'",
-            "}",
-            "",
-            "export const hBoxChild = {",
-            "    flex: 1",
-            "}",
-            "",
-            "export const vBoxContainer = {",
-            "    display: 'flex',",
-            "    flexDirection: 'column',",
-            "    alignItems: 'stretch',",
-            "    justifyContent: 'center'",
-            "}",
-            "",
-            "export const vBoxChild = {",
-            "    flex: 1",
+            "() => {",
+            "   $1",
+            "   return ($0)",
             "}"
         ]
     },
@@ -133,20 +71,6 @@
             "() => {",
             "    $0",
             "}"
-        ]
-    },
-    "Create material styles": {
-        "prefix": ["material-style"],
-        "body": [
-            "const styles = makeStyles((theme: any) => ({",
-            "    ${1:// Camel-case key-value here}",
-            "}))$0"
-        ]
-    },
-    "<head> for TSX": {
-        "prefix": ["head"],
-        "body": [
-            "<head>$0</head>"
         ]
     },
     "<div> for TSX": {
@@ -209,140 +133,8 @@
             "<img src={$0} />"
         ]
     },
-    "input with button for TSX": {
-        "prefix": ["input-button"],
-        "body": [
-            "<input type=\"button\"/>"
-        ]
-    },
-    "input with checkbox for TSX": {
-        "prefix": ["input-checkbox"],
-        "body": [
-            "<input type=\"checkbox\"/>"
-        ]
-    },
-    "input with color for TSX": {
-        "prefix": ["input-color"],
-        "body": [
-            "<input type=\"color\"/>"
-        ]
-    },
-    "input with date for TSX": {
-        "prefix": ["input-date"],
-        "body": [
-            "<input type=\"date\"/>"
-        ]
-    },
-    "input with datetime-local for TSX": {
-        "prefix": ["input-datetime-local"],
-        "body": [
-            "<input type=\"datetime-local\"/>"
-        ]
-    },
-    "input with email for TSX": {
-        "prefix": ["input-email"],
-        "body": [
-            "<input type=\"email\"/>"
-        ]
-    },
-    "input with file for TSX": {
-        "prefix": ["input-file"],
-        "body": [
-            "<input type=\"file\"/>"
-        ]
-    },
-    "input with hidden for TSX": {
-        "prefix": ["input-hidden"],
-        "body": [
-            "<input type=\"hidden\"/>"
-        ]
-    },
-    "input with image for TSX": {
-        "prefix": ["input-image"],
-        "body": [
-            "<input type=\"image\"/>"
-        ]
-    },
-    "input with month for TSX": {
-        "prefix": ["input-month"],
-        "body": [
-            "<input type=\"month\"/>"
-        ]
-    },
-    "input with number for TSX": {
-        "prefix": ["input-number"],
-        "body": [
-            "<input type=\"number\"/>"
-        ]
-    },
-    "input with password for TSX": {
-        "prefix": ["input-password"],
-        "body": [
-            "<input type=\"password\"/>"
-        ]
-    },
-    "input with radio for TSX": {
-        "prefix": ["input-radio"],
-        "body": [
-            "<input type=\"radio\"/>"
-        ]
-    },
-    "input with range for TSX": {
-        "prefix": ["input-range"],
-        "body": [
-            "<input type=\"range\"/>"
-        ]
-    },
-    "input with reset for TSX": {
-        "prefix": ["input-reset"],
-        "body": [
-            "<input type=\"reset\"/>"
-        ]
-    },
-    "input with search for TSX": {
-        "prefix": ["input-search"],
-        "body": [
-            "<input type=\"search\"/>"
-        ]
-    },
-    "input with submit for TSX": {
-        "prefix": ["input-submitnput-search"],
-        "body": [
-            "<input type=\"submit\"/>"
-        ]
-    },
-    "input with tel for TSX": {
-        "prefix": ["input-tel"],
-        "body": [
-            "<input type=\"tel\"/>"
-        ]
-    },
-    "input with text for TSX": {
-        "prefix": ["input-text"],
-        "body": [
-            "<input type=\"text\"/>"
-        ]
-    },
-    "input with time for TSX": {
-        "prefix": ["input-time"],
-        "body": [
-            "<input type=\"time\"/>"
-        ]
-    },
-    "input with url for TSX": {
-        "prefix": ["input-url"],
-        "body": [
-            "<input type=\"url\"/>"
-        ]
-    },
-    "input with week for TSX": {
-        "prefix": ["input-week"],
-        "body": [
-            "<input type=\"week\"/>"
-        ]
-    },
     "easy tag": {
-        "prefix": ["tag"],
+        "prefix": ["tt"],
         "body": [
             "<$1>",
             "    $0",
