@@ -469,27 +469,37 @@ By default, evil bind =C-z= to toggle between =evil-state= and =emacs-state=, bu
 ** Kill current window by =Q= and exit =Emacs= by =<leader>q=
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind 'Q'
-  ;;
-  (dolist (map (list
-                dired-mode-map
-                xref--xref-buffer-mode-map
-                ))
-        (evil-define-key 'normal map (kbd "Q") nil)
-  )
-  (define-key evil-normal-state-map (kbd "Q") nil)
-
-  ;;
-  ;; Rebind 'Q'
-  ;;
   (dolist (map (list
                 evil-motion-state-map
+                evil-normal-state-map
                 ))
       (define-key map (kbd "Q") 'delete-window)
       (define-key map (kbd "<leader>q") 'save-buffers-kill-terminal)
       (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
-      ;;(message "State: %s" state);
+      ;; (message ">>> bind 'Q/<leader>q/C-c q' in '%s'" map);
+  )
+
+
+  ;;
+  ;; Bind to the local buffer keymap against the following delay modes
+  ;;
+  (defun my-bind-q-kill-current-window-local()
+    ;;
+    ;; Disable the 'SPC' binding first before binding local, otherwise,
+    ;; '<leader>' won't work correctly!!!
+    ;;
+    ;; (define-key dired-mode-map (kbd "SPC") nil)
+    ;; (define-key xref--xref-buffer-mode-map (kbd "SPC") nil)
+
+    (define-key dired-mode-map (kbd "SPC") nil)
+    (define-key evil-normal-state-local-map (kbd "Q") 'delete-window)
+  )
+
+  (dolist (hook '(
+                 dired-mode-hook
+                 xref--xref-buffer-mode-hook
+                 ))
+    (add-hook hook #'my-bind-q-kill-current-window-local)
   )
 #+END_SRC
 
@@ -514,7 +524,7 @@ By default, evil bind =C-z= to toggle between =evil-state= and =emacs-state=, bu
     (define-key map (kbd "C-c dv") 'helpful-variable)
     (define-key map (kbd "<leader>dk") 'describe-key)
     (define-key map (kbd "C-c dk") 'helpful-key)
-    (define-key map (kbd "<leader>db") 'helpful-bindings)
+    (define-key map (kbd "<leader>db") 'describe-bindings)
     (define-key map (kbd "C-c db") 'describe-bindings)
     (define-key map (kbd "<leader>dm") 'describe-mode)
     (define-key map (kbd "C-c dm") 'describe-mode)
@@ -791,20 +801,6 @@ For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
 For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
-
-  (dolist (map (list
-                dired-mode-map
-                ))
-    (evil-define-key '(normal motion) map (kbd "=") 'nil)
-    (evil-define-key '(normal motion) map (kbd "-") 'nil)
-    (evil-define-key '(normal motion) map (kbd "+") 'nil)
-    (evil-define-key '(normal motion) map (kbd "_") 'nil)
-    (evil-define-key '(normal motion) map (kbd "|") 'nil)
-  )
-
   (defun my-increase-window-width ()
     (interactive)
     (evil-window-increase-width 5)
@@ -835,9 +831,26 @@ For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
     (define-key map (kbd "+") 'my-increase-window-height)
     (define-key map (kbd "_") 'my-decrease-window-height)
   )
+
+  ;;
+  ;; Bind to the local buffer keymap against the following delay modes
+  ;;
+  (defun my-bind-window-resize-local()
+    (define-key evil-normal-state-local-map (kbd "|") 'balance-windows)
+    (define-key evil-normal-state-local-map (kbd "=") 'my-increase-window-width)
+    (define-key evil-normal-state-local-map (kbd "-") 'my-decrease-window-width)
+    (define-key evil-normal-state-local-map (kbd "+") 'my-increase-window-height)
+    (define-key evil-normal-state-local-map (kbd "_") 'my-decrease-window-height)
+  )
+
+  (dolist (hook '(
+                 dired-mode-hook
+                 ))
+    (add-hook hook #'my-bind-window-resize-local)
+  )
 #+END_SRC
 
-        
+
 ** Improve =<C-j>= and =<C-k>= for each mode I needed
 
 *** Disable =<C-j>= and =<C-k>= from the following modes
@@ -921,7 +934,7 @@ For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
   (evil-define-key 'normal org-mode-map (kbd "C-k") 'my-org-previous-heading)
 
   ;;
-  ;; 'markdown-mode' and 'markdown-view-mode'
+  ;; Bind to the local buffer keymap against the following delay modes
   ;;
   (defun my-markdown-next-heading()
     (interactive)
@@ -935,12 +948,16 @@ For jumping between up and down windows, I prefer to use =<C-w>j= and =<C-w>k=.
     (evil-scroll-line-to-center nil)
   )
 
-  (dolist (map (list
-                markdown-mode-map
-                markdown-view-mode-map
-                ))
-    (evil-define-key 'normal map (kbd "C-j") 'my-markdown-next-heading)
-    (evil-define-key 'normal map (kbd "C-k") 'my-markdown-previous-heading)
+  (defun my-bind-markdown-heading-jumping-local()
+    (define-key evil-normal-state-local-map (kbd "C-j") 'my-markdown-next-heading)
+    (define-key evil-normal-state-local-map (kbd "C-k") 'my-markdown-previous-heading)
+  )
+
+  (dolist (hook '(
+                 markdown-mode-hook
+                 markdown-view-mode-hook
+                 ))
+    (add-hook hook #'my-bind-markdown-heading-jumping-local)
   )
 #+END_SRC
 
@@ -1329,43 +1346,25 @@ Switch to =eglot= already, =K= is the default keybinding to call =eldoc-doc-bffe
 *** Go up dire by =h= and into dir or open file by =l=
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
-  (define-key dired-mode-map (kbd "SPC") nil)
-  (evil-define-key 'normal dired-mode-map (kbd "SPC") nil)
-
-  ;;
-  ;; Rebind
-  ;;
-  (evil-define-key '(motion) dired-mode-map (kbd "h") 'dired-up-directory)
-  (evil-define-key '(motion) dired-mode-map (kbd "l") 'dired-find-file)
-  ;; (evil-define-key 'normal dired-mode-map (kbd "SPC") 'dired-mark)
+  (defun my-dired-h-l-to-directory-navigating-local()
+    (define-key evil-normal-state-local-map (kbd "h") 'dired-up-directory)
+    (define-key evil-normal-state-local-map (kbd "l") 'dired-find-file)
+  )
 #+END_SRC
 
 
 *** Open file to other window by =o=
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
-  (define-key dired-mode-map (kbd "o") nil)
-  (evil-define-key 'normal dired-mode-map (kbd "o") nil)
-
-  ;;
-  ;; Rebind
-  ;;
-  (evil-define-key '(normal motion) dired-mode-map (kbd "o") 'dired-find-file-other-window)
+  (defun my-dired-o-to-open-file-local()
+    (evil-local-set-key 'normal (kbd "o") 'dired-find-file-other-window)
+  )
 #+END_SRC
 
 
 *** Jump back to ~dired buffer~ corresponding to current buffer by =C-c j=
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Rebind
-  ;;
   (dolist (map (list
                 evil-motion-state-map
                 ))
@@ -1386,29 +1385,6 @@ Switch to =eglot= already, =K= is the default keybinding to call =eldoc-doc-bffe
 - ~gz~: Go Photos =~/zig=
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
-  (evil-define-key '(normal) dired-mode-map (kbd "gh") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gb") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gc") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gd") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gp") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gr") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gt") 'nil)
-  (evil-define-key '(normal) dired-mode-map (kbd "gz") 'nil)
-
-  ;;(define-key evil-normal-state-map (kbd "gh") 'nil)
-  ;;(define-key evil-normal-state-map (kbd "gb") 'nil)
-  ;;(define-key evil-normal-state-map (kbd "gc") 'nil)
-  ;;(define-key evil-normal-state-map (kbd "gp") 'nil)
-  ;;(define-key evil-normal-state-map (kbd "gr") 'nil)
-  ;;(define-key evil-normal-state-map (kbd "gt") 'nil)
-  ;;(define-key evil-normal-state-map (kbd "gz") 'nil)
-
-  ;;
-  ;; Rebind
-  ;;
   (defun my-goto-home-directory()
      (interactive)
      (dired "~/")
@@ -1442,14 +1418,16 @@ Switch to =eglot= already, =K= is the default keybinding to call =eldoc-doc-bffe
      (dired "~/Photos")
   )
 
-  (evil-define-key '(normal) dired-mode-map (kbd "gh") 'my-goto-home-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gb") 'my-goto-shell-backup-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gd") 'my-goto-downloads-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gc") 'my-goto-c-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gp") 'my-goto-photo-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gr") 'my-goto-rust-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gt") 'my-goto-temp-directory)
-  (evil-define-key '(normal) dired-mode-map (kbd "gz") 'my-goto-zig-directory)
+  (defun my-dired-custom-go-to-local()
+    (define-key evil-normal-state-local-map (kbd "gh") 'my-goto-home-directory)
+    (define-key evil-normal-state-local-map (kbd "gb") 'my-goto-shell-backup-directory)
+    (define-key evil-normal-state-local-map (kbd "gd") 'my-goto-downloads-directory)
+    (define-key evil-normal-state-local-map (kbd "gc") 'my-goto-c-directory)
+    (define-key evil-normal-state-local-map (kbd "gp") 'my-goto-photo-directory)
+    (define-key evil-normal-state-local-map (kbd "gr") 'my-goto-rust-directory)
+    (define-key evil-normal-state-local-map (kbd "gt") 'my-goto-temp-directory)
+    (define-key evil-normal-state-local-map (kbd "gz") 'my-goto-zig-directory)
+  )
 #+END_SRC
 
 
@@ -1462,22 +1440,41 @@ Before this can work, you have to make sure that you have the following settings
 #+BEGIN_SRC emacs-lisp
   (setq dired-omit-files "^\\...+$")
 
-  (evil-define-key '(normal) dired-mode-map (kbd "<leader>h") 'dired-omit-mode)
-  (evil-define-key '(normal) dired-mode-map (kbd "C-c h") 'dired-omit-mode)
+  (defun my-dired-toggle-hidden-files-local()
+    (define-key evil-normal-state-local-map (kbd "<leader>h") 'dired-omit-mode)
+    (define-key evil-normal-state-local-map (kbd "C-c h") 'dired-omit-mode)
+  )
 #+END_SRC
 
 
 *** Modify the READ-ONLY buffer by =<leader>m=
 
 #+BEGIN_SRC emacs-lisp
-  (evil-define-key '(normal) dired-mode-map (kbd "<leader>m") 'dired-toggle-read-only)
-  (evil-define-key '(normal) dired-mode-map (kbd "C-c m") 'dired-toggle-read-only)
+  (defun my-dired-toggle-read-only-local()
+    (define-key evil-normal-state-local-map (kbd "<leader>m") 'dired-toggle-read-only)
+    (define-key evil-normal-state-local-map (kbd "C-c m") 'dired-toggle-read-only)
+  )
 #+END_SRC
 
 After going into the =wdired-change-to-wdired-mode=, here are the default keybindgins to accept or discard changes:
 
 + =C-c C-c:= Accept changes
 + =C-c C-k:= Discard changes
+
+
+*** Bind all bindings above in the 'dired-mode-hook' once
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-dired-customized-bindings()
+     (my-dired-h-l-to-directory-navigating-local)
+     (my-dired-o-to-open-file-local)
+     (my-dired-custom-go-to-local)
+     (my-dired-toggle-hidden-files-local)
+     (my-dired-toggle-read-only-local)
+  )
+
+  (add-hook 'dired-mode-hook #'my-dired-customized-bindings)
+#+END_SRC
 
 
 ** Image Dired
@@ -1579,23 +1576,18 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
 *** Basic movement and edit
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
   (dolist (map (list
-                        evil-normal-state-map
-                        evil-visual-state-map
-                        evil-motion-state-map
-                        ))
-        (define-key map (kbd "i") nil)
-        (define-key map (kbd "I") nil)
-        (define-key map (kbd "m") nil)
-        (define-key map (kbd "l") nil)
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "n") 'nil)
+      (define-key map (kbd "e") 'nil)
+      (define-key map (kbd "m") 'nil)
+      (define-key map (kbd "i") 'nil)
+      (define-key map (kbd "l") 'nil)
+      ;;(message "State: %s" state);
   )
 
-  ;;
-  ;; Rebind
-  ;;
   (dolist (map (list
                 evil-motion-state-map
                 ))
@@ -1607,32 +1599,13 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
       ;;(message "State: %s" state);
   )
 
-  ;;
   (define-key evil-normal-state-map (kbd "L") 'evil-insert-line)
-
-
 #+END_SRC
 
 
 *** Window movement
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-        (define-key map (kbd "C-n") nil)
-        (define-key map (kbd "C-p") nil)
-        (define-key map (kbd "C-i") nil)
-        (define-key map (kbd "C-m") nil)
-  )
-
-  ;;
-  ;; Rebind
-  ;;
   (dolist (map (list
                 evil-motion-state-map
                 ))
@@ -1640,17 +1613,16 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
       (define-key map (kbd "C-m") 'evil-window-left)
       (define-key map (kbd "C-w n") 'evil-window-down)
       (define-key map (kbd "C-w e") 'evil-window-up)
+      (define-key map (kbd "C-w m") 'evil-window-left)
+      (define-key map (kbd "C-w i") 'evil-window-right)
       ;;(message "State: %s" state);
   )
 
   (defun my-rebind-window-movement-for-treemacs()
       (interactive)
-      (define-key treemacs-mode-map (kbd "C-n") nil)
-      (define-key treemacs-mode-map (kbd "C-p") nil)
-      (define-key treemacs-mode-map (kbd "C-i") nil)
       (define-key evil-treemacs-state-map (kbd "C-i") nil)
-      (define-key treemacs-mode-map (kbd "C-m") nil)
-
+      (define-key treemacs-mode-map (kbd "C-i") nil)
+  
       (define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
       (define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
       (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
@@ -1760,7 +1732,6 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                   treemacs-mode-map
                     ))
             (define-key map (kbd "SPC") nil)
-            (define-key map (kbd "<leader>e") nil)
     )
 
     (dolist (map (list
@@ -1848,19 +1819,34 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
 **** Go up dire by =m= and into dir or open file by =i=
 
 #+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind
-  ;;
-  (define-key dired-mode-map (kbd "m") nil)
-  (evil-define-key 'normal dired-mode-map (kbd "m") nil)
-  (define-key dired-mode-map (kbd "i") nil)
-  (evil-define-key 'normal dired-mode-map (kbd "i") nil)
+  (defun my-colemak-m-i-directory-navigating-local()
+    (define-key evil-normal-state-local-map (kbd "m") 'dired-up-directory)
+    (define-key evil-normal-state-local-map (kbd "i") 'dired-find-file)
+  )
+
+  (add-hook 'dired-mode-hook #'my-colemak-m-i-directory-navigating-local)
+#+END_SRC
+
+
+**** Open dired by =<leader> dd=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-open-sbzi-folder()
+    (interactive)
+    (dired "~/sbzi")
+  )
 
   ;;
-  ;; Rebind
+  ;; Bind
   ;;
-  (evil-define-key '(motion) dired-mode-map (kbd "m") 'dired-up-directory)
-  (evil-define-key '(motion) dired-mode-map (kbd "i") 'dired-find-file)
-  ;; (evil-define-key 'normal dired-mode-map (kbd "SPC") 'dired-mark)
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "<leader>dd") 'my-open-sbzi-folder)
+  )
 #+END_SRC
+
+
+
 
