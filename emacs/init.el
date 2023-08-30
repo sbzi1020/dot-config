@@ -84,3 +84,14 @@
 ;; ======================================================================
 (org-babel-load-file (expand-file-name "~/.config/emacs/color_theme.org"))
 
+
+(set-face-attribute 'mode-line-active nil :background "systemGreenColor")
+(set-face-attribute 'mode-line-inactive nil :background nil)
+
+;; Function name
+(set-face-attribute 'font-lock-function-name-face nil :foreground "#2AA198" :weight 'bold)
+;; docstring
+(set-face-attribute 'font-lock-doc-face nil :foreground "#96A7A9" :weight 'normal)
+;; comment
+(set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
+(set-face-attribute 'font-lock-comment-face nil :weight 'normal)

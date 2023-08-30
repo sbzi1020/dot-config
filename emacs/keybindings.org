@@ -1059,10 +1059,10 @@ Then you can change the URL or the DESCRIPTION part and add back the final =]= c
 
 
 
-*** ~org-mode~ fold or unfold when cursor is on heading by =<RET>=
+*** ~org-mode~ open at point =<RET>=
 
 #+begin_src emacs-lisp 
-  (evil-define-key 'normal org-mode-map (kbd "RET") 'org-cycle)
+  (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
 #+end_src
 
 
@@ -1479,6 +1479,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
      (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
      (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
      (define-key evil-normal-state-local-map (kbd "SPC vs") 'evil-window-vsplit)
+     (define-key evil-normal-state-local-map (kbd "SPC h") 'dired-omit-mode)
   )
 
   (add-hook 'dired-mode-hook #'my-dired-customized-bindings)
@@ -1617,8 +1618,8 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      (define-key map (kbd "C-i") 'evil-window-right)
-      (define-key map (kbd "C-m") 'evil-window-left)
+      ;;(define-key map (kbd "C-i") 'evil-window-right)
+      ;;(define-key map (kbd "C-m") 'evil-window-left)
       (define-key map (kbd "C-w n") 'evil-window-down)
       (define-key map (kbd "C-w e") 'evil-window-up)
       (define-key map (kbd "C-w m") 'evil-window-left)
@@ -1628,11 +1629,11 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
 
   (defun my-rebind-window-movement-for-treemacs()
       (interactive)
-      (define-key evil-treemacs-state-map (kbd "C-i") nil)
-      (define-key treemacs-mode-map (kbd "C-i") nil)
+      ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
+      ;;(define-key treemacs-mode-map (kbd "C-i") nil)
   
-      (define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
-      (define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
+      ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
+      ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
       (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
       (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
   )
