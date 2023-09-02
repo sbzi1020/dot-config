@@ -1062,7 +1062,7 @@ Then you can change the URL or the DESCRIPTION part and add back the final =]= c
 *** ~org-mode~ open at point =<RET>=
 
 #+begin_src emacs-lisp 
-  (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
+  ;; (evil-define-key 'normal org-mode-map (kbd "RET") 'org-open-at-point)
 #+end_src
 
 
@@ -1858,4 +1858,11 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
 
 
 
+*** Embark
+
+**** Run ~embark-act~ by =C-,=
+
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map (kbd "C-,") 'embark-act)
+#+END_SRC
 

@@ -76,7 +76,8 @@ Rich annotations in the minibuffer
 
 ** Consult
 
-Useful search and navigation commands
+Useful search and navigation commands, here is the best video to explain how it works:
+https://www.youtube.com/watch?v=HwBHBwYgs2g
 
 #+begin_src emacs-lisp
   ;; Enable rich annotations using the Marginalia package
@@ -84,6 +85,22 @@ Useful search and navigation commands
     :after vertico
   )
 #+end_src
+
+*** Here are the useful commands:
+
+**** ~consult-imenu~: The enhanced ~imenu~
+
+**** ~consult-yank-pop~: List all yanked content, press =RET= to replace at point.
+
+**** ~consult-ripgrep~: Run ~ripgrep~ and preview
+
+By default ~consult-ripgrep~ runs the search in current (opened-file) directory, if you want to change the search directory, you can run the function directly like this:
+
+#+BEGIN_SRC emacs-lisp
+  ;;(consult-ripgrep "~/.config/emacs")
+#+END_SRC
+
+**** ~consult-line~: Better search like ~/~ or ~*~ but with preview
 
 
 ** vertico-posframe
@@ -174,3 +191,76 @@ NOTE: =vertico-posframe= requires Emacs 26 and do not support mouse click.
     )
   )
 #+end_src
+
+
+** Embark
+
+=Embark= allows you to do something (aka, run an action) on the following targets:
+
+- A single item or all items inside the completion list/Minibuffer/imenu result/rg result/etc
+- Selection of text
+
+*** Work with =which-key= 
+
+Be able to show keybindings via =which-key=
+
+#+BEGIN_SRC emacs-lisp
+  (defun embark-which-key-indicator ()
+    "An embark indicator that displays keymaps using which-key.
+  The which-key help message will show the type and value of the
+  current target followed by an ellipsis if there are further
+  targets."
+    (lambda (&optional keymap targets prefix)
+      (if (null keymap)
+          (which-key--hide-popup-ignore-command)
+        (which-key--show-keymap
+         (if (eq (plist-get (car targets) :type) 'embark-become)
+             "Become"
+           (format "Act on %s '%s'%s"
+                   (plist-get (car targets) :type)
+                   (embark--truncate-target (plist-get (car targets) :target))
+                   (if (cdr targets) "…" "")))
+         (if prefix
+             (pcase (lookup-key keymap prefix 'accept-default)
+               ((and (pred keymapp) km) km)
+               (_ (key-binding prefix 'accept-default)))
+           keymap)
+         nil nil t (lambda (binding)
+                     (not (string-suffix-p "-argument" (cdr binding))))))))
+#+END_SRC
+
+
+*** Install and configure
+
+#+BEGIN_SRC emacs-lisp
+  (use-package embark
+    :init
+      ;; Optionally replace the key help with a completing-read interface
+      (setq prefix-help-command #'embark-prefix-help-command)
+
+      ;;
+      ;; Work with 'which-key', 'embark-which-key-indicator' must defined!!!
+      ;;
+      (setq embark-indicators '(embark-which-key-indicator
+                                embark-highlight-indicator
+                                embark-isearch-highlight-indicator)
+      )
+
+    :config
+      ;;
+      ;; Hide the mode line of the Embark live/completions buffers
+      ;;
+      ;; (add-to-list 'display-buffer-alist
+      ;; 						'("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+      ;; 						nil
+      ;; 						(window-parameters (mode-line-format . none))))
+  )
+
+  ;;
+  ;; Consult users will also want the embark-consult package.
+  ;;
+  (use-package embark-consult
+    :hook
+        (embark-collect-mode . consult-preview-at-point-mode))
+#+END_SRC
+
