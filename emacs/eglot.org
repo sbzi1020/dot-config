@@ -59,6 +59,14 @@ Before you can active =eglot=, you have to install your language server separate
 #+END_SRC
 
 
+*** =python=
+
+#+BEGIN_SRC bash
+  pip install python-lsp-server
+  pip install --upgrade autopep8 
+#+END_SRC
+
+
 ** Setup langauge server list (optional)
 
 ~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
