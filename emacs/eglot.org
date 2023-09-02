@@ -219,6 +219,12 @@ Here is the way to set the default style via the hook:
       ;;
       (setq c-ts-mode-indent-style "linux")        ;; Default is 'gun'
       (setq c-ts-mode-indent-offset my-tab-width)  ;; Default is 2
+
+      ;;
+      ;; Use normal TAB behaviour
+      ;;
+      (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
+
       (message ">>> my-c-style-settings [done]")
   )
 

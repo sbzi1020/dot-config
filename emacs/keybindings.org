@@ -450,7 +450,7 @@ By default, evil bind =C-z= to toggle between =evil-state= and =emacs-state=, bu
 ** Fix =TAB= issue
 
 #+BEGIN_SRC emacs-lisp
-  (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
+  ;; (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 #+END_SRC
 
 
