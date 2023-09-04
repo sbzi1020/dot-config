@@ -50,6 +50,11 @@ This setting changes it to use =y= or =n= for shorter and faster responses.
 ** Fonts
 
 #+BEGIN_SRC emacs-lisp
+  ;; (set-face-attribute 'default nil
+  ;;                     :family "Maple Mono"
+  ;;                     :weight 'semi-bold
+  ;;                     :height 140
+  ;; )
   (set-face-attribute 'default nil
                       :family "SauceCodePro Nerd Font"
                       :weight 'semi-bold
