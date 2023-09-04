@@ -2161,6 +2161,14 @@ Before you can active =eglot=, you have to install your language server separate
 
 
 
+**** =Python=
+
+#+BEGIN_SRC bash
+  pip install python-lsp-server
+  pip install --upgrade autopep8 
+#+END_SRC
+
+
 *** Setup langauge server list (optional)
 
 ~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
@@ -2351,6 +2359,7 @@ Here is the way to set the default style via the hook:
   (add-hook 'c++-ts-mode-hook #'my-c-style-settings)
   (add-hook 'zig-mode-hook #'my-c-style-settings)
   (add-hook 'rust-ts-mode-hook #'my-c-style-settings)
+  (add-hook 'python-ts-mode-hook #'my-c-style-settings)
   (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
 #+END_SRC
 
@@ -2370,6 +2379,7 @@ Here is the way to start =eglot= automatically:
                   c++-ts-mode-hook
                   rust-ts-mode-hook
                   zig-mode-hook
+                  python-ts-mode-hook 
                   ))
      (add-hook hook #'start-eglot)
   )

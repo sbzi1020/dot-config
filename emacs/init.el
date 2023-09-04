@@ -609,6 +609,7 @@ targets."
 (add-hook 'c++-ts-mode-hook #'my-c-style-settings)
 (add-hook 'zig-mode-hook #'my-c-style-settings)
 (add-hook 'rust-ts-mode-hook #'my-c-style-settings)
+(add-hook 'python-ts-mode-hook #'my-c-style-settings)
 (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
 
 (defun start-eglot()
@@ -621,6 +622,7 @@ targets."
                 c++-ts-mode-hook
                 rust-ts-mode-hook
                 zig-mode-hook
+                python-ts-mode-hook 
                 ))
    (add-hook hook #'start-eglot)
 )
