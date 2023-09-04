@@ -36,7 +36,7 @@
   ;;
   ;; Force to set a particular background color for better transparent effect.
   ;;
-  (set-face-attribute 'default nil :background "#23211B")
+  ;; (set-face-attribute 'default nil :background "#23211B")
 
   (set-frame-parameter nil 'alpha-background 95)
   (add-to-list 'default-frame-alist '(alpha-background . 95))

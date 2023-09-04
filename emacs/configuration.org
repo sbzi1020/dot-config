@@ -1146,7 +1146,7 @@ That's why the following code has to be placed into =early-init.el= instead of =
     ;;
     ;; Force to set a particular background color for better transparent effect.
     ;;
-    (set-face-attribute 'default nil :background "#23211B")
+    ;; (set-face-attribute 'default nil :background "#23211B")
 
     (set-frame-parameter nil 'alpha-background 95)
     (add-to-list 'default-frame-alist '(alpha-background . 95))
@@ -3784,8 +3784,8 @@ Because of I use =vertico-posframe= in =GUI= mode, but =Embark= doesn't work wel
 
 *** =Nerd icons=
 
-#+BEGIN_SRC emacs-lisp
-  (use-package nerd-icons)
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; (use-package nerd-icons)
 #+END_SRC
 
 After =nerd-icons= has been installed, you need to run ~nerd-icons-install-fonts~ once to install particular icon font until you can see the nerd icons!!!
@@ -3795,8 +3795,8 @@ After =nerd-icons= has been installed, you need to run ~nerd-icons-install-fonts
 
 Another option you can choose is =all-the-icons= (But I disabled at this momment, as I use =nerd-icons=).
 
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; (use-package all-the-icons)
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons)
 #+END_SRC
 
 After =all-the-icons= has been installed, you need to run ~all-the-icons-install-fonts~ once to install particular icon font until you can see the icons!!!
@@ -3806,19 +3806,19 @@ After =all-the-icons= has been installed, you need to run ~all-the-icons-install
 
 This package includes a lot of color themes.
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-      :disabled
       :config
       ;; Global settings (defaults)
       (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
             doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
       ;; Load theme, pick the one you like
-      (load-theme 'doom-gruvbox t)
+      ;;(load-theme 'doom-gruvbox t)
       ;;(load-theme 'doom-nord-aurora t)
       ;;(load-theme 'doom-one t)
       ;;(load-theme 'doom-solarized-dark t)
+      (load-theme 'doom-solarized-light t)
       ;;(load-theme 'doom-pine t)
       ;;(load-theme 'doom-zenburn t)
       ;;(load-theme 'doom-laserwave t)
@@ -3904,7 +3904,7 @@ Here are the steps to modify the setting on the fly:
 3. In any =emacs= instance, run ~(load-theme 'my-tron-legacy t)~ to take affect.
 
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 
   ;; Gloden cursor, only effects the 'GUI' mode
@@ -4262,3 +4262,302 @@ Take the =org-level-1= as an example:
    #+BEGIN_SRC emacs-lisp :tangle no
      (use-package rainbow-mode)
    #+END_SRC
+
+
+*** Fion colors
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'mode-line-active nil :background "systemGreenColor")
+  ;; Function name
+  (set-face-attribute 'font-lock-function-name-face nil :foreground "#2AA198" :weight 'bold)
+  ;; docstring
+  (set-face-attribute 'font-lock-doc-face nil :foreground "#96A7A9" :weight 'normal)
+  ;; comment
+  (set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
+  (set-face-attribute 'font-lock-comment-face nil :weight 'normal)
+#+END_SRC
+
+
+** Colemak
+
+*** Basic movement and edit
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "n") 'nil)
+      (define-key map (kbd "e") 'nil)
+      (define-key map (kbd "m") 'nil)
+      (define-key map (kbd "i") 'nil)
+      (define-key map (kbd "l") 'nil)
+      ;;(message "State: %s" state);
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "n") 'evil-next-line)
+      (define-key map (kbd "e") 'evil-previous-line)
+      (define-key map (kbd "m") 'evil-backward-char)
+      (define-key map (kbd "i") 'evil-forward-char)
+      (define-key map (kbd "l") 'evil-insert)
+      ;;(message "State: %s" state);
+  )
+
+  (define-key evil-normal-state-map (kbd "L") 'evil-insert-line)
+#+END_SRC
+
+
+*** Window movement
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      ;;(define-key map (kbd "C-i") 'evil-window-right)
+      ;;(define-key map (kbd "C-m") 'evil-window-left)
+      (define-key map (kbd "C-w n") 'evil-window-down)
+      (define-key map (kbd "C-w e") 'evil-window-up)
+      (define-key map (kbd "C-w m") 'evil-window-left)
+      (define-key map (kbd "C-w i") 'evil-window-right)
+      ;;(message "State: %s" state);
+  )
+
+  (defun my-rebind-window-movement-for-treemacs()
+      (interactive)
+      ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
+      ;;(define-key treemacs-mode-map (kbd "C-i") nil)
+  
+      ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
+      ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
+      (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
+      (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
+  )
+
+  (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
+
+#+END_SRC
+
+
+*** Enable =<C-n>= and =<C-n>= for the following modes
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'vertico-mode'
+  ;;
+  (dolist (map (list
+                vertico-map
+                ))
+    (define-key map (kbd "C-n") 'vertico-next)
+    (define-key map (kbd "C-e") 'vertico-previous)
+  )
+
+  ;;
+  ;; 'org-mode'
+  ;;
+  (defun my-org-next-heading()
+    (interactive)
+    (org-forward-heading-same-level nil)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-org-previous-heading()
+    (interactive)
+    (org-backward-heading-same-level nil)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (evil-define-key 'normal org-mode-map (kbd "C-n") 'my-org-next-heading)
+  (evil-define-key 'normal org-mode-map (kbd "C-e") 'my-org-previous-heading)
+
+  ;;
+  ;; 'markdown-mode' and 'markdown-view-mode'
+  ;;
+  (defun my-markdown-next-heading()
+    (interactive)
+    (outline-next-visible-heading 1)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-markdown-previous-heading()
+    (interactive)
+    (outline-next-visible-heading -1)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (dolist (map (list
+                markdown-mode-map
+                markdown-view-mode-map
+                ))
+    (evil-define-key 'normal map (kbd "C-n") 'my-markdown-next-heading)
+    (evil-define-key 'normal map (kbd "C-e") 'my-markdown-previous-heading)
+  )
+#+END_SRC
+
+
+*** Improve =,= and =.= search
+
+#+begin_src emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+        (define-key map (kbd ".") nil)
+        (define-key map (kbd ",") nil)
+  )
+
+  ;;
+  ;; Unbind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+        (define-key map (kbd ".") 'my-search-next)
+        (define-key map (kbd ",") 'my-search-previous)
+  )
+#+end_src
+
+
+*** Toggle =treemacs=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                  evil-motion-state-map
+                  evil-normal-state-map
+                  ))
+          (define-key map (kbd "<leader>e") 'treemacs)
+  )
+
+  (defun my-rebind-toggle-treemacs()
+    (interactive)
+    (dolist (map (list
+                  evil-motion-state-map
+                  treemacs-mode-map
+                    ))
+            (define-key map (kbd "SPC") nil)
+    )
+
+    (dolist (map (list
+                  treemacs-mode-map
+                    ))
+            (define-key map (kbd "SPC e") 'treemacs)
+            (define-key map (kbd "<leader>e") 'treemacs)
+    )
+  )
+
+  (add-hook 'treemacs-mode-hook #'my-rebind-toggle-treemacs)
+#+END_SRC
+
+
+*** Set bookmark by =b=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "b") 'nil)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "b") 'evil-set-marker)
+      ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+*** Open your key file by =<leader>kk=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "<leader>kk") 'nil)
+  )
+
+  (defun my-open-key-file()
+     (interactive)
+     (find-file-other-window "~/sbzi/personal/keymap.org")
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "<leader>kk") 'my-open-key-file)
+      ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+*** Open EShell =<leader>s=
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "<leader>ss") 'nil)
+  )
+
+  (defun my-open-eshell()
+     (interactive)
+     (split-window-below)
+     (windmove-down)
+     (eshell)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "<leader>ss") 'my-open-eshell)
+  )
+#+END_SRC
+
+
+*** Dired
+
+**** Go up dire by =m= and into dir or open file by =i=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-colemak-m-i-directory-navigating-local()
+    (define-key evil-normal-state-local-map (kbd "m") 'dired-up-directory)
+    (define-key evil-normal-state-local-map (kbd "i") 'dired-find-file)
+  )
+
+  (add-hook 'dired-mode-hook #'my-colemak-m-i-directory-navigating-local)
+#+END_SRC
+
+
+**** Open dired by =<leader> dd=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-open-sbzi-folder()
+    (interactive)
+    (dired "~/sbzi")
+  )
+
+  ;;
+  ;; Bind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "<leader>dd") 'my-open-sbzi-folder)
+  )
+#+END_SRC
+
+
+*** Embark
+
+**** Run ~embark-act~ by =C-,=
+
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map (kbd "C-,") 'embark-act)
+#+END_SRC
