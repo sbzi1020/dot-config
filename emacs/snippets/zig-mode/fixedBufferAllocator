@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: fixedBufferAllocator
+# key: fixedBufferAllocator
+# --
+var stack_buffer: [1024]u8 = undefined;
+var fba = std.heap.FixedBufferAllocator.init(&stack_buffer);
+const allocator = fba.allocator();

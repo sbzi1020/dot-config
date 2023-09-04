@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: testAllocator
+# key: testAllocator
+# --
+const test_allocator = std.testing.allocator;
