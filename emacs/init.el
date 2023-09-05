@@ -1476,6 +1476,10 @@ targets."
 (defface my-modeline-light-red-font '((t :foreground "#f44747")) "Modeline light-red font")
 (defface my-modeline-light-green-font '((t :foreground "#BBF0EF")) "Modeline light-green font")
 (defface my-modeline-dark-green-font '((t :foreground "#5A7387")) "Modeline dark-green font")
+(defface my-modeline-purple-font '((t :foreground "systemPurpleColor")) "Modeline purple font")
+(defface my-modeline-indigo-font '((t :foreground "systemIndigoColor")) "Modeline indigo font")
+(defface my-modeline-black-font '((t :foreground "gridColor")) "Modeline black font")
+
 
 
 ;; -------------------------------------------------------------------------------
@@ -1502,7 +1506,7 @@ targets."
 
 (defvar-local my-modeline-major-mode
   '(:eval
-      (propertize (my-get-major-mode) 'face 'my-modeline-orange-font))
+      (propertize (my-get-major-mode) 'face 'my-modeline-indigo-font))
   "Mode line constructor to display major mode"
 )
 
@@ -1518,7 +1522,7 @@ targets."
 
 (defvar-local my-modeline-buffer-name
   '(:eval
-      (propertize (my-get-current-name) 'face 'my-modeline-blue-green-font))
+      (propertize (my-get-current-name) 'face 'my-modeline-black-font))
   "Mode line constructor to display buffer name"
 )
 
