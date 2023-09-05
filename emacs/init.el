@@ -1633,7 +1633,7 @@ targets."
 ;; Override the default face for change mode line backgroundW
 ;; -------------------------------------------------------------------------------
 (set-face-attribute 'mode-line-active nil :background "#2F2F2F")
-(set-face-attribute 'mode-line-inactive nil :background nil)
+(set-face-attribute 'mode-line-inactive nil :background "#e4e5e4")
 
 
 ;; -------------------------------------------------------------------------------
@@ -1853,6 +1853,7 @@ Specific to the current window's mode line.")
 (dolist (map (list
               evil-motion-state-map
               evil-normal-state-map
+              evil-visual-state-map
               ))
     (define-key map (kbd "n") 'nil)
     (define-key map (kbd "e") 'nil)
@@ -1864,6 +1865,7 @@ Specific to the current window's mode line.")
 
 (dolist (map (list
               evil-motion-state-map
+              evil-visual-state-map
               ))
     (define-key map (kbd "n") 'evil-next-line)
     (define-key map (kbd "e") 'evil-previous-line)
@@ -2074,18 +2076,18 @@ Specific to the current window's mode line.")
 (define-key global-map (kbd "C-,") 'embark-act)
 
 (use-package org-roam
-:custom
-(org-roam-directory (file-truename "~/sbzi/personal/org-roam"))
-:bind (("C-c n l" . org-roam-buffer-toggle)
-       ("C-c n f" . org-roam-node-find)
-       ("C-c n g" . org-roam-graph)
-       ("C-c n i" . org-roam-node-insert)
-       ("C-c n c" . org-roam-capture)
-       ;; Dailies
-       ("C-c n j" . org-roam-dailies-capture-today))
-:config
-;; If you're using a vertical completion framework, you might want a more informative completion interface
-(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-(org-roam-db-autosync-mode)
-;; If using org-roam-protocol
-(require 'org-roam-protocol))
+  :custom
+  (org-roam-directory (file-truename "~/sbzi/personal/org-roam"))
+  :bind (("<leader> n l" . org-roam-buffer-toggle)
+         ("<leader> n f" . org-roam-node-find)
+         ("<leader> n g" . org-roam-graph)
+         ("<leader> n i" . org-roam-node-insert)
+         ("<leader> n c" . org-roam-capture)
+         ;; Dailies
+         ("<leader> n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
