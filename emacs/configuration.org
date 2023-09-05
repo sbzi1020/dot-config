@@ -1097,6 +1097,12 @@ Auto pair =()= and =[]=
 
 
 
+*** Disable the actual size when displaying inline images
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-image-actual-width nil)
+#+END_SRC
+
 ** Set fonts and transparent background, it has to be in ~early-init.el~
 
 For some setttings, you have to place them into the =early-init.el=
@@ -4754,3 +4760,14 @@ Take the =org-level-1= as an example:
    ;; If using org-roam-protocol
    (require 'org-roam-protocol))
 #+END_SRC
+
+
+** =org-download= for copy images from anywhere
+#+BEGIN_SRC emacs-lisp
+  (use-package org-download
+      ;; Drag-and-drop to `dired`
+      :config
+      (add-hook 'dired-mode-hook 'org-download-enable)
+  )
+#+END_SRC
+

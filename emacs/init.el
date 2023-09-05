@@ -72,6 +72,8 @@
 
 (setq native-comp-async-report-warnings-errors nil)
 
+(setq org-image-actual-width nil)
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;;(add-to-list 'package-archives
@@ -2091,3 +2093,9 @@ Specific to the current window's mode line.")
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
   (require 'org-roam-protocol))
+
+(use-package org-download
+    ;; Drag-and-drop to `dired`
+    :config
+    (add-hook 'dired-mode-hook 'org-download-enable)
+)
