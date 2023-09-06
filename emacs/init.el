@@ -1904,14 +1904,15 @@ Specific to the current window's mode line.")
 ;;  (require 'eaf)
 ;;  (require 'eaf-pdf-viewer)
 
-(message "load org noter fork.")
-
 (use-package pdf-tools)
 
-(use-package org-noter )
+(use-package org-noter
+  :config
+      (setq org-noter-max-short-selected-text-length 700000)
+      (setq org-noter-max-short-length 80000)
+      (setq org-noter-always-create-frame nil) ;; Prevent use new frame!!!
+)
 
-(setq org-noter-max-short-selected-text-length 700000)
-(setq org-noter-max-short-length 80000)
 
 
 (define-key org-noter-doc-mode-map (kbd "M-i") nil)
