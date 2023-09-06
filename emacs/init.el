@@ -38,9 +38,9 @@
 ;; Disable it
 (setq save-place-mode nil)
 
-(global-display-line-numbers-mode 1)
-(setq display-line-numbers-type 'relative)
-(setq column-number-mode t)
+;;(global-display-line-numbers-mode 1)
+;;(setq display-line-numbers-type 'relative)
+;;(setq column-number-mode t)
 
 ;; (when window-system (global-hl-line-mode t))
 (global-hl-line-mode t)
@@ -1852,6 +1852,114 @@ Specific to the current window's mode line.")
 (set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
 (set-face-attribute 'font-lock-comment-face nil :weight 'normal)
 
+(use-package org-roam
+  :custom
+  (org-roam-directory (file-truename "~/sbzi/personal/org-roam"))
+ ;; :bind (("<leader> n l" . org-roam-buffer-toggle)
+ ;;        ("<leader> n f" . org-roam-node-find)
+ ;;        ("<leader> n g" . org-roam-graph)
+ ;;        ("<leader> n i" . org-roam-node-insert)
+ ;;        ("<leader> n c" . org-roam-capture)
+ ;;        ;; Dailies
+ ;;        ("<leader> n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
+
+(use-package org-download
+    ;; Drag-and-drop to `dired`
+    :config
+    (add-hook 'dired-mode-hook 'org-download-enable)
+)
+
+(use-package denote
+  :bind (("<leader> n s" . denote-signature)
+         ("<leader> n n" . denote)
+         ("<leader> n i" . denote-insert-link)
+         ("<leader> n r" . denote-rename-file-using-front-matter)
+         ("<leader> n k" . denote-keywords-add)
+         ("<leader> n K" . denote-keywords-remove))
+  :commands (denote denote-signature denote-subdirectory denote-rename-file-using-front-matter
+                    denote-keywords-prompt
+                    denote-rename-file
+                    denote-link-or-create)
+  :hook (dired-mode . denote-dired-mode-in-directories)
+  :config
+  (setq denote-directory (expand-file-name "~/denote"))
+  ;;(setq denote-known-keywords '("books" "coding" "learning" "important"))
+  ;;(setq denote-infer-keywords )
+  (setq denote-dired-directories (list denote-directory
+                                       (thread-last denote-directory (expand-file-name "books"))
+                                       (thread-last denote-directory (expand-file-name "outline"))
+                                       (thread-last denote-directory (expand-file-name "literature"))
+                                       (thread-last denote-directory (expand-file-name "term"))
+                                       (thread-last denote-directory (expand-file-name "references")))))
+
+(use-package pdf-tools
+  :load-path "~/.config/emacs/elpa/pdf-tools-20230611.239"
+  :commands pdf-tools-install
+  :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
+  :magic ("%PDF" . pdf-view-mode)
+  :hook (dirvish-setup . pdf-tools-install)
+  :config
+  (pdf-tools-install t nil t nil))
+
+;;  (add-to-list 'load-path "~/.config/emacs/site-lisp/emacs-application-framework/")
+;;  (require 'eaf)
+;;  (require 'eaf-pdf-viewer)
+
+(message "load org noter fork.")
+
+(use-package pdf-tools)
+
+(use-package org-noter )
+
+(setq org-noter-max-short-selected-text-length 700000)
+(setq org-noter-max-short-length 80000)
+
+
+(define-key org-noter-doc-mode-map (kbd "M-i") nil)
+(define-key pdf-view-mode-map (kbd "C-u") nil)
+(define-key org-noter-doc-mode-map (kbd "M-i") #'dm/insert-precise)
+
+(defun dm/insert-precise (&optional optional)
+  (interactive "P")
+  (org-noter-insert-precise-note 't))
+
+;; (push "~/workspace/org-noter-plus-djvu" load-path)
+;; (push "~/workspace/org-noter-plus-djvu/other" load-path)
+;; (push "~/workspace/org-noter-plus-djvu/modules" load-path)
+
+;; (require 'org-noter)
+;; (require 'org-noter-nov)
+;; (require 'org-noter-pdf)
+
+
+(define-advice org-noter--insert-heading (:after (level title &optional newlines-number location) add-full-body-quote)
+  "Advice for org-noter--insert-heading.
+
+When inserting a precise note insert the text of the note in the body as an org mode QUOTE block.
+
+=org-noter-max-short-length= should be set to a large value to short circuit the normal behavior:
+=(setq org-noter-max-short-length 80000)="
+
+  ;; this tells us it's a precise note that's being invoked.
+  (if (consp location)
+      (insert (format "#+BEGIN_QUOTE\n%s\n#+END_QUOTE" title))))
+
+;; ;; (require 'org-noter-nov-overlay)
+;; doesn't work. (require 'org-noter-integration)
+
+
+;;  (use-package pdf-tools-org-noter-helpers
+;;   :straight (
+;;              :type git :repo "https://github.com/analyticd/pdf-tools-org-noter-helpers")
+;;   :config
+;; (require 'pdf-tools-org-noter-helpers))
+
 (dolist (map (list
               evil-motion-state-map
               evil-normal-state-map
@@ -2077,25 +2185,75 @@ Specific to the current window's mode line.")
 
 (define-key global-map (kbd "C-,") 'embark-act)
 
-(use-package org-roam
-  :custom
-  (org-roam-directory (file-truename "~/sbzi/personal/org-roam"))
-  :bind (("<leader> n l" . org-roam-buffer-toggle)
-         ("<leader> n f" . org-roam-node-find)
-         ("<leader> n g" . org-roam-graph)
-         ("<leader> n i" . org-roam-node-insert)
-         ("<leader> n c" . org-roam-capture)
-         ;; Dailies
-         ("<leader> n j" . org-roam-dailies-capture-today))
-  :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+;;
+;; 
+;;
+(defun my-xxxxx()
+  (interactive)
+  (message ">>>>> [ my-xxxx ]called.")
+)
 
-(use-package org-download
-    ;; Drag-and-drop to `dired`
-    :config
-    (add-hook 'dired-mode-hook 'org-download-enable)
+(defun my-pdf-scroll-local()
+    (message ">>> [ my-pdf-scroll-local ] ")
+
+    ;;
+    ;; Disable SPC
+    ;;
+    (define-key pdf-view-mode-map (kbd "SPC") nil)
+    ;; (define-key evil-motion-state-map (kbd "SPC") nil)
+    ;; (define-key evil-normal-state-map (kbd "SPC") nil)
+    (message ">>> [ my-pdf-scroll-local ] unbind works. ")
+
+    ;;
+    ;; Rebind
+    ;;
+    (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
+    (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
+    (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
+    (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
+    (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
+    (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
+
+
+    ;; disable line number
+    (display-line-numbers-mode -1)
+    ;; (define-key evil-normal-state-local-map (kbd "e") 'my-xxxxx)
+    (message ">>> [ my-pdf-scroll-local ] Set 'e' to local buffer")
+)
+
+(dolist (hook '(pdf-view-mode-hook
+                ))
+   (add-hook hook #'my-pdf-scroll-local)
+)
+
+(defun my-org-noter-local()
+    (message ">>> [ my-pdf-org-noter-local ] ")
+
+    ;;
+    ;; Disable SPC
+    ;;
+    (define-key pdf-view-mode-map (kbd "SPC") nil)
+    ;; (define-key evil-motion-state-map (kbd "SPC") nil)
+    ;; (define-key evil-normal-state-map (kbd "SPC") nil)
+    (message ">>> [ my-pdf-org-noter-local ] unbind works. ")
+
+    ;;
+    ;; Rebind
+    ;;
+    (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
+    (define-key evil-normal-state-local-map (kbd "C-c n i") 'org-noter-insert-note)
+    (define-key evil-normal-state-local-map (kbd "C-c n c") 'org-noter-create-skeleton)
+    (define-key evil-normal-state-local-map (kbd "C-c n k") 'org-noter-kill-session)
+    (define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
+    (define-key evil-normal-state-local-map (kbd "C-c n s") 'org-noter-sync-current-note)
+    (define-key evil-normal-state-local-map (kbd "C-c n p") 'org-noter-insert-precise-note)
+    (define-key evil-normal-state-local-map (kbd "C-c n a") 'org-noter-set-auto-save-last-location)
+
+    (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
+)
+
+(dolist (hook '(org-mode-hook
+                pdf-view-mode-hook
+                ))
+   (add-hook hook #'my-org-noter-local)
 )
