@@ -39,8 +39,8 @@
 (setq save-place-mode nil)
 
 ;;(global-display-line-numbers-mode 1)
-;;(setq display-line-numbers-type 'relative)
-;;(setq column-number-mode t)
+(setq display-line-numbers-type 'relative)
+(setq column-number-mode t)
 
 ;; (when window-system (global-hl-line-mode t))
 (global-hl-line-mode t)
@@ -920,13 +920,6 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>rr") 'eval-buffer)
-  (define-key map (kbd "C-c r r") 'eval-buffer)
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              ))
   (define-key map (kbd "W") 'save-buffer)
 )
 
@@ -1226,15 +1219,15 @@ targets."
 (define-key evil-motion-state-map (kbd "n") 'my-search-next)
 (define-key evil-motion-state-map (kbd "N") 'my-search-previous)
 
-(defun my-org-mode-create-elisp-code-block()
-  (interactive)
-  (org-insert-structure-template "SRC emacs-lisp")
-)
-
-(defun my-org-mode-create-elisp-code-block-local()
-  (define-key evil-normal-state-local-map (kbd "<leader>cb") 'my-org-mode-create-elisp-code-block)
-  (define-key evil-normal-state-local-map (kbd "C-c c b") 'my-org-mode-create-elisp-code-block)
-)
+;; (defun my-org-mode-create-elisp-code-block()
+;;   (interactive)
+;;   (org-insert-structure-template "SRC emacs-lisp")
+;; )
+;; 
+;; (defun my-org-mode-create-elisp-code-block-local()
+;;   (define-key evil-normal-state-local-map (kbd "<leader>cb") 'my-org-mode-create-elisp-code-block)
+;;   (define-key evil-normal-state-local-map (kbd "C-c c b") 'my-org-mode-create-elisp-code-block)
+;; )
 
 (defun my-org-mode-return-cycle-local()
   (define-key evil-normal-state-local-map (kbd "RET") 'org-cycle)
@@ -1248,7 +1241,7 @@ targets."
 )
 
 (defun my-org-mode-local-bindings()
-   (my-org-mode-create-elisp-code-block-local)
+   ;; (my-org-mode-create-elisp-code-block-local)
    (my-org-mode-return-cycle-local)
    (my-org-mode-insert-and-open-link-local)
 )
@@ -2226,16 +2219,26 @@ When inserting a precise note insert the text of the note in the body as an org 
    (add-hook hook #'my-pdf-scroll-local)
 )
 
+(defun my-rebind-spc-for-pdf-view-mode()
+     ;;
+     ;; Rebind all '<leader>' related to local buffer scope
+  ;; to solve the default 'SPC' binds to pdf scrollup
+     ;;
+     (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
+     (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
+     (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
+     (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
+     (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
+     (define-key evil-normal-state-local-map (kbd "SPC df") 'helpful-callable)
+     (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
+     (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
+     (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
+
+     (message "[ my-rebind-spc-for-pdf-view-mode ] - rebind all SPC successfully.")
+)
+
 (defun my-org-noter-local()
     (message ">>> [ my-pdf-org-noter-local ] ")
-
-    ;;
-    ;; Disable SPC
-    ;;
-    (define-key pdf-view-mode-map (kbd "SPC") nil)
-    ;; (define-key evil-motion-state-map (kbd "SPC") nil)
-    ;; (define-key evil-normal-state-map (kbd "SPC") nil)
-    (message ">>> [ my-pdf-org-noter-local ] unbind works. ")
 
     ;;
     ;; Rebind
@@ -2249,6 +2252,7 @@ When inserting a precise note insert the text of the note in the body as an org 
     (define-key evil-normal-state-local-map (kbd "C-c n p") 'org-noter-insert-precise-note)
     (define-key evil-normal-state-local-map (kbd "C-c n a") 'org-noter-set-auto-save-last-location)
 
+
     (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
 )
 
@@ -2257,3 +2261,5 @@ When inserting a precise note insert the text of the note in the body as an org 
                 ))
    (add-hook hook #'my-org-noter-local)
 )
+
+(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)

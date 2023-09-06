@@ -998,8 +998,8 @@ By default, =Emacs= prompts for user confirmation using =yes= or =no=. The follo
 
 #+BEGIN_SRC emacs-lisp
   ;;(global-display-line-numbers-mode 1)
-  ;;(setq display-line-numbers-type 'relative)
-  ;;(setq column-number-mode t)
+  (setq display-line-numbers-type 'relative)
+  (setq column-number-mode t)
 #+END_SRC
 
 
@@ -3001,17 +3001,6 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
 #+END_SRC
 
 
-*** Evaluate/reload current buffer settings by ~<leader>rr~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "<leader>rr") 'eval-buffer)
-    (define-key map (kbd "C-c r r") 'eval-buffer)
-  )
-#+END_SRC
-
 
 *** Save buffer by ~W~
 
@@ -3433,15 +3422,15 @@ For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
 **** ~org-mode~ insert code block by ~<leader>cb~
 
 #+begin_src emacs-lisp 
-  (defun my-org-mode-create-elisp-code-block()
-    (interactive)
-    (org-insert-structure-template "SRC emacs-lisp")
-  )
-  
-  (defun my-org-mode-create-elisp-code-block-local()
-    (define-key evil-normal-state-local-map (kbd "<leader>cb") 'my-org-mode-create-elisp-code-block)
-    (define-key evil-normal-state-local-map (kbd "C-c c b") 'my-org-mode-create-elisp-code-block)
-  )
+  ;; (defun my-org-mode-create-elisp-code-block()
+  ;;   (interactive)
+  ;;   (org-insert-structure-template "SRC emacs-lisp")
+  ;; )
+  ;; 
+  ;; (defun my-org-mode-create-elisp-code-block-local()
+  ;;   (define-key evil-normal-state-local-map (kbd "<leader>cb") 'my-org-mode-create-elisp-code-block)
+  ;;   (define-key evil-normal-state-local-map (kbd "C-c c b") 'my-org-mode-create-elisp-code-block)
+  ;; )
 #+end_src
 
 
@@ -3470,7 +3459,7 @@ For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
 
 #+BEGIN_SRC emacs-lisp
   (defun my-org-mode-local-bindings()
-     (my-org-mode-create-elisp-code-block-local)
+     ;; (my-org-mode-create-elisp-code-block-local)
      (my-org-mode-return-cycle-local)
      (my-org-mode-insert-and-open-link-local)
   )
@@ -4536,13 +4525,6 @@ Take the =org-level-1= as an example:
 
 ** =org-noter=
 
- #+BEGIN_SRC emacs-lisp :tangle no
-   (use-package org-noter
-     :load-path "~/sbzi/personal/org-noter/"
-     :ensure t
-     :demand t)
- #+END_SRC
-
  #+BEGIN_SRC emacs-lisp
    (message "load org noter fork.")
 
@@ -4935,16 +4917,26 @@ When inserting a precise note insert the text of the note in the body as an org 
 *** =org-noter=
 
 #+BEGIN_SRC emacs-lisp
+  (defun my-rebind-spc-for-pdf-view-mode()
+       ;;
+       ;; Rebind all '<leader>' related to local buffer scope
+    ;; to solve the default 'SPC' binds to pdf scrollup
+       ;;
+       (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
+       (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
+       (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
+       (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
+       (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
+       (define-key evil-normal-state-local-map (kbd "SPC df") 'helpful-callable)
+       (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
+       (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
+       (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
+
+       (message "[ my-rebind-spc-for-pdf-view-mode ] - rebind all SPC successfully.")
+  )
+
   (defun my-org-noter-local()
       (message ">>> [ my-pdf-org-noter-local ] ")
-
-      ;;
-      ;; Disable SPC
-      ;;
-      (define-key pdf-view-mode-map (kbd "SPC") nil)
-      ;; (define-key evil-motion-state-map (kbd "SPC") nil)
-      ;; (define-key evil-normal-state-map (kbd "SPC") nil)
-      (message ">>> [ my-pdf-org-noter-local ] unbind works. ")
 
       ;;
       ;; Rebind
@@ -4958,6 +4950,7 @@ When inserting a precise note insert the text of the note in the body as an org 
       (define-key evil-normal-state-local-map (kbd "C-c n p") 'org-noter-insert-precise-note)
       (define-key evil-normal-state-local-map (kbd "C-c n a") 'org-noter-set-auto-save-last-location)
 
+
       (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
   )
 
@@ -4966,4 +4959,6 @@ When inserting a precise note insert the text of the note in the body as an org 
                   ))
      (add-hook hook #'my-org-noter-local)
   )
+
+  (add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
 #+END_SRC
