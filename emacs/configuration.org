@@ -5124,50 +5124,6 @@ Take the =org-level-1= as an example:
 #+END_SRC
 
 
-*** =pdf-tools=
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; 
-  ;;
-  (defun my-xxxxx()
-    (interactive)
-    (message ">>>>> [ my-xxxx ]called.")
-  )
-
-  (defun my-pdf-scroll-local()
-      (message ">>> [ my-pdf-scroll-local ] ")
-
-      ;;
-      ;; Disable SPC
-      ;;
-      (define-key pdf-view-mode-map (kbd "SPC") nil)
-      ;; (define-key evil-motion-state-map (kbd "SPC") nil)
-      ;; (define-key evil-normal-state-map (kbd "SPC") nil)
-      (message ">>> [ my-pdf-scroll-local ] unbind works. ")
-
-      ;;
-      ;; Rebind
-      ;;
-      (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
-      (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
-      (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
-      (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
-      (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
-      (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
-
-      ;; (define-key evil-normal-state-local-map (kbd "e") 'my-xxxxx)
-      (message ">>> [ my-pdf-scroll-local ] Set 'e' to local buffer")
-  )
-
-  (dolist (hook '(pdf-view-mode-hook
-                  ))
-     (add-hook hook #'my-pdf-scroll-local)
-  )
-
-#+END_SRC
-
-
 *** Embark
 
 **** Run ~embark-act~ by =C-,=
@@ -5178,13 +5134,26 @@ Take the =org-level-1= as an example:
 
 
 
-*** =org-noter=
+*** =pdf-tools=
 
 #+BEGIN_SRC emacs-lisp
-  (defun my-rebind-spc-for-pdf-view-mode()
+  (defun my-pdf-scroll-local()
+      (message ">>> [ my-pdf-scroll-local ] ")
+
+      ;;
+      ;; Rebind
+      ;;
+      (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
+      (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
+      (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
+      (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
+      (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
+      (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
+      (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
+
        ;;
        ;; Rebind all '<leader>' related to local buffer scope
-    ;; to solve the default 'SPC' binds to pdf scrollup
+       ;; to solve the default 'SPC' binds to pdf scrollup
        ;;
        (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
        (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
@@ -5195,11 +5164,7 @@ Take the =org-level-1= as an example:
        (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
        (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
        (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
-
-       ;;
-       ;; Noter related
-       ;;
-       (define-key evil-normal-state-local-map (kbd "SPC n n") 'org-noter)
+       (message ">>> [ my-pdf-scroll-local ] rebind SPC related works.")
 
        ;;
        ;; Window movement related
@@ -5208,48 +5173,58 @@ Take the =org-level-1= as an example:
        (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
        (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
        (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
-
-       (message "[ my-rebind-spc-for-pdf-view-mode ] - rebind all SPC successfully.")
+       (message ">>> [ my-pdf-scroll-local ] rebind SPC windows movement works.")
   )
 
+  (dolist (hook '(pdf-view-mode-hook
+                  ))
+     (add-hook hook #'my-pdf-scroll-local)
+  )
+
+#+END_SRC
+
+
+*** =org-noter=
+
+#+BEGIN_SRC emacs-lisp
   (defun my-org-noter-local()
       (message ">>> [ my-pdf-org-noter-local ] ")
 
       ;;
       ;; Rebind
       ;;
+      ;;(define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
       (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-      (define-key evil-normal-state-local-map (kbd "M-i") 'org-noter-insert-note)
+      (define-key evil-normal-state-local-map (kbd "M-a") 'org-noter-insert-note)
       (define-key evil-normal-state-local-map (kbd "M-p") 'org-noter-insert-precise-note)
-      (define-key evil-normal-state-local-map (kbd "C-c n o") 'org-noter-create-skeleton)
-      (define-key evil-normal-state-local-map (kbd "C-c n k") 'org-noter-kill-session)
-      (define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
-      (define-key evil-normal-state-local-map (kbd "C-c n l") 'org-noter-set-auto-save-last-location)
-      (define-key evil-normal-state-local-map (kbd "C-c n >") 'org-noter-sync-next-note)
-      (define-key evil-normal-state-local-map (kbd "C-c n <") 'org-noter-sync-prev-note)
-      (define-key evil-normal-state-local-map (kbd "C-c n ]") 'org-noter-sync-next-page-or-chapter)
-      (define-key evil-normal-state-local-map (kbd "C-c n [") 'org-noter-sync-prev-page-or-chapter)
-      (define-key evil-normal-state-local-map (kbd "C-c n /") 'org-noter-sync-current-page-or-chapter)
-      (define-key evil-normal-state-local-map (kbd "C-c n c") 'org-noter-sync-current-note)
+      (define-key evil-normal-state-local-map (kbd "M-o") 'org-noter-create-skeleton)
+      (define-key evil-normal-state-local-map (kbd "M-q") 'org-noter-kill-session)
+      ;;(define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
+      (define-key evil-normal-state-local-map (kbd "M-s") 'org-noter-set-auto-save-last-location)
+      (define-key evil-normal-state-local-map (kbd "M-]") 'org-noter-sync-next-note)
+      (define-key evil-normal-state-local-map (kbd "M-[") 'org-noter-sync-prev-note)
+      (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-note)
+      (define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
+      (define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
+      (define-key evil-normal-state-local-map (kbd "M-C") 'org-noter-sync-current-page-or-chapter)
 
 
 
-
-      (if my-enable-which-key-customized-description
-          (progn
-              (which-key-add-key-based-replacements "C-c n" "Noter")
-              (which-key-add-key-based-replacements "C-c n n" "Open session")
-              (which-key-add-key-based-replacements "C-c n o" "Outline")
-              (which-key-add-key-based-replacements "C-c n k" "Kill session")
-              (which-key-add-key-based-replacements "C-c n h" "Hide other")
-              (which-key-add-key-based-replacements "C-c n a" "Save last location")
-              (which-key-add-key-based-replacements "C-c n c" "current")
-              (which-key-add-key-based-replacements "C-c n /" "current page")
-              (which-key-add-key-based-replacements "C-c n >" "next note")
-              (which-key-add-key-based-replacements "C-c n <" "prev note")
-              (which-key-add-key-based-replacements "C-c n ]" "next chapter note")
-              (which-key-add-key-based-replacements "C-c n [" "prev chapter note")
-          ))
+    ;; (if my-enable-which-key-customized-description
+    ;;      (progn
+    ;;          ;;(which-key-add-key-based-replacements "C-c n" "Noter")
+    ;;          (which-key-add-key-based-replacements "C-c n n" "Open session")
+    ;;          (which-key-add-key-based-replacements "C-c n o" "Outline")
+    ;;          (which-key-add-key-based-replacements "C-c n k" "Kill session")
+    ;;          (which-key-add-key-based-replacements "C-c n h" "Hide other")
+    ;;          (which-key-add-key-based-replacements "C-c n a" "Save last location")
+    ;;          (which-key-add-key-based-replacements "C-c n c" "current")
+    ;;          (which-key-add-key-based-replacements "C-c n /" "current page")
+    ;;          (which-key-add-key-based-replacements "C-c n >" "next note")
+    ;;          (which-key-add-key-based-replacements "C-c n <" "prev note")
+    ;;          (which-key-add-key-based-replacements "C-c n ]" "next chapter note")
+    ;;          (which-key-add-key-based-replacements "C-c n [" "prev chapter note")
+    ;;      ))
 
       (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
   )
@@ -5260,5 +5235,5 @@ Take the =org-level-1= as an example:
      (add-hook hook #'my-org-noter-local)
   )
 
-  (add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
+  ;(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
 #+END_SRC
