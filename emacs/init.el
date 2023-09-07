@@ -137,12 +137,12 @@
   :defer t
   :init
       (which-key-setup-side-window-right-bottom)
-      (which-key-mode)
-  :config
-      ;; Key panel show up delay, unit in seconds.
-      ;; If you want show up instantly, set to 0, 
-      ;;(setq which-key-idle-delay 0)
       (setq which-key-idle-delay 0.2)
+      ;; (setq which-key-sort-order 'which-key-local-then-key-order)
+      (setq which-key-sort-order 'which-key-prefix-then-key-order)
+      (setq which-key-prefix-prefix "> " )
+  :config
+      (which-key-mode)
 )
 
 (use-package highlight-indent-guides
@@ -558,153 +558,6 @@ targets."
   )
 )
 
-(use-package treemacs
-     :init
-     ;;
-     ;; Mouse click to show action menu
-     ;;
-     (with-eval-after-load 'treemacs
-         (define-key treemacs-mode-map [mouse-1] #'treemacs-single-click-expand-action))
-     :config
-
-
-     ;;
-     ;; Theme
-     ;;
-     (treemacs-load-theme "Default")
-
-     (progn
-         (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-             treemacs-deferred-git-apply-delay        0.5
-             treemacs-directory-name-transformer      #'identity
-             treemacs-display-in-side-window          t
-             treemacs-eldoc-display                   'simple
-             treemacs-file-event-delay                2000
-             treemacs-file-extension-regex            treemacs-last-period-regex-value
-             treemacs-file-follow-delay               0.2
-             treemacs-file-name-transformer           #'identity
-             treemacs-follow-after-init               t
-             treemacs-expand-after-init               t
-             treemacs-find-workspace-method           'find-for-file-or-pick-first
-             treemacs-git-command-pipe                ""
-             treemacs-goto-tag-strategy               'refetch-index
-             treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-             treemacs-hide-dot-git-directory          t
-             treemacs-indentation                     2
-             treemacs-indentation-string              " "
-             treemacs-is-never-other-window           nil
-             treemacs-max-git-entries                 5000
-             treemacs-missing-project-action          'ask
-             treemacs-move-forward-on-expand          nil
-             treemacs-no-png-images                   nil
-             treemacs-no-delete-other-windows         t
-             treemacs-project-follow-cleanup          nil
-             treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-             treemacs-position                        'left
-             treemacs-read-string-input               'from-child-frame
-             treemacs-recenter-distance               0.1
-             treemacs-recenter-after-file-follow      nil
-             treemacs-recenter-after-tag-follow       nil
-             treemacs-recenter-after-project-jump     'always
-             treemacs-recenter-after-project-expand   'on-distance
-             treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-             treemacs-project-follow-into-home        nil
-             treemacs-show-cursor                     nil
-             treemacs-show-hidden-files               t
-             treemacs-silent-filewatch                nil
-             treemacs-silent-refresh                  nil
-             treemacs-sorting                         'alphabetic-asc
-             treemacs-select-when-already-in-treemacs 'move-back
-             treemacs-space-between-root-nodes        t
-             treemacs-tag-follow-cleanup              t
-             treemacs-tag-follow-delay                1.5
-             treemacs-text-scale                      nil
-             treemacs-user-mode-line-format           nil
-             treemacs-user-header-line-format         nil
-             treemacs-wide-toggle-width               70
-             treemacs-width                           35
-             treemacs-width-increment                 1
-             treemacs-width-is-initially-locked       t
-             treemacs-workspace-switch-cleanup        nil)
-
-         ;; The default width and height of the icons is 22 pixels. If you are
-         ;; using a Hi-DPI display, uncomment this to double the icon size.
-         (treemacs-resize-icons 44)
-
-         (treemacs-follow-mode t)
-         (treemacs-filewatch-mode t)
-         (treemacs-fringe-indicator-mode 'always)
-         (when treemacs-python-executable
-         (treemacs-git-commit-diff-mode t))
-
-         (pcase (cons (not (null (executable-find "git")))
-                     (not (null treemacs-python-executable)))
-         (`(t . t)
-         (treemacs-git-mode 'deferred))
-         (`(t . _)
-         (treemacs-git-mode 'simple)))
-
-         (treemacs-hide-gitignored-files-mode nil)
-
-         ;;
-         ;; Enable indent guide
-         ;;
-         (setq treemacs-indent-guide-style 'line)
-         (treemacs-indent-guide-mode t)
-
-         ;;
-         ;; If you want to look at files from within treemacs, without opening them with 'RET'
-         ;; and switching to another window, you can do so with 'P' which activates
-         ;; 'treemacs-peek-mode'.
-         ;;
-         ;; When 'peek-mode' is active treemacs will automatically preview the file at point.
-         ;;
-         ;; You can scroll the window being peeked (and in general other-window when you are in treemacs)
-         ;; with 'M-N/P' or 'M-J/K' if you use treemacs-evil.
-         ;;
-         (treemacs-peek-mode t)
-
-         ;;
-         ;; Allows you to use treemacs icons in dired buffers
-         ;;
-         ;; (treemacs-icons-dired-mode)
-
-         ;;
-         ;; Provides a theme using all-the-icons.
-         ;;
-         ;;(treemacs-all-the-icons)
-     )
-)
-
-;;
-;; evil support
-;;
-(use-package treemacs-evil
- :after (treemacs evil)
-)
-
-(use-package treemacs-icons-dired
- :hook (dired-mode . treemacs-icons-dired-enable-once)
- :ensure t)
-
-;; (use-package treemacs-projectile
-;;   :after (treemacs projectile)
-;;   :ensure t)
-
-;; (use-package treemacs-magit
-;;   :after (treemacs magit)
-;;   :ensure t)
-
-;; (use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
-;;   :after (treemacs persp-mode) ;;or perspective vs. persp-mode
-;;   :ensure t
-;;   :config (treemacs-set-scope-type 'Perspectives))
-
-;; (use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
-;;   :after (treemacs)
-;;   :ensure t
-;;   :config (treemacs-set-scope-type 'Tabs))
-
 (setq my-tab-width 4)
 
 ;;
@@ -844,6 +697,16 @@ targets."
 
 (use-package markdown-mode)
 
+;;
+;; Enable
+;;
+(setq my-enable-which-key-customized-description t)
+
+;;
+;; Disable
+;;
+;; (setq my-enable-which-key-customized-description nil)
+
 (setf (cdr help-mode-map) nil)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -853,13 +716,6 @@ targets."
               evil-motion-state-map
               ))
     (define-key map (kbd "C-z") nil)
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              ))
-  (define-key map (kbd "<leader>sc") 'flyspell-mode)
-  (define-key map (kbd "C-c s c") 'flyspell-mode)
 )
 
 (dolist (map (list
@@ -887,6 +743,12 @@ targets."
   (add-hook hook #'my-bind-q-kill-current-window-local)
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC q" "Save and exit")
+        (which-key-add-key-based-replacements "C-c q" "Save and exit")
+    ))
+
 (dolist (map (list
               evil-motion-state-map
               ))
@@ -903,6 +765,23 @@ targets."
   ;;(message "State: %s" state);
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC d" "Describe ...")
+        (which-key-add-key-based-replacements "C-c d" "Describe ...")
+
+        (which-key-add-key-based-replacements "SPC d f" "Function")
+        (which-key-add-key-based-replacements "C-c d f" "Function")
+        (which-key-add-key-based-replacements "SPC d v" "Variable")
+        (which-key-add-key-based-replacements "C-c d v" "Variable")
+        (which-key-add-key-based-replacements "SPC d k" "Keys")
+        (which-key-add-key-based-replacements "C-c d k" "Keys")
+        (which-key-add-key-based-replacements "SPC d m" "Mode")
+        (which-key-add-key-based-replacements "C-c d m" "Mode")
+        (which-key-add-key-based-replacements "SPC d b" "Bindings")
+        (which-key-add-key-based-replacements "C-c d b" "Bindings")
+    ))
+
 (dolist (map (list
               evil-motion-state-map
               ))
@@ -910,12 +789,26 @@ targets."
   (define-key map (kbd "C-c l") 'clm/toggle-command-log-buffer)
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC l" "Command Log")
+        (which-key-add-key-based-replacements "C-c l" "Command Log")
+    ))
+
 (dolist (map (list
               evil-motion-state-map
               ))
   (define-key map (kbd "<leader>ee") 'eval-last-sexp)
   (define-key map (kbd "C-c e e") 'eval-last-sexp)
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC e" "Evalute/Emoji")
+        (which-key-add-key-based-replacements "C-c e" "Evalute/Emoji")
+        (which-key-add-key-based-replacements "SPC e e" "Evalute Lisp")
+        (which-key-add-key-based-replacements "C-c e e" "Evalute Lisp")
+    ))
 
 (dolist (map (list
               evil-motion-state-map
@@ -962,14 +855,27 @@ targets."
     ;;(message "State: %s" state);
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "gb" "Go back")
+    ))
+
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>p") 'find-file)
-  (define-key map (kbd "C-c p") 'find-file)
+  (define-key map (kbd "<leader>f") 'find-file)
+  (define-key map (kbd "C-c f") 'find-file)
   (define-key map (kbd "<leader>b") 'consult-buffer)
   (define-key map (kbd "C-c b") 'consult-buffer)
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC f" "Find files")
+        (which-key-add-key-based-replacements "C-c f" "Find files")
+        (which-key-add-key-based-replacements "SPC b" "Buffer list")
+        (which-key-add-key-based-replacements "C-c b" "Buffer list")
+    ))
 
 (dolist (map (list
               evil-motion-state-map
@@ -977,11 +883,21 @@ targets."
   (define-key map (kbd "<leader>SPC") 'switch-to-last-buffer)
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC SPC" "Last Buffer")
+    ))
+
 (dolist (map (list
               evil-motion-state-map
               ))
   (define-key map (kbd "<leader>RET") 'olivetti-mode)
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC RET" "Toggle Focus mode")
+    ))
 
 ;;
 ;; Unbind the default <C-s> for 'isearch-forward'
@@ -1010,9 +926,15 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>f") 'consult-ripgrep)
-  (define-key map (kbd "C-c f") 'consult-ripgrep)
+  (define-key map (kbd "<leader>r") 'consult-ripgrep)
+  (define-key map (kbd "C-c r") 'consult-ripgrep)
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC r" "Rg search")
+        (which-key-add-key-based-replacements "C-c r" "Rg search")
+    ))
 
 (dolist (map (list
               evil-motion-state-map
@@ -1021,12 +943,26 @@ targets."
   (define-key map (kbd "C-c i m") 'consult-imenu)
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC i" "iMenu/Insert")
+        (which-key-add-key-based-replacements "C-c i" "iMenu/Insert")
+    ))
+
 (dolist (map (list
               evil-motion-state-map
               ))
   (define-key map (kbd "<leader>vs") 'evil-window-vsplit)
   (define-key map (kbd "C-c v s") 'evil-window-vsplit)
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC v" "Vertical split")
+        (which-key-add-key-based-replacements "C-c v" "Vertical split")
+        (which-key-add-key-based-replacements "SPC v s" "Vertical split")
+        (which-key-add-key-based-replacements "C-c v s" "Vertical split")
+    ))
 
 (dolist (map (list
               evil-motion-state-map
@@ -1100,6 +1036,14 @@ targets."
   (define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
 )
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC o" "Open ....")
+        (which-key-add-key-based-replacements "C-c o" "Open ....")
+        (which-key-add-key-based-replacements "SPC o c" "Config file")
+        (which-key-add-key-based-replacements "C-c o c" "Config file")
+    ))
+
 (defun my-open-yasnippet-folder()
    (interactive)
    (find-file-other-window "~/.config/emacs/snippets")
@@ -1116,21 +1060,39 @@ targets."
   (define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
 )
 
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-  (define-key map (kbd "<leader>ei") 'emoji-insert)
-  (define-key map (kbd "C-c e i") 'emoji-insert)
-)
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC o s" "Snippet folder")
+        (which-key-add-key-based-replacements "C-c o s" "Snippet folder")
+    ))
 
 (dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-  (define-key map (kbd "<leader>er") 'emoji-recent)
-  (define-key map (kbd "C-c e r") 'emoji-recent)
-)
+               evil-motion-state-map
+               evil-normal-state-map
+               ))
+   (define-key map (kbd "<leader>ei") 'emoji-insert)
+   (define-key map (kbd "C-c e i") 'emoji-insert)
+ )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC e i" "Insert emoji")
+        (which-key-add-key-based-replacements "C-c e i" "Insert emoji")
+    ))
+
+(dolist (map (list
+               evil-motion-state-map
+               evil-normal-state-map
+               ))
+   (define-key map (kbd "<leader>er") 'emoji-recent)
+   (define-key map (kbd "C-c e r") 'emoji-recent)
+ )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC e r" "Recent emoji")
+        (which-key-add-key-based-replacements "C-c e r" "Recent emoji")
+    ))
 
 (dolist (map (list
               global-map
@@ -1219,16 +1181,6 @@ targets."
 (define-key evil-motion-state-map (kbd "n") 'my-search-next)
 (define-key evil-motion-state-map (kbd "N") 'my-search-previous)
 
-;; (defun my-org-mode-create-elisp-code-block()
-;;   (interactive)
-;;   (org-insert-structure-template "SRC emacs-lisp")
-;; )
-;; 
-;; (defun my-org-mode-create-elisp-code-block-local()
-;;   (define-key evil-normal-state-local-map (kbd "<leader>cb") 'my-org-mode-create-elisp-code-block)
-;;   (define-key evil-normal-state-local-map (kbd "C-c c b") 'my-org-mode-create-elisp-code-block)
-;; )
-
 (defun my-org-mode-return-cycle-local()
   (define-key evil-normal-state-local-map (kbd "RET") 'org-cycle)
 )
@@ -1238,6 +1190,14 @@ targets."
   (define-key evil-normal-state-local-map (kbd "C-c i l") 'org-insert-link)
   (define-key evil-normal-state-local-map (kbd "<leader>ol") 'org-open-at-point)
   (define-key evil-normal-state-local-map (kbd "C-c o l") 'org-open-at-point)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC o l" "Open at point")
+          (which-key-add-key-based-replacements "C-c o l" "Open at point")
+          (which-key-add-key-based-replacements "SPC i l" "Insert link")
+          (which-key-add-key-based-replacements "C-c i l" "Insert link")
+      ))
 )
 
 (defun my-org-mode-local-bindings()
@@ -1320,11 +1280,23 @@ targets."
 (defun my-dired-toggle-hidden-files-local()
   (define-key evil-normal-state-local-map (kbd "<leader>h") 'dired-omit-mode)
   (define-key evil-normal-state-local-map (kbd "C-c h") 'dired-omit-mode)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC h" "Hidden mode")
+          (which-key-add-key-based-replacements "C-c h" "Hidden mode")
+      ))
 )
 
 (defun my-dired-toggle-read-only-local()
   (define-key evil-normal-state-local-map (kbd "<leader>m") 'dired-toggle-read-only)
   (define-key evil-normal-state-local-map (kbd "C-c m") 'dired-toggle-read-only)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC m" "Modify mode")
+          (which-key-add-key-based-replacements "C-c m" "Modify mode")
+      ))
 )
 
 (defun my-dired-yank-full-path ()
@@ -1335,6 +1307,14 @@ targets."
 (defun my-dired-yank-full-path-local()
   (define-key evil-normal-state-local-map (kbd "<leader>yp") 'my-dired-yank-full-path)
   (define-key evil-normal-state-local-map (kbd "C-c y p") 'my-dired-yank-full-path)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC y" "Yank")
+          (which-key-add-key-based-replacements "C-c y" "Yank")
+          (which-key-add-key-based-replacements "SPC y p" "Yank full path")
+          (which-key-add-key-based-replacements "C-c y p" "Yank full path")
+      ))
 )
 
 (defun my-dired-customized-bindings()
@@ -1356,7 +1336,7 @@ targets."
    (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
    (define-key evil-normal-state-local-map (kbd "SPC dm") 'describe-mode)
    (define-key evil-normal-state-local-map (kbd "SPC l") 'clm/toggle-command-log-buffer)
-   (define-key evil-normal-state-local-map (kbd "SPC p") 'find-file)
+   (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
    (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
    (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
    (define-key evil-normal-state-local-map (kbd "SPC vs") 'evil-window-vsplit)
@@ -1406,6 +1386,14 @@ targets."
 (define-key evil-motion-state-map (kbd "<leader>kh") 'kill-helpful-window-and-buffers)
 (define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC k" "Kill")
+        (which-key-add-key-based-replacements "C-c k" "Kill")
+        (which-key-add-key-based-replacements "SPC k h" "Help window and buffer")
+        (which-key-add-key-based-replacements "C-c k h" "Help window and buffer")
+    ))
+
 ;;
 ;; Close the 'eldoc' window and kill its buffer
 ;;
@@ -1442,6 +1430,12 @@ targets."
 (define-key evil-motion-state-map (kbd "<leader>kd") 'kill-eldoc-window-and-buffers)
 (define-key evil-normal-state-map (kbd "C-c k d") 'kill-eldoc-window-and-buffers)
 
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC k d" "Doc window and buffer")
+        (which-key-add-key-based-replacements "C-c k d" "Doc window and buffer")
+    ))
+
 ;;
 ;; Close the 'embark' window and kill its buffer
 ;;
@@ -1477,6 +1471,12 @@ targets."
 
 (define-key evil-motion-state-map (kbd "<leader>ke") 'kill-embark-window-and-buffers)
 (define-key evil-normal-state-map (kbd "C-c k e") 'kill-embark-window-and-buffers)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC k e" "Embark window and buffer")
+        (which-key-add-key-based-replacements "C-c k e" "Embark window and buffer")
+    ))
 
 (defun my-lsp-error-jumping-in-local-buffer()
   (define-key evil-normal-state-local-map (kbd "C-n") 'flymake-goto-next-error)
@@ -1554,6 +1554,21 @@ targets."
    (my-lsp-code-action)
    (my-lsp-toggle-comment)
    (my-setup-toggle-inlay-hint)
+
+   (if my-enable-which-key-customized-description
+       (progn
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC f" "Format")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC f f" "Format")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC r" "Rename")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC r n" "Rename")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC s" "Show errors")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC s e" "Show errors")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC c" "Code actions")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC c a" "Code actions")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC /" "Comment")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC t" "Toggle hints")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC t a" "Toggle hints")
+       ))
 )
 
 (dolist (hook '(c-mode-hook
@@ -1994,18 +2009,18 @@ When inserting a precise note insert the text of the note in the body as an org 
     ;;(message "State: %s" state);
 )
 
-(defun my-rebind-window-movement-for-treemacs()
-    (interactive)
-    ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
-    ;;(define-key treemacs-mode-map (kbd "C-i") nil)
+;; (defun my-rebind-window-movement-for-treemacs()
+;;     (interactive)
+;;     ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
+;;     ;;(define-key treemacs-mode-map (kbd "C-i") nil)
+;; 
+;;     ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
+;;     ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
+;;     (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
+;;     (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
+;; )
 
-    ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
-    ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
-    (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
-    (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
-)
-
-(add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
+;; (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
 
 ;;
 ;; 'vertico-mode'
@@ -2076,32 +2091,6 @@ When inserting a precise note insert the text of the note in the body as an org 
       (define-key map (kbd ".") 'my-search-next)
       (define-key map (kbd ",") 'my-search-previous)
 )
-
-(dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-        (define-key map (kbd "<leader>e") 'treemacs)
-)
-
-(defun my-rebind-toggle-treemacs()
-  (interactive)
-  (dolist (map (list
-                evil-motion-state-map
-                treemacs-mode-map
-                  ))
-          (define-key map (kbd "SPC") nil)
-  )
-
-  (dolist (map (list
-                treemacs-mode-map
-                  ))
-          (define-key map (kbd "SPC e") 'treemacs)
-          (define-key map (kbd "<leader>e") 'treemacs)
-  )
-)
-
-(add-hook 'treemacs-mode-hook #'my-rebind-toggle-treemacs)
 
 (dolist (map (list
               evil-motion-state-map
@@ -2175,8 +2164,15 @@ When inserting a precise note insert the text of the note in the body as an org 
               evil-motion-state-map
               evil-normal-state-map
               ))
-    (define-key map (kbd "<leader>dd") 'my-open-sbzi-folder)
+    (define-key map (kbd "<leader>od") 'my-open-sbzi-folder)
+    (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC o d" "directory")
+        (which-key-add-key-based-replacements "C-C o d" "directory")
+    ))
 
 (define-key global-map (kbd "C-,") 'embark-act)
 

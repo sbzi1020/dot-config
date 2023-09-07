@@ -1461,7 +1461,7 @@ Display the full documentation of FUNCTION (a symbol).
     :config
         (which-key-mode)
   )
-+#+END_SRC
+#+END_SRC
 
 
 *** =Highlight indent=
@@ -2114,8 +2114,9 @@ You can check each of them to see whether has been install successfully or not:
 
 A tree layout file explorer for Emacs.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
     (use-package treemacs
+       :disabled
        :init
        ;;
        ;; Mouse click to show action menu
@@ -2237,10 +2238,12 @@ A tree layout file explorer for Emacs.
   ;; evil support
   ;;
   (use-package treemacs-evil
+   :disabled
    :after (treemacs evil)
   )
 
   (use-package treemacs-icons-dired
+   :disabled
    :hook (dired-mode . treemacs-icons-dired-enable-once)
    :ensure t)
 
@@ -2880,6 +2883,46 @@ The folder structure looks like this (aka, ~snippet tables~):
 
     If you bind key to =montion= state, that means you bind the key to =normal, visual and operator= state as well. That's quite convenient to save a lot of bindings!!!
 
+*** Control whether enable =which-key= customize description or not
+
+By default, =which-key= only show the function name with the keybindings like below:
+
+#+BEGIN_SRC
+ b → consult-buffer 
+ o → +prefix
+#+END_SRC
+
+That's fine but not very convenient, as I might forget what the ~o~ prefix means. By using the following settings:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (which-key-add-key-based-replacements "b" "Switch to buffer")
+  (which-key-add-key-based-replacements "o" "(Quick) Open...")
+#+END_SRC
+
+Then I got a better =which-key= list like this:
+
+#+BEGIN_SRC
+ b → Switch to buffer
+ o → (Quick) Open...
+#+END_SRC
+
+
+That means I need to write a lot of ~(which-key-add-key-based-replacements)~ function calls for all of my keybindings, but what if I don't need that (or I prefer to switch back to the original function name display style)? So, for a better choice, I add a global variable ~my-enable-which-key-customized-description~ to enable or disbale that feature just by setting it to ~t~ or ~nil~:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Enable
+  ;;
+  (setq my-enable-which-key-customized-description t)
+
+  ;;
+  ;; Disable
+  ;;
+  ;; (setq my-enable-which-key-customized-description nil)
+#+END_SRC
+
+
+
 *** Unbind all keybindings for the following modes
 
 Why do this?
@@ -2914,15 +2957,15 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
 #+END_SRC
 
 
-*** Toggle spell checking by ~<leader>sc~
+*** +Toggle spell checking+
 
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "<leader>sc") 'flyspell-mode)
-    (define-key map (kbd "C-c s c") 'flyspell-mode)
-  )
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; (dolist (map (list
+  ;;               evil-motion-state-map
+  ;;               ))
+  ;;   (define-key map (kbd "<leader>sc") 'flyspell-mode)
+  ;;   (define-key map (kbd "C-c s c") 'flyspell-mode)
+  ;; )
 #+END_SRC
 
 
@@ -2953,6 +2996,12 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
                  ))
     (add-hook hook #'my-bind-q-kill-current-window-local)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC q" "Save and exit")
+          (which-key-add-key-based-replacements "C-c q" "Save and exit")
+      ))
 #+END_SRC
 
 
@@ -2974,6 +3023,23 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
     (define-key map (kbd "C-c dm") 'describe-mode)
     ;;(message "State: %s" state);
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC d" "Describe ...")
+          (which-key-add-key-based-replacements "C-c d" "Describe ...")
+
+          (which-key-add-key-based-replacements "SPC d f" "Function")
+          (which-key-add-key-based-replacements "C-c d f" "Function")
+          (which-key-add-key-based-replacements "SPC d v" "Variable")
+          (which-key-add-key-based-replacements "C-c d v" "Variable")
+          (which-key-add-key-based-replacements "SPC d k" "Keys")
+          (which-key-add-key-based-replacements "C-c d k" "Keys")
+          (which-key-add-key-based-replacements "SPC d m" "Mode")
+          (which-key-add-key-based-replacements "C-c d m" "Mode")
+          (which-key-add-key-based-replacements "SPC d b" "Bindings")
+          (which-key-add-key-based-replacements "C-c d b" "Bindings")
+      ))
 #+END_SRC
 
 
@@ -2986,6 +3052,12 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
     (define-key map (kbd "<leader>l") 'clm/toggle-command-log-buffer)
     (define-key map (kbd "C-c l") 'clm/toggle-command-log-buffer)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC l" "Command Log")
+          (which-key-add-key-based-replacements "C-c l" "Command Log")
+      ))
 #+END_SRC
 
 
@@ -2998,6 +3070,14 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
     (define-key map (kbd "<leader>ee") 'eval-last-sexp)
     (define-key map (kbd "C-c e e") 'eval-last-sexp)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC e" "Evalute/Emoji")
+          (which-key-add-key-based-replacements "C-c e" "Evalute/Emoji")
+          (which-key-add-key-based-replacements "SPC e e" "Evalute Lisp")
+          (which-key-add-key-based-replacements "C-c e e" "Evalute Lisp")
+      ))
 #+END_SRC
 
 
@@ -3068,20 +3148,33 @@ As a workaround, I can use the default evil keybinding =m= to set a =M= to curre
       (define-key map (kbd "gb") 'my-goto-last-marked-position)
       ;;(message "State: %s" state);
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "gb" "Go back")
+      ))
 #+END_SRC
 
 
-*** Open files or buffers by ~<leader>p/b~
+*** Open files or buffers by ~<leader>f/b~
 
 #+BEGIN_SRC emacs-lisp
   (dolist (map (list
                 evil-motion-state-map
                 ))
-    (define-key map (kbd "<leader>p") 'find-file)
-    (define-key map (kbd "C-c p") 'find-file)
+    (define-key map (kbd "<leader>f") 'find-file)
+    (define-key map (kbd "C-c f") 'find-file)
     (define-key map (kbd "<leader>b") 'consult-buffer)
     (define-key map (kbd "C-c b") 'consult-buffer)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC f" "Find files")
+          (which-key-add-key-based-replacements "C-c f" "Find files")
+          (which-key-add-key-based-replacements "SPC b" "Buffer list")
+          (which-key-add-key-based-replacements "C-c b" "Buffer list")
+      ))
 #+END_SRC
 
 
@@ -3093,6 +3186,11 @@ As a workaround, I can use the default evil keybinding =m= to set a =M= to curre
                 ))
     (define-key map (kbd "<leader>SPC") 'switch-to-last-buffer)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC SPC" "Last Buffer")
+      ))
 #+END_SRC
 
 
@@ -3104,6 +3202,11 @@ As a workaround, I can use the default evil keybinding =m= to set a =M= to curre
                 ))
     (define-key map (kbd "<leader>RET") 'olivetti-mode)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC RET" "Toggle Focus mode")
+      ))
 #+END_SRC
 
 
@@ -3136,15 +3239,21 @@ As a workaround, I can use the default evil keybinding =m= to set a =M= to curre
 #+END_SRC
 
 
-*** Rg on cursor word by ~<leader>f~
+*** Rg on cursor word by ~<leader>r~
 
 #+BEGIN_SRC emacs-lisp
   (dolist (map (list
                 evil-motion-state-map
                 ))
-    (define-key map (kbd "<leader>f") 'consult-ripgrep)
-    (define-key map (kbd "C-c f") 'consult-ripgrep)
+    (define-key map (kbd "<leader>r") 'consult-ripgrep)
+    (define-key map (kbd "C-c r") 'consult-ripgrep)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC r" "Rg search")
+          (which-key-add-key-based-replacements "C-c r" "Rg search")
+      ))
 #+END_SRC
 
 
@@ -3157,6 +3266,12 @@ As a workaround, I can use the default evil keybinding =m= to set a =M= to curre
     (define-key map (kbd "<leader>im") 'consult-imenu)
     (define-key map (kbd "C-c i m") 'consult-imenu)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC i" "iMenu/Insert")
+          (which-key-add-key-based-replacements "C-c i" "iMenu/Insert")
+      ))
 #+END_SRC
 
 
@@ -3169,6 +3284,14 @@ As a workaround, I can use the default evil keybinding =m= to set a =M= to curre
     (define-key map (kbd "<leader>vs") 'evil-window-vsplit)
     (define-key map (kbd "C-c v s") 'evil-window-vsplit)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC v" "Vertical split")
+          (which-key-add-key-based-replacements "C-c v" "Vertical split")
+          (which-key-add-key-based-replacements "SPC v s" "Vertical split")
+          (which-key-add-key-based-replacements "C-c v s" "Vertical split")
+      ))
 #+END_SRC
 
 
@@ -3245,42 +3368,56 @@ For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
 **** Open ~configuration.org~ by ~<leader>oc~
 
 #+BEGIN_SRC emacs-lisp
-   (defun my-open-emacs-configuration-file()
-      (interactive)
-      (find-file-other-window "~/.config/emacs/configuration.org")
-   )
+  (defun my-open-emacs-configuration-file()
+     (interactive)
+     (find-file-other-window "~/.config/emacs/configuration.org")
+  )
 
-   ;; Unbind this!!!
-   (define-key global-map (kbd "C-c o") nil)
+  ;; Unbind this!!!
+  (define-key global-map (kbd "C-c o") nil)
 
-   (dolist (map (list
-                 evil-motion-state-map
-                 evil-normal-state-map
-                 ))
-     (define-key map (kbd "<leader>oc") 'my-open-emacs-configuration-file)
-     (define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
-   )
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+    (define-key map (kbd "<leader>oc") 'my-open-emacs-configuration-file)
+    (define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC o" "Open ....")
+          (which-key-add-key-based-replacements "C-c o" "Open ....")
+          (which-key-add-key-based-replacements "SPC o c" "Config file")
+          (which-key-add-key-based-replacements "C-c o c" "Config file")
+      ))
 #+END_SRC
 
 
 **** Open ~Yasnippet~ folder by ~<leader>os~
 
 #+BEGIN_SRC emacs-lisp
-   (defun my-open-yasnippet-folder()
-      (interactive)
-      (find-file-other-window "~/.config/emacs/snippets")
-   )
+  (defun my-open-yasnippet-folder()
+     (interactive)
+     (find-file-other-window "~/.config/emacs/snippets")
+  )
 
-   ;; Unbind this!!!
-   (define-key global-map (kbd "C-c o") nil)
+  ;; Unbind this!!!
+  (define-key global-map (kbd "C-c o") nil)
 
-   (dolist (map (list
-                 evil-motion-state-map
-                 evil-normal-state-map
-                 ))
-     (define-key map (kbd "<leader>os") 'my-open-yasnippet-folder)
-     (define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
-   )
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+    (define-key map (kbd "<leader>os") 'my-open-yasnippet-folder)
+    (define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC o s" "Snippet folder")
+          (which-key-add-key-based-replacements "C-c o s" "Snippet folder")
+      ))
 #+END_SRC
 
 
@@ -3297,19 +3434,31 @@ For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
      (define-key map (kbd "<leader>ei") 'emoji-insert)
      (define-key map (kbd "C-c e i") 'emoji-insert)
    )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC e i" "Insert emoji")
+          (which-key-add-key-based-replacements "C-c e i" "Insert emoji")
+      ))
  #+END_SRC
 
 
 **** Emoji recent by ~<leader>er~
 
  #+BEGIN_SRC emacs-lisp
-   (dolist (map (list
-                 evil-motion-state-map
-                 evil-normal-state-map
-                 ))
-     (define-key map (kbd "<leader>er") 'emoji-recent)
-     (define-key map (kbd "C-c e r") 'emoji-recent)
-   )
+    (dolist (map (list
+                  evil-motion-state-map
+                  evil-normal-state-map
+                  ))
+      (define-key map (kbd "<leader>er") 'emoji-recent)
+      (define-key map (kbd "C-c e r") 'emoji-recent)
+    )
+
+   (if my-enable-which-key-customized-description
+       (progn
+           (which-key-add-key-based-replacements "SPC e r" "Recent emoji")
+           (which-key-add-key-based-replacements "C-c e r" "Recent emoji")
+       ))
  #+END_SRC
 
 
@@ -3419,9 +3568,9 @@ For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
 
 *** Org mode
 
-**** ~org-mode~ insert code block by ~<leader>cb~
+**** +org-mode insert code block+
 
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp :tangle no
   ;; (defun my-org-mode-create-elisp-code-block()
   ;;   (interactive)
   ;;   (org-insert-structure-template "SRC emacs-lisp")
@@ -3451,6 +3600,14 @@ For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
     (define-key evil-normal-state-local-map (kbd "C-c i l") 'org-insert-link)
     (define-key evil-normal-state-local-map (kbd "<leader>ol") 'org-open-at-point)
     (define-key evil-normal-state-local-map (kbd "C-c o l") 'org-open-at-point)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC o l" "Open at point")
+            (which-key-add-key-based-replacements "C-c o l" "Open at point")
+            (which-key-add-key-based-replacements "SPC i l" "Insert link")
+            (which-key-add-key-based-replacements "C-c i l" "Insert link")
+        ))
   )
 #+end_src
 
@@ -3586,6 +3743,12 @@ Before this can work, you have to make sure that you have the following settings
   (defun my-dired-toggle-hidden-files-local()
     (define-key evil-normal-state-local-map (kbd "<leader>h") 'dired-omit-mode)
     (define-key evil-normal-state-local-map (kbd "C-c h") 'dired-omit-mode)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC h" "Hidden mode")
+            (which-key-add-key-based-replacements "C-c h" "Hidden mode")
+        ))
   )
 #+END_SRC
 
@@ -3596,6 +3759,12 @@ Before this can work, you have to make sure that you have the following settings
   (defun my-dired-toggle-read-only-local()
     (define-key evil-normal-state-local-map (kbd "<leader>m") 'dired-toggle-read-only)
     (define-key evil-normal-state-local-map (kbd "C-c m") 'dired-toggle-read-only)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC m" "Modify mode")
+            (which-key-add-key-based-replacements "C-c m" "Modify mode")
+        ))
   )
 #+END_SRC
 
@@ -3616,6 +3785,14 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
   (defun my-dired-yank-full-path-local()
     (define-key evil-normal-state-local-map (kbd "<leader>yp") 'my-dired-yank-full-path)
     (define-key evil-normal-state-local-map (kbd "C-c y p") 'my-dired-yank-full-path)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC y" "Yank")
+            (which-key-add-key-based-replacements "C-c y" "Yank")
+            (which-key-add-key-based-replacements "SPC y p" "Yank full path")
+            (which-key-add-key-based-replacements "C-c y p" "Yank full path")
+        ))
   )
 #+END_SRC
 
@@ -3642,7 +3819,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
      (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
      (define-key evil-normal-state-local-map (kbd "SPC dm") 'describe-mode)
      (define-key evil-normal-state-local-map (kbd "SPC l") 'clm/toggle-command-log-buffer)
-     (define-key evil-normal-state-local-map (kbd "SPC p") 'find-file)
+     (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
      (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
      (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
      (define-key evil-normal-state-local-map (kbd "SPC vs") 'evil-window-vsplit)
@@ -3691,7 +3868,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                             (message ">>> [ kill-helpful-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
                         )
                      )
-    
+
                      ;;
                      ;; Kill buffer.
                      ;;
@@ -3700,12 +3877,20 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                  )
               )
       )
-    
+
       (message ">>> [ kill-helpful-window-and-buffers ] - [done] ")
   )
 
   (define-key evil-motion-state-map (kbd "<leader>kh") 'kill-helpful-window-and-buffers)
   (define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC k" "Kill")
+          (which-key-add-key-based-replacements "C-c k" "Kill")
+          (which-key-add-key-based-replacements "SPC k h" "Help window and buffer")
+          (which-key-add-key-based-replacements "C-c k h" "Help window and buffer")
+      ))
 #+END_SRC
 
 
@@ -3718,7 +3903,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
   (defun kill-eldoc-window-and-buffers ()
       (interactive)
       (message ">>> [ kill-eldoc-window-and-buffers ] - ....... ")
-    
+
       (cl-loop for buf in (buffer-list)
          do (if (string-match-p "^*eldoc" (buffer-name buf))
              (progn
@@ -3732,7 +3917,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                         (message ">>> [ kill-eldoc-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
                     )
                 )
-    
+
                 ;;
                 ;; Kill buffer.
                 ;;
@@ -3741,12 +3926,18 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
              )
          )
       )
-    
+
       (message ">>> [ kill-eldoc-window-and-buffers ] - [done] ")
   )
 
   (define-key evil-motion-state-map (kbd "<leader>kd") 'kill-eldoc-window-and-buffers)
   (define-key evil-normal-state-map (kbd "C-c k d") 'kill-eldoc-window-and-buffers)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC k d" "Doc window and buffer")
+          (which-key-add-key-based-replacements "C-c k d" "Doc window and buffer")
+      ))
 #+END_SRC
 
 
@@ -3788,6 +3979,12 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
 
   (define-key evil-motion-state-map (kbd "<leader>ke") 'kill-embark-window-and-buffers)
   (define-key evil-normal-state-map (kbd "C-c k e") 'kill-embark-window-and-buffers)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC k e" "Embark window and buffer")
+          (which-key-add-key-based-replacements "C-c k e" "Embark window and buffer")
+      ))
 #+END_SRC
 
 
@@ -3907,6 +4104,21 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
      (my-lsp-code-action)
      (my-lsp-toggle-comment)
      (my-setup-toggle-inlay-hint)
+
+     (if my-enable-which-key-customized-description
+         (progn
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC f" "Format")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC f f" "Format")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC r" "Rename")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC r n" "Rename")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC s" "Show errors")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC s e" "Show errors")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC c" "Code actions")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC c a" "Code actions")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC /" "Comment")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC t" "Toggle hints")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC t a" "Toggle hints")
+         ))
   )
 
   (dolist (hook '(c-mode-hook
@@ -4631,18 +4843,18 @@ Take the =org-level-1= as an example:
       ;;(message "State: %s" state);
   )
 
-  (defun my-rebind-window-movement-for-treemacs()
-      (interactive)
-      ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
-      ;;(define-key treemacs-mode-map (kbd "C-i") nil)
-  
-      ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
-      ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
-      (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
-      (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
-  )
+  ;; (defun my-rebind-window-movement-for-treemacs()
+  ;;     (interactive)
+  ;;     ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
+  ;;     ;;(define-key treemacs-mode-map (kbd "C-i") nil)
+  ;; 
+  ;;     ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
+  ;;     ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
+  ;;     (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
+  ;;     (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
+  ;; )
 
-  (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
+  ;; (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
 
 #+END_SRC
 
@@ -4729,32 +4941,32 @@ Take the =org-level-1= as an example:
 
 *** Toggle =treemacs=
 
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                  evil-motion-state-map
-                  evil-normal-state-map
-                  ))
-          (define-key map (kbd "<leader>e") 'treemacs)
-  )
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; (dolist (map (list
+  ;;                 evil-motion-state-map
+  ;;                 evil-normal-state-map
+  ;;                 ))
+  ;;         (define-key map (kbd "<leader>e") 'treemacs)
+  ;; )
 
-  (defun my-rebind-toggle-treemacs()
-    (interactive)
-    (dolist (map (list
-                  evil-motion-state-map
-                  treemacs-mode-map
-                    ))
-            (define-key map (kbd "SPC") nil)
-    )
+  ;; (defun my-rebind-toggle-treemacs()
+  ;;   (interactive)
+  ;;   (dolist (map (list
+  ;;                 evil-motion-state-map
+  ;;                 treemacs-mode-map
+  ;;                   ))
+  ;;           (define-key map (kbd "SPC") nil)
+  ;;   )
 
-    (dolist (map (list
-                  treemacs-mode-map
-                    ))
-            (define-key map (kbd "SPC e") 'treemacs)
-            (define-key map (kbd "<leader>e") 'treemacs)
-    )
-  )
+  ;;   (dolist (map (list
+  ;;                 treemacs-mode-map
+  ;;                   ))
+  ;;           (define-key map (kbd "SPC e") 'treemacs)
+  ;;           (define-key map (kbd "<leader>e") 'treemacs)
+  ;;   )
+  ;; )
 
-  (add-hook 'treemacs-mode-hook #'my-rebind-toggle-treemacs)
+  ;; (add-hook 'treemacs-mode-hook #'my-rebind-toggle-treemacs)
 #+END_SRC
 
 
@@ -4840,7 +5052,7 @@ Take the =org-level-1= as an example:
 #+END_SRC
 
 
-**** Open dired by =<leader> dd=
+**** Open dired by =<leader>od=
 
 #+BEGIN_SRC emacs-lisp
   (defun my-open-sbzi-folder()
@@ -4855,8 +5067,15 @@ Take the =org-level-1= as an example:
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-      (define-key map (kbd "<leader>dd") 'my-open-sbzi-folder)
+      (define-key map (kbd "<leader>od") 'my-open-sbzi-folder)
+      (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC o d" "directory")
+          (which-key-add-key-based-replacements "C-C o d" "directory")
+      ))
 #+END_SRC
 
 
