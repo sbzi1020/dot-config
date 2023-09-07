@@ -1927,6 +1927,12 @@ Specific to the current window's mode line.")
       (setq org-noter-max-short-selected-text-length 700000)
       (setq org-noter-max-short-length 80000)
       (setq org-noter-always-create-frame nil) ;; Prevent use new frame!!!
+      (if (> 999 (display-pixel-height)) 
+         (setq org-noter-doc-split-fraction '(0.6 . 0.5)))
+  :custom
+      (org-noter-highlight-selected-text t)
+      (org-noter-notes-search-path '("~/sbzi/personal/org-noter/"))
+      (org-noter-auto-save-last-location t)
 )
 
 
@@ -2002,12 +2008,21 @@ When inserting a precise note insert the text of the note in the body as an org 
               ))
     ;;(define-key map (kbd "C-i") 'evil-window-right)
     ;;(define-key map (kbd "C-m") 'evil-window-left)
-    (define-key map (kbd "C-w n") 'evil-window-down)
-    (define-key map (kbd "C-w e") 'evil-window-up)
-    (define-key map (kbd "C-w m") 'evil-window-left)
-    (define-key map (kbd "C-w i") 'evil-window-right)
+    (define-key map (kbd "<leader>wn") 'evil-window-down)
+    (define-key map (kbd "<leader>we") 'evil-window-up)
+    (define-key map (kbd "<leader>wm") 'evil-window-left)
+    (define-key map (kbd "<leader>wi") 'evil-window-right)
     ;;(message "State: %s" state);
 )
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC w" "Window")
+        (which-key-add-key-based-replacements "SPC w n" "Down")
+        (which-key-add-key-based-replacements "SPC w e" "Up")
+        (which-key-add-key-based-replacements "SPC w m" "Left")
+        (which-key-add-key-based-replacements "SPC w i" "Right")
+    ))
 
 ;; (defun my-rebind-window-movement-for-treemacs()
 ;;     (interactive)
@@ -2190,7 +2205,14 @@ When inserting a precise note insert the text of the note in the body as an org 
         (which-key-add-key-based-replacements "C-C o d" "directory")
     ))
 
-(define-key global-map (kbd "C-,") 'embark-act)
+(defun my-colemak-dired-window-movement-local()
+   (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
+   (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
+   (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
+   (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
+)
+
+(add-hook 'dired-mode-hook #'my-colemak-dired-window-movement-local)
 
 ;;
 ;; 
@@ -2230,6 +2252,8 @@ When inserting a precise note insert the text of the note in the body as an org 
    (add-hook hook #'my-pdf-scroll-local)
 )
 
+(define-key global-map (kbd "C-,") 'embark-act)
+
 (defun my-rebind-spc-for-pdf-view-mode()
      ;;
      ;; Rebind all '<leader>' related to local buffer scope
@@ -2245,6 +2269,19 @@ When inserting a precise note insert the text of the note in the body as an org 
      (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
      (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
 
+     ;;
+     ;; Noter related
+     ;;
+     (define-key evil-normal-state-local-map (kbd "SPC n n") 'org-noter)
+
+     ;;
+     ;; Window movement related
+     ;;
+     (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
+     (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
+     (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
+     (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
+
      (message "[ my-rebind-spc-for-pdf-view-mode ] - rebind all SPC successfully.")
 )
 
@@ -2255,25 +2292,36 @@ When inserting a precise note insert the text of the note in the body as an org 
     ;; Rebind
     ;;
     (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-    (define-key evil-normal-state-local-map (kbd "C-c n i") 'org-noter-insert-note)
-    (define-key evil-normal-state-local-map (kbd "C-c n c") 'org-noter-create-skeleton)
+    (define-key evil-normal-state-local-map (kbd "M-i") 'org-noter-insert-note)
+    (define-key evil-normal-state-local-map (kbd "M-p") 'org-noter-insert-precise-note)
+    (define-key evil-normal-state-local-map (kbd "C-c n o") 'org-noter-create-skeleton)
     (define-key evil-normal-state-local-map (kbd "C-c n k") 'org-noter-kill-session)
     (define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
-    (define-key evil-normal-state-local-map (kbd "C-c n s") 'org-noter-sync-current-note)
-    (define-key evil-normal-state-local-map (kbd "C-c n p") 'org-noter-insert-precise-note)
-    (define-key evil-normal-state-local-map (kbd "C-c n a") 'org-noter-set-auto-save-last-location)
+    (define-key evil-normal-state-local-map (kbd "C-c n l") 'org-noter-set-auto-save-last-location)
+    (define-key evil-normal-state-local-map (kbd "C-c n >") 'org-noter-sync-next-note)
+    (define-key evil-normal-state-local-map (kbd "C-c n <") 'org-noter-sync-prev-note)
+    (define-key evil-normal-state-local-map (kbd "C-c n ]") 'org-noter-sync-next-page-or-chapter)
+    (define-key evil-normal-state-local-map (kbd "C-c n [") 'org-noter-sync-prev-page-or-chapter)
+    (define-key evil-normal-state-local-map (kbd "C-c n /") 'org-noter-sync-current-page-or-chapter)
+    (define-key evil-normal-state-local-map (kbd "C-c n c") 'org-noter-sync-current-note)
+
+
+
 
     (if my-enable-which-key-customized-description
         (progn
             (which-key-add-key-based-replacements "C-c n" "Noter")
             (which-key-add-key-based-replacements "C-c n n" "Open session")
-            (which-key-add-key-based-replacements "C-c n i" "Insert")
-            (which-key-add-key-based-replacements "C-c n c" "Outline")
+            (which-key-add-key-based-replacements "C-c n o" "Outline")
             (which-key-add-key-based-replacements "C-c n k" "Kill session")
             (which-key-add-key-based-replacements "C-c n h" "Hide other")
-            (which-key-add-key-based-replacements "C-c n s" "Sync")
-            (which-key-add-key-based-replacements "C-c n p" "Insert precise")
             (which-key-add-key-based-replacements "C-c n a" "Save last location")
+            (which-key-add-key-based-replacements "C-c n c" "current")
+            (which-key-add-key-based-replacements "C-c n /" "current page")
+            (which-key-add-key-based-replacements "C-c n >" "next note")
+            (which-key-add-key-based-replacements "C-c n <" "prev note")
+            (which-key-add-key-based-replacements "C-c n ]" "next chapter note")
+            (which-key-add-key-based-replacements "C-c n [" "prev chapter note")
         ))
 
     (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
