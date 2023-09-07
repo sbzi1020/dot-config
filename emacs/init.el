@@ -718,12 +718,15 @@ targets."
     (define-key map (kbd "C-z") nil)
 )
 
+(define-key evil-motion-state-map (kbd "<SPC>") nil)
+(define-key evil-normal-state-map (kbd "<SPC>") nil)
+
 (dolist (map (list
               evil-motion-state-map
               evil-normal-state-map
               ))
     (define-key map (kbd "Q") 'delete-window)
-    (define-key map (kbd "<leader>q") 'save-buffers-kill-terminal)
+    (define-key map (kbd "SPC q") 'save-buffers-kill-terminal)
     (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
     ;; (message ">>> bind 'Q/<leader>q/C-c q' in '%s'" map);
 )
@@ -751,17 +754,18 @@ targets."
 
 (dolist (map (list
               evil-motion-state-map
+              evil-normal-state-map
               ))
-  (define-key map (kbd "<leader>df") 'helpful-callable)
-  (define-key map (kbd "C-c df") 'helpful-callable)
-  (define-key map (kbd "<leader>dv") 'helpful-variable)
-  (define-key map (kbd "C-c dv") 'helpful-variable)
-  (define-key map (kbd "<leader>dk") 'describe-key)
-  (define-key map (kbd "C-c dk") 'helpful-key)
-  (define-key map (kbd "<leader>db") 'describe-bindings)
-  (define-key map (kbd "C-c db") 'describe-bindings)
-  (define-key map (kbd "<leader>dm") 'describe-mode)
-  (define-key map (kbd "C-c dm") 'describe-mode)
+  (define-key map (kbd "SPC d f") 'helpful-callable)
+  (define-key map (kbd "C-c d f") 'helpful-callable)
+  (define-key map (kbd "SPC d v") 'helpful-variable)
+  (define-key map (kbd "C-c d v") 'helpful-variable)
+  (define-key map (kbd "SPC d k") 'describe-key)
+  (define-key map (kbd "C-c d k") 'helpful-key)
+  (define-key map (kbd "SPC d b") 'describe-bindings)
+  (define-key map (kbd "C-c d b") 'describe-bindings)
+  (define-key map (kbd "SPC d m") 'describe-mode)
+  (define-key map (kbd "C-c d m") 'describe-mode)
   ;;(message "State: %s" state);
 )
 
@@ -785,7 +789,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>l") 'clm/toggle-command-log-buffer)
+  (define-key map (kbd "SPC l") 'clm/toggle-command-log-buffer)
   (define-key map (kbd "C-c l") 'clm/toggle-command-log-buffer)
 )
 
@@ -798,7 +802,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>ee") 'eval-last-sexp)
+  (define-key map (kbd "SPC e e") 'eval-last-sexp)
   (define-key map (kbd "C-c e e") 'eval-last-sexp)
 )
 
@@ -863,9 +867,9 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>f") 'find-file)
+  (define-key map (kbd "SPC f") 'find-file)
   (define-key map (kbd "C-c f") 'find-file)
-  (define-key map (kbd "<leader>b") 'consult-buffer)
+  (define-key map (kbd "SPC b") 'consult-buffer)
   (define-key map (kbd "C-c b") 'consult-buffer)
 )
 
@@ -880,7 +884,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>SPC") 'switch-to-last-buffer)
+  (define-key map (kbd "SPC SPC") 'switch-to-last-buffer)
 )
 
 (if my-enable-which-key-customized-description
@@ -891,7 +895,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>RET") 'olivetti-mode)
+  (define-key map (kbd "SPC RET") 'olivetti-mode)
 )
 
 (if my-enable-which-key-customized-description
@@ -926,7 +930,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>r") 'consult-ripgrep)
+  (define-key map (kbd "SPC r") 'consult-ripgrep)
   (define-key map (kbd "C-c r") 'consult-ripgrep)
 )
 
@@ -939,7 +943,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>im") 'consult-imenu)
+  (define-key map (kbd "SPC i m") 'consult-imenu)
   (define-key map (kbd "C-c i m") 'consult-imenu)
 )
 
@@ -952,7 +956,7 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
-  (define-key map (kbd "<leader>vs") 'evil-window-vsplit)
+  (define-key map (kbd "SPC v s") 'evil-window-vsplit)
   (define-key map (kbd "C-c v s") 'evil-window-vsplit)
 )
 
@@ -1032,7 +1036,7 @@ targets."
               evil-motion-state-map
               evil-normal-state-map
               ))
-  (define-key map (kbd "<leader>oc") 'my-open-emacs-configuration-file)
+  (define-key map (kbd "SPC o c") 'my-open-emacs-configuration-file)
   (define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
 )
 
@@ -1056,7 +1060,7 @@ targets."
               evil-motion-state-map
               evil-normal-state-map
               ))
-  (define-key map (kbd "<leader>os") 'my-open-yasnippet-folder)
+  (define-key map (kbd "SPC o s") 'my-open-yasnippet-folder)
   (define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
 )
 
@@ -1070,7 +1074,7 @@ targets."
                evil-motion-state-map
                evil-normal-state-map
                ))
-   (define-key map (kbd "<leader>ei") 'emoji-insert)
+   (define-key map (kbd "SPC e i") 'emoji-insert)
    (define-key map (kbd "C-c e i") 'emoji-insert)
  )
 
@@ -1084,7 +1088,7 @@ targets."
                evil-motion-state-map
                evil-normal-state-map
                ))
-   (define-key map (kbd "<leader>er") 'emoji-recent)
+   (define-key map (kbd "SPC e r") 'emoji-recent)
    (define-key map (kbd "C-c e r") 'emoji-recent)
  )
 
@@ -1186,9 +1190,9 @@ targets."
 )
 
 (defun my-org-mode-insert-and-open-link-local()
-  (define-key evil-normal-state-local-map (kbd "<leader>il") 'org-insert-link)
+  (define-key evil-normal-state-local-map (kbd "SPC i l") 'org-insert-link)
   (define-key evil-normal-state-local-map (kbd "C-c i l") 'org-insert-link)
-  (define-key evil-normal-state-local-map (kbd "<leader>ol") 'org-open-at-point)
+  (define-key evil-normal-state-local-map (kbd "SPC o l") 'org-open-at-point)
   (define-key evil-normal-state-local-map (kbd "C-c o l") 'org-open-at-point)
 
   (if my-enable-which-key-customized-description
@@ -1210,6 +1214,202 @@ targets."
 
 (evil-define-key 'normal markdown-mode-map (kbd "RET") 'markdown-cycle)
 (evil-define-key 'normal markdown-view-mode-map (kbd "RET") 'markdown-cycle)
+
+;;
+;; Close the 'helful' window and kill its buffer
+;;
+(defun kill-helpful-window-and-buffers ()
+    (interactive)
+    (message ">>> [ kill-helpful-window-and-buffers ] - ....... ")
+
+    (cl-loop for buf in (buffer-list)
+            do (if (string-match-p "^*helpful" (buffer-name buf))
+               (progn
+                   ;;
+                   ;; Try to close its window first if exists.
+                   ;;
+                   (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+                   (if window-to-be-killed
+                      (progn
+                          (delete-window window-to-be-killed)
+                          (message ">>> [ kill-helpful-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                      )
+                   )
+
+                   ;;
+                   ;; Kill buffer.
+                   ;;
+                   (message ">>> [ kill-helpful-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+                   (kill-buffer buf)
+               )
+            )
+    )
+
+    (message ">>> [ kill-helpful-window-and-buffers ] - [done] ")
+)
+
+(define-key evil-motion-state-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
+(define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC k" "Kill")
+        (which-key-add-key-based-replacements "C-c k" "Kill")
+        (which-key-add-key-based-replacements "SPC k h" "Help window and buffer")
+        (which-key-add-key-based-replacements "C-c k h" "Help window and buffer")
+    ))
+
+;;
+;; Close the 'eldoc' window and kill its buffer
+;;
+(defun kill-eldoc-window-and-buffers ()
+    (interactive)
+    (message ">>> [ kill-eldoc-window-and-buffers ] - ....... ")
+
+    (cl-loop for buf in (buffer-list)
+       do (if (string-match-p "^*eldoc" (buffer-name buf))
+           (progn
+              ;;
+              ;; Try to close its window first if exists.
+              ;;
+              (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+              (if window-to-be-killed
+                  (progn
+                      (delete-window window-to-be-killed)
+                      (message ">>> [ kill-eldoc-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                  )
+              )
+
+              ;;
+              ;; Kill buffer.
+              ;;
+              (message ">>> [ kill-eldoc-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+              (kill-buffer buf)
+           )
+       )
+    )
+
+    (message ">>> [ kill-eldoc-window-and-buffers ] - [done] ")
+)
+
+(define-key evil-motion-state-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
+(define-key evil-normal-state-map (kbd "C-c k d") 'kill-eldoc-window-and-buffers)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC k d" "Doc window and buffer")
+        (which-key-add-key-based-replacements "C-c k d" "Doc window and buffer")
+    ))
+
+;;
+;; Close the 'embark' window and kill its buffer
+;;
+(defun kill-embark-window-and-buffers ()
+   (interactive)
+   (message ">>> [ kill-embark-window-and-buffers ] - ....... ")
+
+   (cl-loop for buf in (buffer-list)
+      do (if (string-match-p "^*Embark" (buffer-name buf))
+         (progn
+             ;;
+             ;; Try to close its window first if exists.
+             ;;
+             (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+             (if window-to-be-killed
+                 (progn
+                     (delete-window window-to-be-killed)
+                     (message ">>> [ kill-embark-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                 )
+             )
+
+             ;;
+             ;; Kill buffer.
+             ;;
+             (message ">>> [ kill-embark-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+             (kill-buffer buf)
+         )
+      )
+   )
+
+   (message ">>> [ kill-embark-window-and-buffers ] - [done] ")
+)
+
+(define-key evil-motion-state-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
+(define-key evil-normal-state-map (kbd "C-c k e") 'kill-embark-window-and-buffers)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC k e" "Embark window and buffer")
+        (which-key-add-key-based-replacements "C-c k e" "Embark window and buffer")
+    ))
+
+(defun rebind-general-leader-x-bindings-to-local-buffer-scope()
+  ;;
+  ;; Quick
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
+
+  ;;
+  ;; Describe related
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC d f") 'helpful-callable)
+  (define-key evil-normal-state-local-map (kbd "SPC d v") 'helpful-variable)
+  (define-key evil-normal-state-local-map (kbd "SPC d k") 'describe-key)
+  (define-key evil-normal-state-local-map (kbd "SPC d b") 'describe-bindings)
+  (define-key evil-normal-state-local-map (kbd "SPC d m") 'describe-mode)
+
+  ;;
+  ;; Command log
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC l") 'clm/toggle-command-log-buffer)
+
+  ;;
+  ;; Evalate
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC e e") 'eval-last-sexp)
+
+  ;;
+  ;; Find and switch related
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
+  (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
+  (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
+  (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
+
+  ;;
+  ;; Focus mode
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC RET") 'olivetti-mode)
+
+  ;;
+  ;; iMenu
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC i m") 'consult-imenu)
+
+  ;;
+  ;; Window split and movement
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC v s") 'evil-window-vsplit)
+
+  ;;
+  ;; Quick open related
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
+  (define-key evil-normal-state-local-map (kbd "SPC o s") 'my-open-yasnippet-folder)
+
+  ;;
+  ;; Emoji related
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC e i") 'emoji-insert)
+  (define-key evil-normal-state-local-map (kbd "SPC e r") 'emoji-recent)
+
+  ;;
+  ;; Kill specific buffer and opened windows
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
+  (define-key evil-normal-state-local-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
+  (define-key evil-normal-state-local-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
+)
 
 (defun my-dired-h-l-to-directory-navigating-local()
   (define-key evil-normal-state-local-map (kbd "h") 'dired-up-directory)
@@ -1326,157 +1526,14 @@ targets."
    (my-dired-yank-full-path-local)
 
    ;;
-   ;; Rebind all '<leader>' related to local buffer scope
-   ;; to solve the default 'SPC' binds to 'dired-next-line'!!!
+   ;; Rebind all SPC related bindings to local buffer scope
    ;;
-   (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
-   (define-key evil-normal-state-local-map (kbd "SPC df") 'helpful-callable)
-   (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
-   (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
-   (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
-   (define-key evil-normal-state-local-map (kbd "SPC dm") 'describe-mode)
-   (define-key evil-normal-state-local-map (kbd "SPC l") 'clm/toggle-command-log-buffer)
-   (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
-   (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
-   (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
-   (define-key evil-normal-state-local-map (kbd "SPC vs") 'evil-window-vsplit)
-   (define-key evil-normal-state-local-map (kbd "SPC m") 'dired-toggle-read-only)
-   (define-key evil-normal-state-local-map (kbd "SPC h") 'dired-omit-mode)
-   (define-key evil-normal-state-local-map (kbd "SPC yp") 'my-dired-yank-full-path)
-   (define-key evil-normal-state-local-map (kbd "SPC oc") 'my-open-emacs-configuration-file)
+   (rebind-general-leader-x-bindings-to-local-buffer-scope)
 )
 
 (add-hook 'dired-mode-hook #'my-dired-customized-bindings)
 
 (evil-define-key '(normal) image-mode-map (kbd "=") 'image-transform-fit-to-window)
-
-;;
-;; Close the 'helful' window and kill its buffer
-;;
-(defun kill-helpful-window-and-buffers ()
-    (interactive)
-    (message ">>> [ kill-helpful-window-and-buffers ] - ....... ")
-
-    (cl-loop for buf in (buffer-list)
-            do (if (string-match-p "^*helpful" (buffer-name buf))
-               (progn
-                   ;;
-                   ;; Try to close its window first if exists.
-                   ;;
-                   (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
-                   (if window-to-be-killed
-                      (progn
-                          (delete-window window-to-be-killed)
-                          (message ">>> [ kill-helpful-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
-                      )
-                   )
-
-                   ;;
-                   ;; Kill buffer.
-                   ;;
-                   (message ">>> [ kill-helpful-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
-                   (kill-buffer buf)
-               )
-            )
-    )
-
-    (message ">>> [ kill-helpful-window-and-buffers ] - [done] ")
-)
-
-(define-key evil-motion-state-map (kbd "<leader>kh") 'kill-helpful-window-and-buffers)
-(define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
-
-(if my-enable-which-key-customized-description
-    (progn
-        (which-key-add-key-based-replacements "SPC k" "Kill")
-        (which-key-add-key-based-replacements "C-c k" "Kill")
-        (which-key-add-key-based-replacements "SPC k h" "Help window and buffer")
-        (which-key-add-key-based-replacements "C-c k h" "Help window and buffer")
-    ))
-
-;;
-;; Close the 'eldoc' window and kill its buffer
-;;
-(defun kill-eldoc-window-and-buffers ()
-    (interactive)
-    (message ">>> [ kill-eldoc-window-and-buffers ] - ....... ")
-
-    (cl-loop for buf in (buffer-list)
-       do (if (string-match-p "^*eldoc" (buffer-name buf))
-           (progn
-              ;;
-              ;; Try to close its window first if exists.
-              ;;
-              (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
-              (if window-to-be-killed
-                  (progn
-                      (delete-window window-to-be-killed)
-                      (message ">>> [ kill-eldoc-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
-                  )
-              )
-
-              ;;
-              ;; Kill buffer.
-              ;;
-              (message ">>> [ kill-eldoc-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
-              (kill-buffer buf)
-           )
-       )
-    )
-
-    (message ">>> [ kill-eldoc-window-and-buffers ] - [done] ")
-)
-
-(define-key evil-motion-state-map (kbd "<leader>kd") 'kill-eldoc-window-and-buffers)
-(define-key evil-normal-state-map (kbd "C-c k d") 'kill-eldoc-window-and-buffers)
-
-(if my-enable-which-key-customized-description
-    (progn
-        (which-key-add-key-based-replacements "SPC k d" "Doc window and buffer")
-        (which-key-add-key-based-replacements "C-c k d" "Doc window and buffer")
-    ))
-
-;;
-;; Close the 'embark' window and kill its buffer
-;;
-(defun kill-embark-window-and-buffers ()
-   (interactive)
-   (message ">>> [ kill-embark-window-and-buffers ] - ....... ")
-
-   (cl-loop for buf in (buffer-list)
-      do (if (string-match-p "^*Embark" (buffer-name buf))
-         (progn
-             ;;
-             ;; Try to close its window first if exists.
-             ;;
-             (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
-             (if window-to-be-killed
-                 (progn
-                     (delete-window window-to-be-killed)
-                     (message ">>> [ kill-embark-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
-                 )
-             )
-
-             ;;
-             ;; Kill buffer.
-             ;;
-             (message ">>> [ kill-embark-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
-             (kill-buffer buf)
-         )
-      )
-   )
-
-   (message ">>> [ kill-embark-window-and-buffers ] - [done] ")
-)
-
-(define-key evil-motion-state-map (kbd "<leader>ke") 'kill-embark-window-and-buffers)
-(define-key evil-normal-state-map (kbd "C-c k e") 'kill-embark-window-and-buffers)
-
-(if my-enable-which-key-customized-description
-    (progn
-        (which-key-add-key-based-replacements "SPC k e" "Embark window and buffer")
-        (which-key-add-key-based-replacements "C-c k e" "Embark window and buffer")
-    ))
 
 (defun my-lsp-error-jumping-in-local-buffer()
   (define-key evil-normal-state-local-map (kbd "C-n") 'flymake-goto-next-error)
@@ -2239,10 +2296,10 @@ When inserting a precise note insert the text of the note in the body as an org 
      (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
      (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
      (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
-     (define-key evil-normal-state-local-map (kbd "SPC df") 'helpful-callable)
-     (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
-     (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
-     (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
+     ;; (define-key evil-normal-state-local-map (kbd "SPC df") 'helpful-callable)
+     ;; (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
+     ;; (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
+     ;; (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
      (message ">>> [ my-pdf-scroll-local ] rebind SPC related works.")
 
      ;;
