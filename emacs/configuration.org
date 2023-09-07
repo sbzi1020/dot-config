@@ -1,4 +1,4 @@
-#+title: My Emacs Configuration
+title: My Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 #+auto_tangle: t
 
@@ -1454,14 +1454,14 @@ Display the full documentation of FUNCTION (a symbol).
     :defer t
     :init
         (which-key-setup-side-window-right-bottom)
-        (which-key-mode)
-    :config
-        ;; Key panel show up delay, unit in seconds.
-        ;; If you want show up instantly, set to 0, 
-        ;;(setq which-key-idle-delay 0)
         (setq which-key-idle-delay 0.2)
+        ;; (setq which-key-sort-order 'which-key-local-then-key-order)
+        (setq which-key-sort-order 'which-key-prefix-then-key-order)
+        (setq which-key-prefix-prefix "> " )
+    :config
+        (which-key-mode)
   )
-#+END_SRC
++#+END_SRC
 
 
 *** =Highlight indent=
@@ -3918,6 +3918,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                   rust-mode-hook
                   rust-ts-mode-hook
                   typescript-mode-hook
+                  python-ts-mode-hook
                   ))
      (add-hook hook #'my-lsp-bindings)
   )

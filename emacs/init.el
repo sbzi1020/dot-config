@@ -1565,6 +1565,7 @@ targets."
                 rust-mode-hook
                 rust-ts-mode-hook
                 typescript-mode-hook
+                python-ts-mode-hook
                 ))
    (add-hook hook #'my-lsp-bindings)
 )
