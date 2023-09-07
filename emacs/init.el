@@ -2221,9 +2221,6 @@ When inserting a precise note insert the text of the note in the body as an org 
     (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
     (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
 
-
-    ;; disable line number
-    (display-line-numbers-mode -1)
     ;; (define-key evil-normal-state-local-map (kbd "e") 'my-xxxxx)
     (message ">>> [ my-pdf-scroll-local ] Set 'e' to local buffer")
 )
@@ -2266,6 +2263,18 @@ When inserting a precise note insert the text of the note in the body as an org 
     (define-key evil-normal-state-local-map (kbd "C-c n p") 'org-noter-insert-precise-note)
     (define-key evil-normal-state-local-map (kbd "C-c n a") 'org-noter-set-auto-save-last-location)
 
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "C-c n" "Noter")
+            (which-key-add-key-based-replacements "C-c n n" "Open session")
+            (which-key-add-key-based-replacements "C-c n i" "Insert")
+            (which-key-add-key-based-replacements "C-c n c" "Outline")
+            (which-key-add-key-based-replacements "C-c n k" "Kill session")
+            (which-key-add-key-based-replacements "C-c n h" "Hide other")
+            (which-key-add-key-based-replacements "C-c n s" "Sync")
+            (which-key-add-key-based-replacements "C-c n p" "Insert precise")
+            (which-key-add-key-based-replacements "C-c n a" "Save last location")
+        ))
 
     (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
 )
