@@ -4939,7 +4939,7 @@ Take the =org-level-1= as an example:
 #+end_src
 
 
-*** Toggle =treemacs=
+*** +Toggle treemacs+
 
 #+BEGIN_SRC emacs-lisp :tangle no
   ;; (dolist (map (list
@@ -4989,14 +4989,14 @@ Take the =org-level-1= as an example:
 #+END_SRC
 
 
-*** Open your key file by =<leader>kk=
+*** Open your key file by =<leader>ok=
 
 #+BEGIN_SRC emacs-lisp
   (dolist (map (list
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-      (define-key map (kbd "<leader>kk") 'nil)
+      (define-key map (kbd "<leader>ok") 'nil)
   )
 
   (defun my-open-key-file()
@@ -5007,7 +5007,15 @@ Take the =org-level-1= as an example:
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      (define-key map (kbd "<leader>kk") 'my-open-key-file)
+      (define-key map (kbd "<leader>ok") 'my-open-key-file)
+      (define-key map (kbd "C-c o k") 'my-open-key-file)
+
+      (if my-enable-which-key-customized-description
+          (progn
+              (which-key-add-key-based-replacements "SPC o k" "Key file")
+              (which-key-add-key-based-replacements "C-c o k" "Key file")
+          ))
+
       ;;(message "State: %s" state);
   )
 #+END_SRC
@@ -5020,7 +5028,8 @@ Take the =org-level-1= as an example:
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-      (define-key map (kbd "<leader>ss") 'nil)
+      (define-key map (kbd "<leader>os") 'nil)
+      (define-key map (kbd "C-c o s") 'nil)
   )
 
   (defun my-open-eshell()
@@ -5033,7 +5042,14 @@ Take the =org-level-1= as an example:
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      (define-key map (kbd "<leader>ss") 'my-open-eshell)
+      (define-key map (kbd "<leader>os") 'my-open-eshell)
+      (define-key map (kbd "C-c o s") 'my-open-eshell)
+
+      (if my-enable-which-key-customized-description
+          (progn
+              (which-key-add-key-based-replacements "SPC o s" "Shell")
+              (which-key-add-key-based-replacements "C-c o s" "Shell")
+          ))
   )
 #+END_SRC
 

@@ -2110,7 +2110,7 @@ When inserting a precise note insert the text of the note in the body as an org 
               evil-motion-state-map
               evil-normal-state-map
               ))
-    (define-key map (kbd "<leader>kk") 'nil)
+    (define-key map (kbd "<leader>ok") 'nil)
 )
 
 (defun my-open-key-file()
@@ -2121,7 +2121,15 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               ))
-    (define-key map (kbd "<leader>kk") 'my-open-key-file)
+    (define-key map (kbd "<leader>ok") 'my-open-key-file)
+    (define-key map (kbd "C-c o k") 'my-open-key-file)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC o k" "Key file")
+            (which-key-add-key-based-replacements "C-c o k" "Key file")
+        ))
+
     ;;(message "State: %s" state);
 )
 
@@ -2129,7 +2137,8 @@ When inserting a precise note insert the text of the note in the body as an org 
               evil-motion-state-map
               evil-normal-state-map
               ))
-    (define-key map (kbd "<leader>ss") 'nil)
+    (define-key map (kbd "<leader>os") 'nil)
+    (define-key map (kbd "C-c o s") 'nil)
 )
 
 (defun my-open-eshell()
@@ -2142,7 +2151,14 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               ))
-    (define-key map (kbd "<leader>ss") 'my-open-eshell)
+    (define-key map (kbd "<leader>os") 'my-open-eshell)
+    (define-key map (kbd "C-c o s") 'my-open-eshell)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC o s" "Shell")
+            (which-key-add-key-based-replacements "C-c o s" "Shell")
+        ))
 )
 
 (defun my-colemak-m-i-directory-navigating-local()
