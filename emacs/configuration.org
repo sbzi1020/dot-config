@@ -5225,42 +5225,24 @@ So, the following function is designed for that purpose: Call one function in ~x
 
 #+BEGIN_SRC emacs-lisp
   (defun my-pdf-scroll-local()
-      (message ">>> [ my-pdf-scroll-local ] ")
+     (message ">>> [ my-pdf-scroll-local ] ")
 
-      ;;
-      ;; Rebind
-      ;;
-      (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
-      (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
-      (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
-      (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
-      (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
-      (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
-      (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
+     ;;
+     ;; Rebind
+     ;;
+     (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
+     (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
+     (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
+     (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
+     (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
+     (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
+     (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
 
-       ;;
-       ;; Rebind all '<leader>' related to local buffer scope
-       ;; to solve the default 'SPC' binds to pdf scrollup
-       ;;
-       (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
-       (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
-       (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
-       (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
-       (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
-       ;; (define-key evil-normal-state-local-map (kbd "SPC df") 'helpful-callable)
-       ;; (define-key evil-normal-state-local-map (kbd "SPC dv") 'helpful-variable)
-       ;; (define-key evil-normal-state-local-map (kbd "SPC dk") 'describe-key)
-       ;; (define-key evil-normal-state-local-map (kbd "SPC db") 'describe-bindings)
-       (message ">>> [ my-pdf-scroll-local ] rebind SPC related works.")
-
-       ;;
-       ;; Window movement related
-       ;;
-       (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
-       (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
-       (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
-       (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
-       (message ">>> [ my-pdf-scroll-local ] rebind SPC windows movement works.")
+     ;;
+     ;; Rebind all SPC related bindings to local buffer scope
+     ;;
+     (rebind-general-leader-x-bindings-to-local-buffer-scope)
+     (rebind-colemak-leader-x-bindings-to-local-buffer-scope)
   )
 
   (dolist (hook '(pdf-view-mode-hook
