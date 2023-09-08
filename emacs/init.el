@@ -1478,7 +1478,7 @@ targets."
 (setq dired-omit-files "^\\...+$")
 
 (defun my-dired-toggle-hidden-files-local()
-  (define-key evil-normal-state-local-map (kbd "<leader>h") 'dired-omit-mode)
+  (define-key evil-normal-state-local-map (kbd "SPC h") 'dired-omit-mode)
   (define-key evil-normal-state-local-map (kbd "C-c h") 'dired-omit-mode)
 
   (if my-enable-which-key-customized-description
@@ -1489,7 +1489,7 @@ targets."
 )
 
 (defun my-dired-toggle-read-only-local()
-  (define-key evil-normal-state-local-map (kbd "<leader>m") 'dired-toggle-read-only)
+  (define-key evil-normal-state-local-map (kbd "SPC m") 'dired-toggle-read-only)
   (define-key evil-normal-state-local-map (kbd "C-c m") 'dired-toggle-read-only)
 
   (if my-enable-which-key-customized-description
@@ -1505,7 +1505,7 @@ targets."
 )
 
 (defun my-dired-yank-full-path-local()
-  (define-key evil-normal-state-local-map (kbd "<leader>yp") 'my-dired-yank-full-path)
+  (define-key evil-normal-state-local-map (kbd "SPC y p") 'my-dired-yank-full-path)
   (define-key evil-normal-state-local-map (kbd "C-c y p") 'my-dired-yank-full-path)
 
   (if my-enable-which-key-customized-description
