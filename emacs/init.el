@@ -1964,24 +1964,16 @@ Specific to the current window's mode line.")
   :hook (dired-mode . denote-dired-mode-in-directories)
   :config
   (setq denote-directory (expand-file-name "~/denote"))
-  ;;(setq denote-known-keywords '("books" "coding" "learning" "important"))
-  ;;(setq denote-infer-keywords )
-  (setq denote-dired-directories (list denote-directory
-                                       (thread-last denote-directory (expand-file-name "books"))
-                                       (thread-last denote-directory (expand-file-name "outline"))
-                                       (thread-last denote-directory (expand-file-name "literature"))
-                                       (thread-last denote-directory (expand-file-name "term"))
-                                       (thread-last denote-directory (expand-file-name "references")))))
 
   (setq denote-directory (expand-file-name "~/sbzi/personal/denote/")
-        denote-known-keywords '("dev" "liter" "books" "dailies")
+        denote-known-keywords '("dev" "liter" "books" "dailies" "personal")
         denote-infer-keywords t
         denote-sort-keywords t
         denote-allow-multi-word-keywords t
         denote-date-prompt-use-org-read-date t
         denote-link-fontify-backlinks t
         denote-front-matter-date-format 'org-timestamp
-        denote-prompts '(title keywords))
+        denote-prompts '(title keywords)))
 
 (use-package pdf-tools
   :load-path "~/.config/emacs/elpa/pdf-tools-20230611.239"
