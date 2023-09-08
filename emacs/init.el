@@ -1409,6 +1409,8 @@ targets."
   (define-key evil-normal-state-local-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
   (define-key evil-normal-state-local-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
   (define-key evil-normal-state-local-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
+
+  (message "[ rebind-general-leader-x-bindings-to-local-buffer-scope ] - Done.")
 )
 
 (defun my-dired-h-l-to-directory-navigating-local()
@@ -2063,13 +2065,10 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               ))
-    ;;(define-key map (kbd "C-i") 'evil-window-right)
-    ;;(define-key map (kbd "C-m") 'evil-window-left)
-    (define-key map (kbd "<leader>wn") 'evil-window-down)
-    (define-key map (kbd "<leader>we") 'evil-window-up)
-    (define-key map (kbd "<leader>wm") 'evil-window-left)
-    (define-key map (kbd "<leader>wi") 'evil-window-right)
-    ;;(message "State: %s" state);
+    (define-key map (kbd "SPC w n") 'evil-window-down)
+    (define-key map (kbd "SPC w e") 'evil-window-up)
+    (define-key map (kbd "SPC w m") 'evil-window-left)
+    (define-key map (kbd "SPC w i") 'evil-window-right)
 )
 
 (if my-enable-which-key-customized-description
@@ -2178,13 +2177,6 @@ When inserting a precise note insert the text of the note in the body as an org 
     ;;(message "State: %s" state);
 )
 
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-    (define-key map (kbd "<leader>ok") 'nil)
-)
-
 (defun my-open-key-file()
    (interactive)
    (find-file-other-window "~/sbzi/personal/keymap.org")
@@ -2193,7 +2185,7 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               ))
-    (define-key map (kbd "<leader>ok") 'my-open-key-file)
+    (define-key map (kbd "SPC o k") 'my-open-key-file)
     (define-key map (kbd "C-c o k") 'my-open-key-file)
 
     (if my-enable-which-key-customized-description
@@ -2209,8 +2201,8 @@ When inserting a precise note insert the text of the note in the body as an org 
               evil-motion-state-map
               evil-normal-state-map
               ))
-    (define-key map (kbd "<leader>os") 'nil)
-    (define-key map (kbd "C-c o s") 'nil)
+    (define-key map (kbd "SPC s") 'nil)
+    (define-key map (kbd "C-c s") 'nil)
 )
 
 (defun my-open-eshell()
@@ -2223,14 +2215,32 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               ))
-    (define-key map (kbd "<leader>os") 'my-open-eshell)
-    (define-key map (kbd "C-c o s") 'my-open-eshell)
+    (define-key map (kbd "SPC s") 'my-open-eshell)
+    (define-key map (kbd "C-c s") 'my-open-eshell)
 
     (if my-enable-which-key-customized-description
         (progn
-            (which-key-add-key-based-replacements "SPC o s" "Shell")
-            (which-key-add-key-based-replacements "C-c o s" "Shell")
+            (which-key-add-key-based-replacements "SPC s" "Shell")
+            (which-key-add-key-based-replacements "C-c s" "Shell")
         ))
+)
+
+(defun rebind-colemak-leader-x-bindings-to-local-buffer-scope()
+  ;;
+  ;; Window movement
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
+  (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
+  (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
+  (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
+
+  ;;
+  ;; Quick open related
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC o k") 'my-open-key-file)
+  (define-key evil-normal-state-local-map (kbd "SPC s") 'my-open-eshell)
+
+  (message "[ rebind-colemak-leader-x-bindings-to-local-buffer-scope ] - Done.")
 )
 
 (defun my-colemak-m-i-directory-navigating-local()
@@ -2252,7 +2262,7 @@ When inserting a precise note insert the text of the note in the body as an org 
               evil-motion-state-map
               evil-normal-state-map
               ))
-    (define-key map (kbd "<leader>od") 'my-open-sbzi-folder)
+    (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
     (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
 )
 
@@ -2262,14 +2272,7 @@ When inserting a precise note insert the text of the note in the body as an org 
         (which-key-add-key-based-replacements "C-C o d" "directory")
     ))
 
-(defun my-colemak-dired-window-movement-local()
-   (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
-   (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
-   (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
-   (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
-)
-
-(add-hook 'dired-mode-hook #'my-colemak-dired-window-movement-local)
+(add-hook 'dired-mode-hook #'rebind-colemak-leader-x-bindings-to-local-buffer-scope)
 
 (define-key global-map (kbd "C-,") 'embark-act)
 

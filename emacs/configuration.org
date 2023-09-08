@@ -3864,6 +3864,8 @@ So, the following function is designed for that purpose: Call one function in ~x
     (define-key evil-normal-state-local-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
     (define-key evil-normal-state-local-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
     (define-key evil-normal-state-local-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
+
+    (message "[ rebind-general-leader-x-bindings-to-local-buffer-scope ] - Done.")
   )
 #+END_SRC
 
@@ -4913,13 +4915,10 @@ Take the =org-level-1= as an example:
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      ;;(define-key map (kbd "C-i") 'evil-window-right)
-      ;;(define-key map (kbd "C-m") 'evil-window-left)
-      (define-key map (kbd "<leader>wn") 'evil-window-down)
-      (define-key map (kbd "<leader>we") 'evil-window-up)
-      (define-key map (kbd "<leader>wm") 'evil-window-left)
-      (define-key map (kbd "<leader>wi") 'evil-window-right)
-      ;;(message "State: %s" state);
+      (define-key map (kbd "SPC w n") 'evil-window-down)
+      (define-key map (kbd "SPC w e") 'evil-window-up)
+      (define-key map (kbd "SPC w m") 'evil-window-left)
+      (define-key map (kbd "SPC w i") 'evil-window-right)
   )
 
   (if my-enable-which-key-customized-description
@@ -5080,13 +5079,6 @@ Take the =org-level-1= as an example:
 *** Open your key file by =<leader>ok=
 
 #+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-      (define-key map (kbd "<leader>ok") 'nil)
-  )
-
   (defun my-open-key-file()
      (interactive)
      (find-file-other-window "~/sbzi/personal/keymap.org")
@@ -5095,7 +5087,7 @@ Take the =org-level-1= as an example:
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      (define-key map (kbd "<leader>ok") 'my-open-key-file)
+      (define-key map (kbd "SPC o k") 'my-open-key-file)
       (define-key map (kbd "C-c o k") 'my-open-key-file)
 
       (if my-enable-which-key-customized-description
@@ -5116,8 +5108,8 @@ Take the =org-level-1= as an example:
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-      (define-key map (kbd "<leader>os") 'nil)
-      (define-key map (kbd "C-c o s") 'nil)
+      (define-key map (kbd "SPC s") 'nil)
+      (define-key map (kbd "C-c s") 'nil)
   )
 
   (defun my-open-eshell()
@@ -5130,14 +5122,43 @@ Take the =org-level-1= as an example:
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      (define-key map (kbd "<leader>os") 'my-open-eshell)
-      (define-key map (kbd "C-c o s") 'my-open-eshell)
+      (define-key map (kbd "SPC s") 'my-open-eshell)
+      (define-key map (kbd "C-c s") 'my-open-eshell)
 
       (if my-enable-which-key-customized-description
           (progn
-              (which-key-add-key-based-replacements "SPC o s" "Shell")
-              (which-key-add-key-based-replacements "C-c o s" "Shell")
+              (which-key-add-key-based-replacements "SPC s" "Shell")
+              (which-key-add-key-based-replacements "C-c s" "Shell")
           ))
+  )
+#+END_SRC
+
+
+*** Rebind colemak ~<leader>X~ bindings to local buffer scope by calling this function
+
+All the ~<leader>X~ bindings above are targeted to =evil-motion-state-map= (which covers =Normal/Motion/Visual= evil states), it should work for most situtations.
+
+But for some particular modes, you still should rebind all of them ~<leader>X~ bindings to the given modes' local buffer scope to make sure to override the packages' level bindings IF you want your ~<leader>X~ bindings work on that mode!!!
+
+So, the following function is designed for that purpose: Call one function in ~xxxx-mode-hook~ to rebind all ~<leader>X~ bindings to the given modes' local buffer scope!!!
+
+#+BEGIN_SRC emacs-lisp
+  (defun rebind-colemak-leader-x-bindings-to-local-buffer-scope()
+    ;;
+    ;; Window movement
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
+    (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
+    (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
+    (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
+
+    ;;
+    ;; Quick open related
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC o k") 'my-open-key-file)
+    (define-key evil-normal-state-local-map (kbd "SPC s") 'my-open-eshell)
+
+    (message "[ rebind-colemak-leader-x-bindings-to-local-buffer-scope ] - Done.")
   )
 #+END_SRC
 
@@ -5171,7 +5192,7 @@ Take the =org-level-1= as an example:
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-      (define-key map (kbd "<leader>od") 'my-open-sbzi-folder)
+      (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
       (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
   )
 
@@ -5183,17 +5204,10 @@ Take the =org-level-1= as an example:
 #+END_SRC
 
 
-**** Rebind window movement
+**** Rebind colemak ~<leader>x~
 
 #+BEGIN_SRC emacs-lisp
-  (defun my-colemak-dired-window-movement-local()
-     (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
-     (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
-     (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
-     (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
-  )
-
-  (add-hook 'dired-mode-hook #'my-colemak-dired-window-movement-local)
+  (add-hook 'dired-mode-hook #'rebind-colemak-leader-x-bindings-to-local-buffer-scope)
 #+END_SRC
 
 
