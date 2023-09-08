@@ -396,7 +396,8 @@ targets."
             evil-want-integration t     ;This is optional since it's already set to t by default.
             evil-want-keybinding nil
       )
-    ;; :hook (evil-mode . rune/evil-hook)
+    :custom
+      (evil-undo-system 'undo-redo)
     :config
       (evil-mode 1)
 
@@ -464,36 +465,48 @@ targets."
   ;; But the following settings only work in =GUI= mode, nothing will happen in =Terminal= mode!!!
   ;;
   (dolist (face '((org-level-1 . 1.5)
-                  (org-level-2 . 1.3)
-                  (org-level-3 . 1.2)
-                  (org-level-4 . 1.1)
-                  (org-level-5 . 1.0)
-                  (org-level-6 . 1.0)
-                  (org-level-7 . 1.0)))
+		  (org-level-2 . 1.3)
+		  (org-level-3 . 1.2)
+		  (org-level-4 . 1.1)
+		  (org-level-5 . 1.0)
+		  (org-level-6 . 1.0)
+		  (org-level-7 . 1.0)))
     (set-face-attribute (car face) nil
-                        :font "SauceCodePro Nerd Font"
-                        :weight 'regular
-                        :height (cdr face))
+			:font "SauceCodePro Nerd Font"
+			:weight 'regular
+			:height (cdr face))
   )
 )
 
 (use-package org
-  :hook (org-mode . my/org-mode-setup)
-  :config
-  (setq org-ellipsis " ......"         ; Ellipsis string when `S-TAB`
-        org-hide-emphasis-markers t    ; Hide the marker (bold, link etc)
-        ))
+   :config
+	(setq org-ellipsis " ......"         ; Ellipsis string when `S-TAB`
+	      org-hide-emphasis-markers t    ; Hide the marker (bold, link etc)
+	)
+	(add-hook 'org-mode-hook #'my/org-mode-setup)
+ )
+
 
 (use-package org-bullets
   :after org
   :init
-    (setq org-bullets-bullet-list '("" "" ">" "●" "◆" "*"))
-  :hook (org-mode . org-bullets-mode)
+    ;;(setq org-bullets-bullet-list '("①" "②" "③" "④" "⑤" "⑥"))
+    (setq org-bullets-bullet-list '("➊" "➋" "➌" "➍" "➎" "➏"))
+  :config
+     (add-hook 'org-mode-hook #'org-bullets-mode)
+)
+
+(defun my-enable-org-auto-tangle()
+   (message "[ my-enable-org-auto-tangle ]")
+   (org-auto-tangle-mode nil)
+   (message "[ my-enable-org-auto-tangle ] - Done.")
 )
 
 (use-package org-auto-tangle
-  :defer t
-  :hook (org-mode . org-auto-tangle-mode))
+  :after org
+  :config
+     (add-hook 'org-mode-hook #'my-enable-org-auto-tangle)
+)
 
 (setq treesit-language-source-alist
   '((c "https://github.com/tree-sitter/tree-sitter-c")
@@ -1944,12 +1957,6 @@ Specific to the current window's mode line.")
 )
 
 (use-package denote
-  :bind (("<leader> n s" . denote-signature)
-         ("<leader> n n" . denote)
-         ("<leader> n i" . denote-insert-link)
-         ("<leader> n r" . denote-rename-file-using-front-matter)
-         ("<leader> n k" . denote-keywords-add)
-         ("<leader> n K" . denote-keywords-remove))
   :commands (denote denote-signature denote-subdirectory denote-rename-file-using-front-matter
                     denote-keywords-prompt
                     denote-rename-file
@@ -1965,6 +1972,16 @@ Specific to the current window's mode line.")
                                        (thread-last denote-directory (expand-file-name "literature"))
                                        (thread-last denote-directory (expand-file-name "term"))
                                        (thread-last denote-directory (expand-file-name "references")))))
+
+  (setq denote-directory (expand-file-name "~/sbzi/personal/denote/")
+        denote-known-keywords '("dev" "liter" "books" "dailies")
+        denote-infer-keywords t
+        denote-sort-keywords t
+        denote-allow-multi-word-keywords t
+        denote-date-prompt-use-org-read-date t
+        denote-link-fontify-backlinks t
+        denote-front-matter-date-format 'org-timestamp
+        denote-prompts '(title keywords))
 
 (use-package pdf-tools
   :load-path "~/.config/emacs/elpa/pdf-tools-20230611.239"
@@ -2316,12 +2333,12 @@ When inserting a precise note insert the text of the note in the body as an org 
     (define-key evil-normal-state-local-map (kbd "M-q") 'org-noter-kill-session)
     ;;(define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
     (define-key evil-normal-state-local-map (kbd "M-s") 'org-noter-set-auto-save-last-location)
-    (define-key evil-normal-state-local-map (kbd "M-]") 'org-noter-sync-next-note)
-    (define-key evil-normal-state-local-map (kbd "M-[") 'org-noter-sync-prev-note)
-    (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-note)
-    (define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
-    (define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
-    (define-key evil-normal-state-local-map (kbd "M-C") 'org-noter-sync-current-page-or-chapter)
+    (define-key evil-normal-state-local-map (kbd "M-.") 'org-noter-sync-next-note)
+    (define-key evil-normal-state-local-map (kbd "M-,") 'org-noter-sync-prev-note)
+    (define-key evil-normal-state-local-map (kbd "M-/") 'org-noter-sync-current-note)
+    ;;(define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
+    ;;(define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
+    (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-page-or-chapter)
 
 
 
@@ -2351,3 +2368,45 @@ When inserting a precise note insert the text of the note in the body as an org 
 )
 
 ;(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
+
+(defun my-denote-local()
+    (message ">>> [ my-denote-local ] ")
+
+    ;;
+    ;; Unbind
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC n") nil)
+
+    ;;
+    ;; Rebind
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC n l") 'denote-link)
+    (define-key evil-normal-state-local-map (kbd "SPC n L") 'denote-backlink)
+    (define-key evil-normal-state-local-map (kbd "SPC n t") 'denote-template)
+    (define-key evil-normal-state-local-map (kbd "SPC n a") 'denote-add-links)
+    (define-key evil-normal-state-local-map (kbd "SPC n g") 'denote-global-menu)
+    (define-key evil-normal-state-local-map (kbd "SPC n r") 'denote-rename-file)
+    (define-key evil-normal-state-local-map (kbd "SPC n k") 'denote-keywords-add)
+    (define-key evil-normal-state-local-map (kbd "SPC n K") 'denote-keywords-remove)
+    (define-key evil-normal-state-local-map (kbd "SPC n f") 'denote-find-link)
+    (define-key evil-normal-state-local-map (kbd "SPC n F") 'denote-find-backlink)
+
+
+
+  ;; (if my-enable-which-key-customized-description
+  ;;      (progn
+  ;;          ;;(which-key-add-key-based-replacements "C-c n" "Noter")
+  ;;          (which-key-add-key-based-replacements "C-c n <" "prev note")
+  ;;          (which-key-add-key-based-replacements "C-c n ]" "next chapter note")
+  ;;      ))
+
+    (message ">>> [ my-denote-local ] - rebind successfully. ")
+)
+
+(dolist (hook '(org-mode-hook
+		pdf-view-mode-hook
+		))
+   (add-hook hook #'my-denote-local)
+)
+
+(message ">>>>>>>>>")
