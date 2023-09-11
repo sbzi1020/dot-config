@@ -74,6 +74,22 @@
 
 (setq org-image-actual-width nil)
 
+;; Just for debugging purpose:
+;;
+;; When developing your dynamically Loaded Module for emacs, you can
+;; add your library output folder to the 'load-path' for testing.
+;;
+;; After adding your testing library folder to 'load-path', then you
+;; can load it by running:
+;; 
+;; (require 'YOUR_LIB_FILENAME_HERE)
+;; (CALL_YOUR_MODULE_FUNCTION)
+;; ...
+;;
+(push (expand-file-name "~/zig/emacs-module-in-zig/zig-out/lib") load-path)
+
+(push "~/.config/emacs/lib" load-path)
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;;(add-to-list 'package-archives

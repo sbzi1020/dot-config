@@ -1097,11 +1097,52 @@ Auto pair =()= and =[]=
 
 
 
-*** Disable the actual size when displaying inline images
+*** Don't use actual image size for inline images
 
 #+BEGIN_SRC emacs-lisp
   (setq org-image-actual-width nil)
 #+END_SRC
+
+After you set ~org-image-actual-width~ to ~nil~, then you're able to use the following attributes to specific the size of any inline images:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;;
+  ;; Display image with half of the current window size
+  ;;
+  #+ATTR_HTML: :width 50%
+  [[~/...your_image_file]]
+
+  ;;
+  ;; Display image with exactly pixels width
+  ;;
+  #+ATTR_HTML: :width 100px
+  [[~/...your_image_file]]
+#+END_SRC
+
+
+
+*** Add extra module load path
+
+Load your custom dynamically loaded module from the given path.
+
+#+BEGIN_SRC emacs-lisp
+  ;; Just for debugging purpose:
+  ;;
+  ;; When developing your dynamically Loaded Module for emacs, you can
+  ;; add your library output folder to the 'load-path' for testing.
+  ;;
+  ;; After adding your testing library folder to 'load-path', then you
+  ;; can load it by running:
+  ;; 
+  ;; (require 'YOUR_LIB_FILENAME_HERE)
+  ;; (CALL_YOUR_MODULE_FUNCTION)
+  ;; ...
+  ;;
+  (push (expand-file-name "~/zig/emacs-module-in-zig/zig-out/lib") load-path)
+
+  (push "~/.config/emacs/lib" load-path)
+#+END_SRC
+
 
 
 ** Set fonts and transparent background, it has to be in ~early-init.el~
