@@ -1576,7 +1576,7 @@ targets."
 (defun my-lsp-format-buffer()
   ;;(define-key evil-normal-state-local-map (kbd "<leader>ff") 'lsp-format-buffer)
 
-  (define-key evil-normal-state-local-map (kbd "<leader>ff") 'eglot-format-buffer)
+  (define-key evil-normal-state-local-map (kbd "SPC f f") 'eglot-format-buffer)
 
   (message ">>> [ my-lsp-format-buffer ] Set '<leader>ff' to local buffer")
 )
@@ -1584,14 +1584,13 @@ targets."
 (defun my-lsp-rename-buffer()
   ;; (define-key evil-normal-state-local-map (kbd "<leader>rn") 'lsp-rename)
 
-  (define-key evil-normal-state-local-map (kbd "<leader>rn") 'eglot-rename)
+  (define-key evil-normal-state-local-map (kbd "SPC r n") 'eglot-rename)
 
   (message ">>> [ my-lsp-rename-buffer ] Set '<leader>rn' to local buffer")
 )
 
 (defun my-lsp-show-error()
-  (define-key evil-normal-state-local-map (kbd "<leader>se") 'flymake-show-buffer-diagnostics)
-  (define-key evil-normal-state-local-map (kbd "C-c s e") 'flymake-show-buffer-diagnostics)
+  (define-key evil-normal-state-local-map (kbd "SPC s e") 'flymake-show-buffer-diagnostics)
 
   (message ">>> [ my-lsp-show-error ] Set '<leader>se' to local buffer")
 )
@@ -1600,15 +1599,13 @@ targets."
   ;; (define-key evil-normal-state-local-map (kbd "<leader>ca") 'lsp-execute-code-action)
   ;; (define-key evil-normal-state-local-map (kbd "C-c c a") 'lsp-execute-code-action)
 
-  (define-key evil-normal-state-local-map (kbd "<leader>ca") 'eglot-code-action-quickfix)
-  (define-key evil-normal-state-local-map (kbd "C-c c a") 'eglot-code-action-quickfix)
+  (define-key evil-normal-state-local-map (kbd "SPC c a") 'eglot-code-action-quickfix)
 
   (message ">>> [ my-lsp-code-action ] Set '<leader>ca' to local buffer")
 )
 
 (defun my-lsp-toggle-comment()
-  (define-key evil-visual-state-local-map (kbd "<leader>/") 'evilnc-comment-or-uncomment-lines)
-  (define-key evil-visual-state-local-map (kbd "C-c /") 'evilnc-comment-or-uncomment-lines)
+  (define-key evil-visual-state-local-map (kbd "SPC /") 'evilnc-comment-or-uncomment-lines)
 
   (message ">>> [ my-lsp-toggle-comment ] Set '<leader>/' to local buffer")
 )
@@ -1629,8 +1626,7 @@ targets."
 )
 
 (defun my-setup-toggle-inlay-hint()
-    (define-key evil-normal-state-local-map (kbd "<leader>th") 'my-lsp-toggle-inlay-hint)
-    (define-key evil-normal-state-local-map (kbd "C-c t h") 'my-lsp-toggle-inlay-hint)
+    (define-key evil-normal-state-local-map (kbd "SPC t h") 'my-lsp-toggle-inlay-hint)
     (message ">>> [ my-setup-toggle-inlay-hint ] Set '<leader>th' to local buffer")
 )
 
@@ -1654,8 +1650,8 @@ targets."
            (which-key-add-major-mode-key-based-replacements major-mode "SPC c" "Code actions")
            (which-key-add-major-mode-key-based-replacements major-mode "SPC c a" "Code actions")
            (which-key-add-major-mode-key-based-replacements major-mode "SPC /" "Comment")
-           (which-key-add-major-mode-key-based-replacements major-mode "SPC t" "Toggle hints")
-           (which-key-add-major-mode-key-based-replacements major-mode "SPC t a" "Toggle hints")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC t" "Toggle")
+           (which-key-add-major-mode-key-based-replacements major-mode "SPC t h" "Toggle hints")
        ))
 )
 
