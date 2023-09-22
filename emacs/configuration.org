@@ -1,4 +1,4 @@
-title: My Emacs Configuration
+itle: My Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 #+auto_tangle: t
 
@@ -2731,19 +2731,17 @@ Completion to provide a dropdown selection.
   (use-package company
     :custom
        (company-minimum-prefix-length 2)
-       (company-idel-delay 0.0)
+       (company-idle-delay 0.0)
+       (company-tooltip-align-annotations t)
+       (company-show-numbers t)
+       (company-selection-wrap-around t)
+       (company-transformers '(company-sort-by-occurrence))
     :config
         ;;
         ;; Enable completion for all buffers
         ;;
         (global-company-mode 1)
   )
-
-  ;;
-  ;; A company front-end with icons.
-  ;;
-  (use-package company-box
-    :hook (company-mode . company-box-mode))
 #+end_src
 
 
@@ -4960,230 +4958,6 @@ Take the =org-level-1= as an example:
 
 ** Colemak
 
-*** Basic movement and edit
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                evil-visual-state-map
-                ))
-      (define-key map (kbd "n") 'nil)
-      (define-key map (kbd "e") 'nil)
-      (define-key map (kbd "m") 'nil)
-      (define-key map (kbd "i") 'nil)
-      (define-key map (kbd "l") 'nil)
-      ;;(message "State: %s" state);
-  )
-
-  (dolist (map (list
-                evil-motion-state-map
-                evil-visual-state-map
-                ))
-      (define-key map (kbd "n") 'evil-next-line)
-      (define-key map (kbd "e") 'evil-previous-line)
-      (define-key map (kbd "m") 'evil-backward-char)
-      (define-key map (kbd "i") 'evil-forward-char)
-      (define-key map (kbd "l") 'evil-insert)
-      ;;(message "State: %s" state);
-  )
-
-  (define-key evil-normal-state-map (kbd "L") 'evil-insert-line)
-#+END_SRC
-
-
-*** Window movement
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "SPC w n") 'evil-window-down)
-      (define-key map (kbd "SPC w e") 'evil-window-up)
-      (define-key map (kbd "SPC w m") 'evil-window-left)
-      (define-key map (kbd "SPC w i") 'evil-window-right)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC w" "Window")
-          (which-key-add-key-based-replacements "SPC w n" "Down")
-          (which-key-add-key-based-replacements "SPC w e" "Up")
-          (which-key-add-key-based-replacements "SPC w m" "Left")
-          (which-key-add-key-based-replacements "SPC w i" "Right")
-      ))
-
-  ;; (defun my-rebind-window-movement-for-treemacs()
-  ;;     (interactive)
-  ;;     ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
-  ;;     ;;(define-key treemacs-mode-map (kbd "C-i") nil)
-  ;; 
-  ;;     ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
-  ;;     ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
-  ;;     (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
-  ;;     (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
-  ;; )
-
-  ;; (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
-
-#+END_SRC
-
-
-*** Enable =<C-n>= and =<C-n>= for the following modes
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; 'vertico-mode'
-  ;;
-  (dolist (map (list
-                vertico-map
-                ))
-    (define-key map (kbd "C-n") 'vertico-next)
-    (define-key map (kbd "C-e") 'vertico-previous)
-  )
-
-  ;;
-  ;; 'org-mode'
-  ;;
-  (defun my-org-next-heading()
-    (interactive)
-    (org-forward-heading-same-level nil)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (defun my-org-previous-heading()
-    (interactive)
-    (org-backward-heading-same-level nil)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (evil-define-key 'normal org-mode-map (kbd "C-n") 'my-org-next-heading)
-  (evil-define-key 'normal org-mode-map (kbd "C-e") 'my-org-previous-heading)
-
-  ;;
-  ;; 'markdown-mode' and 'markdown-view-mode'
-  ;;
-  (defun my-markdown-next-heading()
-    (interactive)
-    (outline-next-visible-heading 1)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (defun my-markdown-previous-heading()
-    (interactive)
-    (outline-next-visible-heading -1)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (dolist (map (list
-                markdown-mode-map
-                markdown-view-mode-map
-                ))
-    (evil-define-key 'normal map (kbd "C-n") 'my-markdown-next-heading)
-    (evil-define-key 'normal map (kbd "C-e") 'my-markdown-previous-heading)
-  )
-#+END_SRC
-
-
-*** Improve =,= and =.= search
-
-#+begin_src emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-        (define-key map (kbd ".") nil)
-        (define-key map (kbd ",") nil)
-  )
-
-  ;;
-  ;; Unbind
-  ;;
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-        (define-key map (kbd ".") 'my-search-next)
-        (define-key map (kbd ",") 'my-search-previous)
-  )
-#+end_src
-
-
-*** +Toggle treemacs+
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; (dolist (map (list
-  ;;                 evil-motion-state-map
-  ;;                 evil-normal-state-map
-  ;;                 ))
-  ;;         (define-key map (kbd "<leader>e") 'treemacs)
-  ;; )
-
-  ;; (defun my-rebind-toggle-treemacs()
-  ;;   (interactive)
-  ;;   (dolist (map (list
-  ;;                 evil-motion-state-map
-  ;;                 treemacs-mode-map
-  ;;                   ))
-  ;;           (define-key map (kbd "SPC") nil)
-  ;;   )
-
-  ;;   (dolist (map (list
-  ;;                 treemacs-mode-map
-  ;;                   ))
-  ;;           (define-key map (kbd "SPC e") 'treemacs)
-  ;;           (define-key map (kbd "<leader>e") 'treemacs)
-  ;;   )
-  ;; )
-
-  ;; (add-hook 'treemacs-mode-hook #'my-rebind-toggle-treemacs)
-#+END_SRC
-
-
-*** Set bookmark by =b=
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-      (define-key map (kbd "b") 'nil)
-  )
-
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "b") 'evil-set-marker)
-      ;;(message "State: %s" state);
-  )
-#+END_SRC
-
-
-*** Open your key file by =<leader>ok=
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-open-key-file()
-     (interactive)
-     (find-file-other-window "~/sbzi/personal/keymap.org")
-  )
-
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "SPC o k") 'my-open-key-file)
-      (define-key map (kbd "C-c o k") 'my-open-key-file)
-
-      (if my-enable-which-key-customized-description
-          (progn
-              (which-key-add-key-based-replacements "SPC o k" "Key file")
-              (which-key-add-key-based-replacements "C-c o k" "Key file")
-          ))
-
-      ;;(message "State: %s" state);
-  )
-#+END_SRC
-
-
 *** Open EShell =<leader>s=
 
 #+BEGIN_SRC emacs-lisp
@@ -5191,8 +4965,8 @@ Take the =org-level-1= as an example:
                 evil-motion-state-map
                 evil-normal-state-map
                 ))
-      (define-key map (kbd "SPC s") 'nil)
-      (define-key map (kbd "C-c s") 'nil)
+      (define-key map (kbd "SPC s s") 'nil)
+      (define-key map (kbd "C-c s s") 'nil)
   )
 
   (defun my-open-eshell()
@@ -5205,60 +4979,20 @@ Take the =org-level-1= as an example:
   (dolist (map (list
                 evil-motion-state-map
                 ))
-      (define-key map (kbd "SPC s") 'my-open-eshell)
-      (define-key map (kbd "C-c s") 'my-open-eshell)
+      (define-key map (kbd "SPC s s") 'my-open-eshell)
+      (define-key map (kbd "C-c s s") 'my-open-eshell)
 
       (if my-enable-which-key-customized-description
           (progn
-              (which-key-add-key-based-replacements "SPC s" "Shell")
-              (which-key-add-key-based-replacements "C-c s" "Shell")
+              (which-key-add-key-based-replacements "SPC s s" "Shell")
+              (which-key-add-key-based-replacements "C-c s s" "Shell")
           ))
   )
 #+END_SRC
 
 
-*** Rebind colemak ~<leader>X~ bindings to local buffer scope by calling this function
-
-All the ~<leader>X~ bindings above are targeted to =evil-motion-state-map= (which covers =Normal/Motion/Visual= evil states), it should work for most situtations.
-
-But for some particular modes, you still should rebind all of them ~<leader>X~ bindings to the given modes' local buffer scope to make sure to override the packages' level bindings IF you want your ~<leader>X~ bindings work on that mode!!!
-
-So, the following function is designed for that purpose: Call one function in ~xxxx-mode-hook~ to rebind all ~<leader>X~ bindings to the given modes' local buffer scope!!!
-
-#+BEGIN_SRC emacs-lisp
-  (defun rebind-colemak-leader-x-bindings-to-local-buffer-scope()
-    ;;
-    ;; Window movement
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
-    (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
-    (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
-    (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
-
-    ;;
-    ;; Quick open related
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC o k") 'my-open-key-file)
-    (define-key evil-normal-state-local-map (kbd "SPC s") 'my-open-eshell)
-
-    (message "[ rebind-colemak-leader-x-bindings-to-local-buffer-scope ] - Done.")
-  )
-#+END_SRC
-
 
 *** Dired
-
-**** Go up dire by =m= and into dir or open file by =i=
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-colemak-m-i-directory-navigating-local()
-    (define-key evil-normal-state-local-map (kbd "m") 'dired-up-directory)
-    (define-key evil-normal-state-local-map (kbd "i") 'dired-find-file)
-  )
-
-  (add-hook 'dired-mode-hook #'my-colemak-m-i-directory-navigating-local)
-#+END_SRC
-
 
 **** Open dired by =<leader>od=
 
@@ -5287,13 +5021,6 @@ So, the following function is designed for that purpose: Call one function in ~x
 #+END_SRC
 
 
-**** Rebind colemak ~<leader>x~
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'dired-mode-hook #'rebind-colemak-leader-x-bindings-to-local-buffer-scope)
-#+END_SRC
-
-
 *** Embark
 
 **** Run ~embark-act~ by =C-,=
@@ -5313,8 +5040,8 @@ So, the following function is designed for that purpose: Call one function in ~x
      ;;
      ;; Rebind
      ;;
-     (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
-     (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
+     (define-key evil-normal-state-local-map (kbd "k") 'pdf-view-scroll-down-or-previous-page)
+     (define-key evil-normal-state-local-map (kbd "j") 'pdf-view-scroll-up-or-next-page)
      (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
      (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
      (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
@@ -5441,3 +5168,30 @@ So, the following function is designed for that purpose: Call one function in ~x
    (message ">>>>>>>>>")
  #+END_SRC
 
+
+
+
+** =python=
+
+#+BEGIN_SRC emacs-lisp :tangle no
+   ;; (use-package lsp-pyright
+   ;; :ensure t
+   ;; :config
+   ;; :hook
+   ;; (python-mode . (lambda ()
+   ;;                 (require 'lsp-pyright)
+   ;;                 (lsp-deferred))))
+ ;; (use-package python-mode
+ ;;   :ensure nil
+ ;;   :after flycheck
+ ;;   :mode "\\.py\\'"
+ ;;   :custom
+ ;;   (python-indent-offset 4)
+ ;;   (flycheck-python-pycompile-executable "python3")
+ ;;   (python-shell-interpreter "python3"))
+
+ ;; (use-package lsp-pyright
+ ;; :hook (python-mode . (lambda () (require 'lsp-pyright)))
+ ;; :custom
+ ;; (lsp-pyright-multi-root nil))
+#+END_SRC

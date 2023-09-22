@@ -661,19 +661,17 @@ targets."
 (use-package company
   :custom
      (company-minimum-prefix-length 2)
-     (company-idel-delay 0.0)
+     (company-idle-delay 0.0)
+     (company-tooltip-align-annotations t)
+     (company-show-numbers t)
+     (company-selection-wrap-around t)
+     (company-transformers '(company-sort-by-occurrence))
   :config
       ;;
       ;; Enable completion for all buffers
       ;;
       (global-company-mode 1)
 )
-
-;;
-;; A company front-end with icons.
-;;
-(use-package company-box
-  :hook (company-mode . company-box-mode))
 
 (add-to-list 'load-path "~/.config/emacs/snippets")
 
@@ -2092,171 +2090,9 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               evil-normal-state-map
-              evil-visual-state-map
               ))
-    (define-key map (kbd "n") 'nil)
-    (define-key map (kbd "e") 'nil)
-    (define-key map (kbd "m") 'nil)
-    (define-key map (kbd "i") 'nil)
-    (define-key map (kbd "l") 'nil)
-    ;;(message "State: %s" state);
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              evil-visual-state-map
-              ))
-    (define-key map (kbd "n") 'evil-next-line)
-    (define-key map (kbd "e") 'evil-previous-line)
-    (define-key map (kbd "m") 'evil-backward-char)
-    (define-key map (kbd "i") 'evil-forward-char)
-    (define-key map (kbd "l") 'evil-insert)
-    ;;(message "State: %s" state);
-)
-
-(define-key evil-normal-state-map (kbd "L") 'evil-insert-line)
-
-(dolist (map (list
-              evil-motion-state-map
-              ))
-    (define-key map (kbd "SPC w n") 'evil-window-down)
-    (define-key map (kbd "SPC w e") 'evil-window-up)
-    (define-key map (kbd "SPC w m") 'evil-window-left)
-    (define-key map (kbd "SPC w i") 'evil-window-right)
-)
-
-(if my-enable-which-key-customized-description
-    (progn
-        (which-key-add-key-based-replacements "SPC w" "Window")
-        (which-key-add-key-based-replacements "SPC w n" "Down")
-        (which-key-add-key-based-replacements "SPC w e" "Up")
-        (which-key-add-key-based-replacements "SPC w m" "Left")
-        (which-key-add-key-based-replacements "SPC w i" "Right")
-    ))
-
-;; (defun my-rebind-window-movement-for-treemacs()
-;;     (interactive)
-;;     ;;(define-key evil-treemacs-state-map (kbd "C-i") nil)
-;;     ;;(define-key treemacs-mode-map (kbd "C-i") nil)
-;; 
-;;     ;;(define-key treemacs-mode-map (kbd "C-i") 'evil-window-right)
-;;     ;;(define-key treemacs-mode-map (kbd "C-m") 'evil-window-left)
-;;     (define-key treemacs-mode-map (kbd "C-w n") 'evil-window-down)
-;;     (define-key treemacs-mode-map (kbd "C-w e") 'evil-window-up)
-;; )
-
-;; (add-hook 'treemacs-mode-hook #'my-rebind-window-movement-for-treemacs)
-
-;;
-;; 'vertico-mode'
-;;
-(dolist (map (list
-              vertico-map
-              ))
-  (define-key map (kbd "C-n") 'vertico-next)
-  (define-key map (kbd "C-e") 'vertico-previous)
-)
-
-;;
-;; 'org-mode'
-;;
-(defun my-org-next-heading()
-  (interactive)
-  (org-forward-heading-same-level nil)
-  (evil-scroll-line-to-center nil)
-)
-
-(defun my-org-previous-heading()
-  (interactive)
-  (org-backward-heading-same-level nil)
-  (evil-scroll-line-to-center nil)
-)
-
-(evil-define-key 'normal org-mode-map (kbd "C-n") 'my-org-next-heading)
-(evil-define-key 'normal org-mode-map (kbd "C-e") 'my-org-previous-heading)
-
-;;
-;; 'markdown-mode' and 'markdown-view-mode'
-;;
-(defun my-markdown-next-heading()
-  (interactive)
-  (outline-next-visible-heading 1)
-  (evil-scroll-line-to-center nil)
-)
-
-(defun my-markdown-previous-heading()
-  (interactive)
-  (outline-next-visible-heading -1)
-  (evil-scroll-line-to-center nil)
-)
-
-(dolist (map (list
-              markdown-mode-map
-              markdown-view-mode-map
-              ))
-  (evil-define-key 'normal map (kbd "C-n") 'my-markdown-next-heading)
-  (evil-define-key 'normal map (kbd "C-e") 'my-markdown-previous-heading)
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-      (define-key map (kbd ".") nil)
-      (define-key map (kbd ",") nil)
-)
-
-;;
-;; Unbind
-;;
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-      (define-key map (kbd ".") 'my-search-next)
-      (define-key map (kbd ",") 'my-search-previous)
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-    (define-key map (kbd "b") 'nil)
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              ))
-    (define-key map (kbd "b") 'evil-set-marker)
-    ;;(message "State: %s" state);
-)
-
-(defun my-open-key-file()
-   (interactive)
-   (find-file-other-window "~/sbzi/personal/keymap.org")
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              ))
-    (define-key map (kbd "SPC o k") 'my-open-key-file)
-    (define-key map (kbd "C-c o k") 'my-open-key-file)
-
-    (if my-enable-which-key-customized-description
-        (progn
-            (which-key-add-key-based-replacements "SPC o k" "Key file")
-            (which-key-add-key-based-replacements "C-c o k" "Key file")
-        ))
-
-    ;;(message "State: %s" state);
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-    (define-key map (kbd "SPC s") 'nil)
-    (define-key map (kbd "C-c s") 'nil)
+    (define-key map (kbd "SPC s s") 'nil)
+    (define-key map (kbd "C-c s s") 'nil)
 )
 
 (defun my-open-eshell()
@@ -2269,40 +2105,15 @@ When inserting a precise note insert the text of the note in the body as an org 
 (dolist (map (list
               evil-motion-state-map
               ))
-    (define-key map (kbd "SPC s") 'my-open-eshell)
-    (define-key map (kbd "C-c s") 'my-open-eshell)
+    (define-key map (kbd "SPC s s") 'my-open-eshell)
+    (define-key map (kbd "C-c s s") 'my-open-eshell)
 
     (if my-enable-which-key-customized-description
         (progn
-            (which-key-add-key-based-replacements "SPC s" "Shell")
-            (which-key-add-key-based-replacements "C-c s" "Shell")
+            (which-key-add-key-based-replacements "SPC s s" "Shell")
+            (which-key-add-key-based-replacements "C-c s s" "Shell")
         ))
 )
-
-(defun rebind-colemak-leader-x-bindings-to-local-buffer-scope()
-  ;;
-  ;; Window movement
-  ;;
-  (define-key evil-normal-state-local-map (kbd "SPC w n") 'evil-window-down)
-  (define-key evil-normal-state-local-map (kbd "SPC w e") 'evil-window-up)
-  (define-key evil-normal-state-local-map (kbd "SPC w m") 'evil-window-left)
-  (define-key evil-normal-state-local-map (kbd "SPC w i") 'evil-window-right)
-
-  ;;
-  ;; Quick open related
-  ;;
-  (define-key evil-normal-state-local-map (kbd "SPC o k") 'my-open-key-file)
-  (define-key evil-normal-state-local-map (kbd "SPC s") 'my-open-eshell)
-
-  (message "[ rebind-colemak-leader-x-bindings-to-local-buffer-scope ] - Done.")
-)
-
-(defun my-colemak-m-i-directory-navigating-local()
-  (define-key evil-normal-state-local-map (kbd "m") 'dired-up-directory)
-  (define-key evil-normal-state-local-map (kbd "i") 'dired-find-file)
-)
-
-(add-hook 'dired-mode-hook #'my-colemak-m-i-directory-navigating-local)
 
 (defun my-open-sbzi-folder()
   (interactive)
@@ -2326,8 +2137,6 @@ When inserting a precise note insert the text of the note in the body as an org 
         (which-key-add-key-based-replacements "C-C o d" "directory")
     ))
 
-(add-hook 'dired-mode-hook #'rebind-colemak-leader-x-bindings-to-local-buffer-scope)
-
 (define-key global-map (kbd "C-,") 'embark-act)
 
 (defun my-pdf-scroll-local()
@@ -2336,8 +2145,8 @@ When inserting a precise note insert the text of the note in the body as an org 
    ;;
    ;; Rebind
    ;;
-   (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
-   (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
+   (define-key evil-normal-state-local-map (kbd "k") 'pdf-view-scroll-down-or-previous-page)
+   (define-key evil-normal-state-local-map (kbd "j") 'pdf-view-scroll-up-or-next-page)
    (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
    (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
    (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
