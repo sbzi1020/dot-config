@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: include_guard
+# key: include_guard
+# --
+#ifndef __${1:MACRO_NAME}_H__
+#define __$1_H__
+
+$0
+
+#endif

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: enum_hex
+# key: enum_hex
+# --
+typedef enum ${1:EnumName} {
+    $0 = 0x01
+} $1;

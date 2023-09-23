@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: future_result_type
+# key: future_result_type
+# --
+pub type FutureResult<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;

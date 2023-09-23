@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: buffer_type
+# key: buffer_type
+# --
+pub type BufferReference<'a> = &'a [u8];

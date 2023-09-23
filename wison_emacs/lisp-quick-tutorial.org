@@ -1,0 +1,997 @@
+#+title: Emacs LISP Quick Tutorial
+
+*  Data type
+
+**  Variable doesn't have a fixed data type
+
+In =LISP=, a variable doesn't have a fixed data type, it's data type changes based on its value, here is the exampe:
+
+#+BEGIN_SRC emacs-lisp
+(setq value "123") ; let value = "123"
+  (setq value "123")
+  (type-of value)       ; string
+  (setq value 111.222)
+  (type-of value)       ; float
+  (setq value 123)
+  (type-of value)       ; integer
+
+  (setq value 'helloworld) ; singal no eval what I am going to write
+  (type-of value)       ; symbol
+  (setq value t)
+  (type-of value)       ; symbol
+  (setq value nil)
+  (type-of value)       ; symbol
+
+  (setq value '(1 2 3 ))
+  (type-of value)       ; (1 2 3), it's a List
+#+END_SRC
+
+
+**  Evaluate the value or not
+
+If you put a ~'~ in front of a value or a variable, that said DO NOT try tp evaluate to get back the value, just use it as a symbol or value!!!
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-name "Wison Ye")
+  (message "my-name: %s" my-name)   ; "my-name: Wison Ye"
+  (message "my-name: %s" 'my-name)  ; "my-name: my-name"
+#+END_SRC
+
+
+**  True and false
+
+There is no ~true~ and ~false~ in =LISP=, only got ~t~ or ~nil~ symbols to represent =true= or =false= meaning.
+
+
+**  Primitive data type
+
+Basic primitive data type in =LISP= is ~List~:
+
+| Expression                  | Data type          |
+|-----------------------------+--------------------|
+| ~(type-of 789)~               | integer            |
+| ~(type-of 789.123)~           | float              |
+| ~(type-of "789")~             | string             |
+| ~(type-of 'This-is-a-symbol)~ | symbol             |
+| ~(type-of '(123 789))~        | cons               |
+|                             | vector             |
+|                             | has-table          |
+|                             | subr               |
+|                             | byte-code function |
+|                             | record             |
+|                             |                    |
+
+Also, =LISP= has programming types as well.
+
+
+**  How to check whether the given values are equal or not
+
+| Function | Description                                                              |
+|----------+--------------------------------------------------------------------------|
+| ~eq~       | Return t if the two args are the same Lisp object (like same reference). |
+| ~eql~      | Return t if number values are the same.                                  |
+| ~equal~    | Return t if two Lisp objects have similar structure and contents         |
+| ~string=~  | Return t if the two string contents are the same                         |
+|          |                                                                          |
+
+
+So, usually, you will use ~equal~ to check variables or values are equal or not.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local num-1 9.9)
+  (setq-local num-2 9.9)
+  (eql num-1 num-2)
+
+  (setq-local str-1 "Hellow World")
+  (setq-local str-2 "Hellow World")
+  (setq-local str-3 "hellow world")
+
+  (eql str-1 str-2)     ;; nil, you shouldn't use this to check string content
+  (string= str-1 str-2) ;; t
+  (equal str-1 str-2)   ;; t
+  (string= str-1 str-3) ;; nil
+#+END_SRC
+
+
+*  Control flow
+
+**  ~if~
+
+~t~ is true, ~nil~ is false
+
+#+BEGIN_SRC emacs-lisp
+  (setq condition t)
+  (setq condition nil)
+  (if condition
+      (message "true")  ;; If true do this
+      (message "false") ;; Else if falae do this, this branch is optional
+  )
+#+END_SRC
+
+The =false= branch is optional:
+
+#+BEGIN_SRC emacs-lisp
+  (setq condition t)
+  (if condition
+      (message "true")  ;; If true do this
+  )
+#+END_SRC
+
+As you can see, the =true/false= branch statement only accept one function. If you want to run more than one function, then you have to use ~(progn)~ function:
+
+#+BEGIN_SRC emacs-lisp
+  (setq condition t)
+  (setq condition nil)
+  (if condition
+      (progn
+          (message ">>> true-1")
+          (message ">>> true-2")
+          (message ">>> true")
+      )
+      (progn
+          (message ">>> false-1")
+          (message ">>> false-2")
+          (message ">>> false")
+      )
+  )
+#+END_SRC
+
+You can use ~(not)~ function in ~if~ like this:
+
+#+BEGIN_SRC emacs-lisp
+  (if (not condition)
+      (progn
+          (message ">>> true-1")
+          (message ">>> true-2")
+          (message ">>> true")
+      )
+      (progn
+          (message ">>> false-1")
+          (message ">>> false-2")
+          (message ">>> false")
+      )
+  )
+#+END_SRC
+
+Or combine ~(and)~ ~(or)~ etc.
+
+
+**  ~when~ and ~unless~
+
+~when~ is only care about the ~t~ case: Run the body if ~t~, otherwise, return ~nil~.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local download-successfully t)
+  (when download-successfully
+       (message "when hits t")
+       (message "Download successfully.")
+  )
+#+END_SRC
+
+
+~unless~ is only care about the ~nil~ case: Run the body if ~nil~, otherwise, return ~nil~.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local download-successfully nil)
+  (unless download-successfully
+       (message "unless hits nil")
+       (message "Download failed.")
+  )
+#+END_SRC
+
+
+**  ~cond~ works like ~if else if else~ 
+
+There is no ~if else~ in =LISP=, but ~cond~ works like that: if match condition, then return its value
+
+#+BEGIN_SRC emacs-lisp
+  ;; (setq-local temp-str "aaa")
+  ;; (setq-local temp-str "bbb")
+  ;; (setq-local temp-str "cc")
+  ;; (setq-local a 80)
+  ;; (setq-local b 70)
+
+  (setq-local result (cond ((string= temp-str "aaa") "Yes, that's aaa")  ;; if
+                           ((string= temp-str "bbb") "Yes, that's bbb")  ;; else if
+                           ((string= temp-str "ccc") "Yes, that's ccc")  ;; else if
+                           ((> a b) "Yes, a > b")                        ;; else if
+                           (t "Yes, This works like 'else' branch")      ;; else
+  ))
+#+END_SRC
+
+
+**  ~while~ loop
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local counter 5)
+
+  (while (> counter 0)
+       (message ">>> counter: %d" counter)
+       ;; (setq-local counter (- counter 1))
+       (setq-local counter (1- counter))
+  )
+#+END_SRC
+
+
+**  ~dolist~ loop
+
+Loop elements from a list and then do something in the body
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Evaluate elements inside the list and print out
+  ;; 'list' is a function to create a list
+  ;; 'temp-value' is a temporary variable to hold each element in the list
+  ;;
+  (setq value-1 "AAA")
+  (setq value-2 "BBB")
+  (setq value-3 "CCC")
+
+  (dolist (temp-value (list value-1 value-2 value-3))
+       (message "temp-value: %s" temp-value)
+  )
+
+  ;;
+  ;; The same purpose with above
+  ;;
+  (setq temp-list (list "AAA" "BBB" "CCC"))
+  (dolist (temp-value temp-list)
+       (message "temp-value: %s" temp-value)
+  )
+
+  (setq temp-list '("AAA" "BBB"))
+#+END_SRC
+
+
+*  Common functions you need to know
+
+**  Set variables
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 
+  ;;
+  (setq value-outside-current-buffer "Hey")
+
+  ;;
+  ;; This varialbe is current buffer scope
+  ;;
+  (setq-local value-inside-current-buffer "Hey")
+
+#+END_SRC
+
+
+**  Manipulate numbers
+
+***  Number operation
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; +/-/*//
+  ;;
+  (+ 1 1)
+  (- 2 1)
+  (* 2 3)
+  (/ 6 2)
+
+
+  ;;
+  ;; Reminder for integer
+  ;;
+  (% 10 3)
+
+  ;;
+  ;; Reminder for float
+  ;;
+  (mod 10.1 3)
+#+END_SRC
+
+
+***  Number rounding
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; truncate: Rounds float to integer
+  ;; round: Rounds to the nearest integer
+  ;; floor: Rounds float to integer by subtracting
+  ;; ceiling: Rounds up to next integer
+  ;;
+  (truncate 1.6)    ; 1
+  (round 1.6)       ; 2
+  (floor 1.6)       ; 1
+  (ceiling 1.6)     ; 2
+#+END_SRC
+
+
+***  Is it number or no?
+
+#+BEGIN_SRC emacs-lisp
+  (numberp 1)         ; t
+  (numberp 1.1)       ; t
+  (numberp "asdf")    ; nil
+
+  (integerp 1)        ; t
+  (integerp 1.1)      ; nil
+  (integerp "asdf")   ; nil
+
+  (floatp 1)          ; nil
+  (floatp 1.1)        ; t
+  (floatp "asdf")     ; nil
+
+  (zerop 0)           ; t
+  (zerop 0.0)         ; t
+  (zerop 1)           ; nil
+  (zerop 1.1)         ; nil
+#+END_SRC
+
+
+***  Number comparison
+
+#+BEGIN_SRC emacs-lisp
+  (= 1 1)
+  (< 2 1)
+  (> 2 1)
+  (>= 2 1)
+  (<= 2 1)
+
+  (max 2 1 10 99)
+  (min 2 1 10 99)
+#+END_SRC
+
+
+**  Manipuldate strings
+
+***  Comparison
+
+#+BEGIN_SRC emacs-lisp
+  (string= "aaa" "aaa")   ; t
+  (string= "aaa" "bbb")   ; nil
+
+  (string< "aaa" "aaa")   ; nil
+  (string< "aaa" "bbb")   ; t
+
+  (string> "aaa" "aaa")   ; nil
+  (string> "aaa" "bbb")   ; nil
+#+END_SRC
+
+
+***  Operation
+
+#+BEGIN_SRC emacs-lisp
+  (substring "1234567890" 0 4)    ; 1234
+
+  (concat "Hello" " World")       ; Hello World
+
+  ;;
+  ;; Split string by the separator (default is " ")
+  ;;
+  ;; You can use the 'case-fold-search' to control split separate case-sensitive or not:
+  ;;
+  ;; (setq case-fold-search nil)
+  ;; (setq case-fold-search t)
+  ;;
+  (split-string "Hello emacs lisp")     ; '("Hello" "emacs" "lisp")
+  (split-string "Hello,emacs,lisp" ",") ; '("Hello" "emacs" "lisp")
+  (split-string "Hello emacs lisp")     ; '("Hello" "emacs" "lisp")
+#+END_SRC
+
+
+**  Manipulate char
+
+Char value starts with ~?~
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local hex-char ?A)    ; 65
+  (setq-local hex-char ?\t)   ; 9
+  (setq-local hex-char ?\n)   ; 10
+  (setq-local hex-char ?FF)   ; It doesn't work!!!
+#+END_SRC
+
+
+***  Comparison
+
+#+BEGIN_SRC emacs-lisp
+  (char-equal ?A ?A)        ; t
+  (char-equal ?a ?A)        ; nil
+  (char-equal 65 ?A)        ; t
+#+END_SRC
+
+
+**  Format and print out
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Print out something via 'message'
+  ;;
+  (message "Hello world")
+  (message "Integer value: %d, float value: %f, hex value: 0x%X, sting value: %s" 88 123.123 255 "Hey")
+
+  ;;
+  ;; Format string
+  ;;
+  (setq string-value (format
+                        "Integer value: %d, float value: %f, hex value: 0x%X, sting value: %s"
+                        88
+                        123.123
+                        255
+                        "Hey"))
+  (message "string_value: %s" string-value)
+
+  ;;
+  ;; Conversion
+  ;;
+  (string-to-number "111")
+  (number-to-string 111)
+
+  ;;
+  ;; Format time string
+  ;;
+  (setq time-string-value (format-time-string "%A"))
+  (message "time-string-value: %s" time-string-value)
+#+END_SRC
+
+
+**  Manipulate list
+
+#+BEGIN_SRC emacs-lisp
+  (setq element-a "A")
+  (setq element-b "B")
+  (setq element-c "C")
+
+  ;;
+  ;; '() create a symbol list (do NOT evaluate list elements)
+  ;; 'list' create a value list 
+  ;;
+  (setq my-list (list element-a element-b element-c))
+
+  ;;
+  ;; 'car' get back the first element
+  ;;
+  (message "First element: %s" (car my-list))
+
+  ;;
+  ;; 'cdr' get back the second and the rest elements
+  ;;
+  (message "Second element: %s" (cdr my-list))
+
+  ;;
+  ;; 'last' get back the first element, 'nil' if the list is empty
+  ;;
+  (message "Last element: %s" (last my-list))
+
+  ;;
+  ;; 'nth' get back the N element, 0 basic
+  ;;
+  (message "Second element: %s" (nth 0 my-list))
+  (message "Second element: %s" (nth 1 my-list))
+  (message "Second element: %s" (nth 2 my-list))
+  (message "Second element: %s" (nth 3 my-list)) ; 'nil' as out of index
+
+  ;;
+  ;; 'append' to list and return a new list
+  ;;
+  (setq my-list (append my-list '("E" "F")))
+  (message "my-list: %s" my-list)    ; "my-list: (A B C E F)"
+#+END_SRC
+
+
+**  Manipulate association lists (aka ~alists~)
+
+~alist~ are lists containing cons pairs for the purpose of storing named values:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Set a lists with 'symbol -> value' pairs
+  ;;
+  (setq my-alist '(
+                   (enable-this-feature . t)
+                   (show-in-buffer . nil)
+                   (init-height . 20)
+                  )
+  )
+
+  ;;
+  ;; Get value by symbol
+  ;;
+  (alist-get 'enable-this-feature my-alist)      ; t
+  (alist-get 'show-in-buffer my-alist)           ; nil
+  (alist-get 'init-height my-alist)              ; 20
+  (alist-get 'non-exists my-alist)               ; nil (menas doesn't exists)
+
+  ;;
+  ;; Get pair by symbol
+  ;;
+  (assq 'enable-this-feature my-alist)      ; (enable-this-feature . t)
+  (assq 'show-in-buffer my-alist)           ; (show-in-buffer)
+  (assq 'init-height my-alist)              ; (init-height . 20)
+  (assq 'non-exists my-alist)               ; nil (menas doesn't exists)
+
+  ;;
+  ;; Get pair by value
+  ;;
+  (rassq t my-alist)                        ; (enable-this-feature . t)
+  (rassq nil my-alist)                      ; (show-in-buffer)
+  (rassq 20 my-alist)                       ; (init-height . 20)
+  (rassq "non-exists" my-alist)             ; nil (menas doesn't exists)
+
+  ;;
+  ;; Create pair if it doesn't exists
+  ;;
+  (setf (alist-get 'my-name my-alist) "Wison Ye")
+  (alist-get 'my-name my-alist)             ; "Wison Ye"
+  (assq 'my-name my-alist)                  ; (my-name . "Wison Ye")
+#+END_SRC
+
+
+**  Manipulate property list (aka ~plist~)
+
+~plist~ is another way to represent the 'symbol - value' pair in plain text:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Set a plist with 'symbol -> value' pairs in single list format
+  ;;
+  (setq my-plist '(
+                   enable-this-feature . t
+                   show-in-buffer nil
+                   init-height 20
+                  )
+  )
+
+  ;;
+  ;; Get value by symbol
+  ;;
+  (plist-get my-plist 'enable-this-feature)      ; t
+  (plist-get my-plist 'show-in-buffer)           ; nil
+  (plist-get my-plist 'init-height)              ; 20
+  (plist-get my-plist 'non-exists)               ; nil (menas doesn't exists)
+
+  ;;
+  ;; Set plist value by name
+  ;;
+  (plist-put my-plist 'init-height 88)
+  (plist-get my-plist 'init-height)              ; 88
+#+END_SRC
+
+
+**  Manipulate array
+
+~array~ is the sequence arranges in the continuously memory which access more faster than =List=. =String= is also an array.
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Create array
+  ;;
+  (setq my-array [1 2 3 4 5])                    ; [1 2 3 4 5]
+  (setq my-names ["Wison" "Paul" "Henry"])       ; ["Wison" "Paul" "Henry"]
+
+  ;;
+  ;; Set element by index
+  ;;
+  (aset my-array 0 99)
+  (message "my-array: %s" my-array)              ; "my-array: [99 2 3 4 5]"
+  (aset my-names 1 "Lucy")
+  (message "my-names: %s" my-names)              ; "my-names: [Wison Lucy Henry]"
+
+
+  ;;
+  ;; Fill the entire array with given value
+  ;;
+  (fillarray my-array 888)
+  (message "my-array: %s" my-array)              ; "my-array: [888 888 888 888 888]"
+#+END_SRC
+
+
+**  Manipuldate buffers
+
+***  Get back opened buffer list
+
+#+BEGIN_SRC emacs-lisp
+  (buffer-list)
+#+END_SRC
+
+
+***  Get back buffer info: name, filename, size, content
+
+#+BEGIN_SRC emacs-lisp
+  (buffer-name)
+  (buffer-file-name)
+  (buffer-size)
+
+  ;;
+  ;; This return all content with text properties
+  ;;
+  (buffer-string)
+
+  ;;
+  ;; This return all content between 'start' and 'end' position WITHOUT text properties (pure text)
+  ;;
+  (buffer-substring-no-properties 1 (buffer-end 1))
+#+END_SRC
+
+
+***  Get back the given buffer instance
+
+#+BEGIN_SRC emacs-lisp
+  (current-buffer)
+
+  (get-buffer "*Messages*")
+#+END_SRC
+
+
+***  Create or get back a given buffer
+
+#+BEGIN_SRC emacs-lisp
+  (get-buffer-create "*Weather*")
+#+END_SRC
+
+
+***  Do someting in =current-buffer=
+
+- Create or get back a given buffer as =current-buffer
+- Erase original content and write something there
+- Enable =org-mode=
+- Bind ~n~ to close the buffer and kill the window
+
+#+BEGIN_SRC emacs-lisp
+  (with-current-buffer (get-buffer-create "*Weather*")
+      (erase-buffer)
+      (insert "Today is sunny day:)\n")
+      (insert (current-time-string))
+      (org-mode)
+      (define-key evil-normal-state-local-map (kbd "n") 'kill-buffer-and-window)
+  )
+#+END_SRC
+
+
+***  Open buffer with the following conditions
+
+- Must show in same window
+- Must show in bottom position
+- Must only have the minimal height to show the content
+
+#+BEGIN_SRC emacs-lisp
+  (setq buffer-to-show "*Weather*")
+
+  (pop-to-buffer buffer-to-show '(
+                                  (display-buffer-at-bottom)
+                                  (inhibit-same-window . t)
+                                  (window-height . fit-window-to-buffer)
+                                 )
+  )
+#+END_SRC
+
+
+***  Get current values
+
+#+BEGIN_SRC emacs-lisp
+  (current-time)
+  (current-time-string)
+  (current-time-zone)
+  (current-column)
+  (current-thread)
+  (current-cpu-time)
+  (current-message)
+  (current-buffer)
+
+  (current-word) ; Current word at point
+#+END_SRC
+
+
+***  Emacs related
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Get back Emacs start time duration
+  ;;
+  (emacs-init-time)
+  J
+  ;;
+  ;; Restart Emacs
+  ;;
+  (restart-emacs)
+#+END_SRC
+
+
+*  Function
+
+**  Function parameter has no type and return the last expression value
+
+In LISP, function parameter has no type (dynamic type: can be any types);
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 
+  ;;
+  (defun show-type-and-value (x y)
+      (message "x type: %s, value: %s" (type-of x) x)
+      (message "y type: %s, value: %s" (type-of y) y)
+  )
+
+  (show-type-and-value 1 123.11)
+  (show-type-and-value "hey" ?A)
+#+END_SRC
+
+
+Function doesn't have ~return~ keyword, it returns the =last expression value=:
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local function-result (show-type-and-value 88 99.999))   ; "y type: float, value: 99.999"
+  (type-of function-result)                                      ; string
+#+END_SRC
+
+
+**  ~&optional~ parameter
+
+#+BEGIN_SRC emacs-lisp
+  (defun show-type-and-value (x y &optional should-show-y)
+      (message "x type: %s, value: %s" (type-of x) x)
+      (if should-show-y
+          (message "y type: %s, value: %s" (type-of y) y)
+      )
+  )
+
+  ;; Return nil, as last expression is the if, and it returns nil!!!
+  (show-type-and-value 1 123.11)
+
+  ;; Return string, as the if statement is t and run the '(message)' function to product a string
+  (show-type-and-value 1 123.11 t)
+#+END_SRC
+
+
+**  ~&optional~ parameter with default value
+
+#+BEGIN_SRC emacs-lisp
+  (defun show-type-and-value (x &optional y z)
+      (setq-local y-value (or y 10)) ; If 'y' has no value, then default is 10
+      (setq-local z-value (or z 20))
+      (message "y type: %s, value: %s" (type-of y-value) y-value)
+      (message "z type: %s, value: %s" (type-of z-value) z-value)
+  )
+
+  (show-type-and-value 1)
+  (show-type-and-value 1 2)
+  (show-type-and-value 1 2 3)
+#+END_SRC
+
+
+**  ~&rest~ parameter
+
+~&rest~ parameter use a single temporary variable to hold all the parameters (as a list) which handles by the function.
+
+For example the ~(+)~ function definition:
+
+#+BEGIN_SRC emacs-lisp
+  (+ &rest NUMBERS-OR-MARKERS)
+#+END_SRC
+
+That's why you can call it like this:
+
+#+BEGIN_SRC emacs-lisp
+  (+ 2 1)          ; 3
+  (+ 2 10 20 10)   ; 42
+#+END_SRC
+
+
+Let's self implement the ~(+)~ function ues ~&rest~:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-plus (&rest numbers)
+      (setq-local sum 0)
+      (dolist (temp-number numbers)
+           (setq-local sum (+ sum temp-number))
+      )
+      sum
+  )
+
+  (my-plus 2 3 5)    ; 10
+  (my-plus 10 20 30) ; 60
+#+END_SRC
+
+
+**  Function doc
+
+Function documentation shows in ~describe-function~ can be multiple lines, but it keep all spaces which you THINK that's correct indents:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-plus (&rest numbers)
+      " My own plus function implementation
+
+        Example:
+  
+            (my-plus 2 3 5)    ; 10
+            (my-plus 10 20 30) ; 60
+      "
+      (setq-local sum 0)
+      (dolist (temp-number numbers)
+           (setq-local sum (+ sum temp-number))
+      )
+      sum
+  )
+
+  (my-plus 2 3 5)    ; 10
+  (my-plus 10 20 30) ; 60
+#+END_SRC
+
+If you run ~describe-funciton my-plus~, the doc looks like this (which doesn't what you want):
+
+#+BEGIN_SRC emacs-lisp
+  Documentation
+  My own plus function implementation
+
+          Example:
+  
+              (my-plus 2 3 5)    ; 10
+              (my-plus 10 20 30) ; 60
+#+END_SRC
+
+
+You should never indent from line 2:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-plus (&rest numbers)
+      " My own plus function implementation
+
+Example:
+
+    (my-plus 2 3 5)    ; 10
+    (my-plus 10 20 30) ; 60
+      "
+      (setq-local sum 0)
+      (dolist (temp-number numbers)
+           (setq-local sum (+ sum temp-number))
+      )
+      sum
+  )
+
+  (my-plus 2 3 5)    ; 10
+  (my-plus 10 20 30) ; 60
+#+END_SRC
+
+
+If you run ~describe-funciton my-plus~, the doc looks correctly:
+
+#+BEGIN_SRC emacs-lisp
+  Documentation
+  My own plus function implementation
+
+  Example:
+
+      (my-plus 2 3 5)    ; 10
+      (my-plus 10 20 30) ; 60
+
+#+END_SRC
+
+
+**  Lambda function is anonymous function
+
+If you want pass a temporary (only use once) function to another function as parameter and you don't want to declare a real function, then ~lambda~ function is what you want:
+
+#+BEGIN_SRC emacs-lisp
+  (lambda ()
+      (message ">>> This is the anonymous function.")
+  )
+
+  ;;
+  ;; Or you can call the lambda function directly like this:
+  ;;
+  ;; The outside '()' call the lambda function
+  ;; The inside '()' declare the lambda function
+  ;;
+  ((lambda (x y)
+    (message ">>> Run the lambda function directly, x: %s, y: %s" x y)
+   )
+   10 20)
+#+END_SRC
+
+
+**  You can call a given function by the ~(funcall)~ function or ~(apply)~ function
+
+#+BEGIN_SRC emacs-lisp
+  (defun call-me (x) (message "You just call me with x: %s" x))
+
+  ;;
+  ;; Call any function, the first parameter is the function name symbol
+  ;;
+  (funcall 'call-me 88)
+#+END_SRC
+
+
+~(apply)~ works like ~(funcall)~, but you pass a list to combine all parameters as the second parameter:
+
+#+BEGIN_SRC emacs-lisp
+  (apply 'call-me '(88))
+#+END_SRC
+
+
+*  Command
+
+~Command~ is just the interactive function, the differences are:
+
+- You only can call command by ~M-x~
+- You only can bind command to key
+
+
+**  Simple command
+
+A command is the function that start with ~(interactive)~ call:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-first-command()
+      (interactive)
+      (message ">>> my-first-command")
+  )
+#+END_SRC
+
+
+**  Interactive parameters
+
+The interactive form accepts parameters that tells Emacs what to do when the command is executed interactively (either via M-x or when used via key binding). Some examples:
+
+| Prefix code                        | Description                                                  |
+|----------------------------------------+--------------------------------------------------------------|
+| [ General arguments ]                  |                                                              |
+| ~N~                                      | Prompt for numbers or use a numeric prefix argument          |
+| ~p~                                      | Use numeric prefix without prompting (only prefix arguments) |
+| ~M~                                      | Prompt for a string                                          |
+| ~i~                                      | Skip an “irrelevant” argument                                |
+|                                        |                                                              |
+| [ Files, directories, and buffers ]    |                                                              |
+| ~F~                                      | Prompt for a file, providing completions                     |
+| ~D~                                      | Prompt for a directory, providing completions                |
+| ~b~                                      | Prompt for a buffer, providing completions                   |
+|                                        |                                                              |
+| [ Functions, commands, and variables ] |                                                              |
+| ~C~                                      | Prompt for a command name                                    |
+| ~a~                                      | Prompt for a function name                                   |
+| ~v~                                      | Prompt for a custom variable name                            |
+|                                        |                                                              |
+
+For more prefix code, read from here [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Interactive-Codes.html#Interactive-Codes][Emacs Manual: Interactive codes]]
+
+
+*** A command that prompts for a file and a folder by ~F~ and ~D~ prefix codes
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; A command that prompt the for a file
+  ;;
+  (defun prompt-user-file (your-file your-folder)
+      ;;
+      ;; - Must start with the prefix code, then follow by your prompt content
+      ;; - If you need multiple prompts, separate them with '\n'
+      ;; - The total prompts should match your function parameters count, otherwise, your function won't call correctly!
+      ;;
+      (interactive "FPlease select your file: \nDPlease select your folder: ")
+      (message ">>> your-file: %s" your-file)
+      (message ">>> your-folder: %s" your-folder)
+  )
+#+END_SRC
+
+
+*** A command that prompts for 2 numbers by ~N~ prefix code
+
+#+BEGIN_SRC emacs-lisp
+  (defun prompt-user-numbers (number-1 number-2)
+      (interactive "NPlease type your first number: \nNPlease select your second number: ")
+      (message ">>> your-first-number: %d" number-1)
+      (message ">>> your-second-number: %d" number-2)
+      (setq-local result (+ number-1 number-2))
+      (message ">>> result: %d" result)
+      result ; Last expression returns the value
+  )
+#+END_SRC
+
+
+*** A command that prompts for 2 strings by ~M~ prefix code
+
+#+BEGIN_SRC emacs-lisp
+  (defun prompt-user-string-and-concat (first-name last-name)
+      (interactive "MPlease type your first name: \nMPlease select your last name: ")
+      (message ">>> your-first-name: %s" first-name)
+      (message ">>> your-last-name: %s" last-name)
+      (setq-local full-name (concat first-name last-name))
+      (message ">>> Your full name is: %s" full-name)
+      full-name ; Last expression returns the value
+  )
+#+END_SRC
