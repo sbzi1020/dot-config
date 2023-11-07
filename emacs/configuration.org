@@ -2387,6 +2387,13 @@ Before you can active =eglot=, you have to install your language server separate
 #+END_SRC
 
 
+**** =cmake-language-server=
+
+#+BEGIN_SRC bash
+  pip3 install cmake-language-server 
+#+END_SRC
+
+
 *** Setup langauge server list (optional)
 
 ~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
@@ -2579,6 +2586,7 @@ Here is the way to set the default style via the hook:
   (add-hook 'rust-ts-mode-hook #'my-c-style-settings)
   (add-hook 'python-ts-mode-hook #'my-c-style-settings)
   (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
+  (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
 #+END_SRC
 
 
@@ -2589,6 +2597,7 @@ Here is the way to start =eglot= automatically:
 #+BEGIN_SRC emacs-lisp
   (defun start-eglot()
      (eglot-ensure)
+     (setq eldoc-echo-area-prefer-doc-buffer t)
      (message ">>> start-elogt")
   )
 
@@ -2598,6 +2607,7 @@ Here is the way to start =eglot= automatically:
                   rust-ts-mode-hook
                   zig-mode-hook
                   python-ts-mode-hook 
+                  cmake-ts-mode-hook
                   ))
      (add-hook hook #'start-eglot)
   )
@@ -2780,6 +2790,7 @@ Completion to provide a dropdown selection.
       (add-hook 'zig-mode-hook #'yas-minor-mode)
       (add-hook 'zig-mode-hook #'yas-minor-mode)
       (add-hook 'org-mode-hook #'yas-minor-mode)
+      (add-hook 'cmake-ts-mode-hook #'yas-minor-mode)
 
       ;;
       ;; Fix 'company' can't list 'yasnippet' candidates in dropdown list

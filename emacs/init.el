@@ -642,9 +642,11 @@ targets."
 (add-hook 'rust-ts-mode-hook #'my-c-style-settings)
 (add-hook 'python-ts-mode-hook #'my-c-style-settings)
 (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
+(add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
 
 (defun start-eglot()
    (eglot-ensure)
+   (setq eldoc-echo-area-prefer-doc-buffer t)
    (message ">>> start-elogt")
 )
 
@@ -654,6 +656,7 @@ targets."
                 rust-ts-mode-hook
                 zig-mode-hook
                 python-ts-mode-hook 
+                cmake-ts-mode-hook
                 ))
    (add-hook hook #'start-eglot)
 )
@@ -705,6 +708,7 @@ targets."
     (add-hook 'zig-mode-hook #'yas-minor-mode)
     (add-hook 'zig-mode-hook #'yas-minor-mode)
     (add-hook 'org-mode-hook #'yas-minor-mode)
+    (add-hook 'cmake-ts-mode-hook #'yas-minor-mode)
 
     ;;
     ;; Fix 'company' can't list 'yasnippet' candidates in dropdown list
