@@ -911,6 +911,35 @@ targets."
 (dolist (map (list
               evil-motion-state-map
               ))
+  (define-key map (kbd "SPC p f") 'project-find-file)
+  (define-key map (kbd "C-c p f") 'project-find-file)
+
+  (define-key map (kbd "SPC p d") 'project-dired)
+  (define-key map (kbd "C-c p d") 'project-dired)
+
+  (define-key map (kbd "SPC p s") 'project-switch-project)
+  (define-key map (kbd "C-c p s") 'project-switch-project)
+
+  (define-key map (kbd "SPC p b") 'project-switch-to-buffer)
+  (define-key map (kbd "C-c p b") 'project-switch-to-buffer)
+
+  (define-key map (kbd "SPC p c") 'project-async-shell-command)
+  (define-key map (kbd "C-c p c") 'project-async-shell-command)
+)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC p" "Projects")
+        (which-key-add-key-based-replacements "SPC p f" "Fuzzy searching in project")
+        (which-key-add-key-based-replacements "SPC p d" "Open dired in project")
+        (which-key-add-key-based-replacements "SPC p b" "Switch buffer in project")
+        (which-key-add-key-based-replacements "SPC p s" "Switch to another project")
+        (which-key-add-key-based-replacements "SPC p c" "Run async shell command")
+    ))
+
+(dolist (map (list
+              evil-motion-state-map
+              ))
   (define-key map (kbd "SPC SPC") 'switch-to-last-buffer)
 )
 
@@ -1053,7 +1082,7 @@ targets."
 
 (defun my-open-emacs-configuration-file()
    (interactive)
-   (find-file-other-window "~/.config/emacs/configuration.org")
+   (find-file "~/.config/emacs/configuration.org")
 )
 
 ;; Unbind this!!!
@@ -1404,6 +1433,15 @@ targets."
   (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
 
   ;;
+  ;; Project scope related
+  ;;
+  (define-key evil-normal-state-local-map (kbd "SPC p f") 'project-find-file)
+  (define-key evil-normal-state-local-map (kbd "SPC p d") 'project-dired)
+  (define-key evil-normal-state-local-map (kbd "SPC p s") 'project-switch-project)
+  (define-key evil-normal-state-local-map (kbd "SPC p b") 'project-switch-to-buffer)
+  (define-key evil-normal-state-local-map (kbd "SPC p c") 'project-async-shell-command)
+
+  ;;
   ;; Focus mode
   ;;
   (define-key evil-normal-state-local-map (kbd "SPC RET") 'olivetti-mode)
@@ -1412,6 +1450,8 @@ targets."
   ;; iMenu
   ;;
   (define-key evil-normal-state-local-map (kbd "SPC i m") 'consult-imenu)
+
+
 
   ;;
   ;; Window split and movement
@@ -1998,62 +2038,6 @@ Specific to the current window's mode line.")
 ;;  (require 'eaf)
 ;;  (require 'eaf-pdf-viewer)
 
-(use-package pdf-tools)
-
-(use-package org-noter
-  :config
-      (setq org-noter-max-short-selected-text-length 700000)
-      (setq org-noter-max-short-length 80000)
-      (setq org-noter-always-create-frame nil) ;; Prevent use new frame!!!
-      (if (> 999 (display-pixel-height)) 
-         (setq org-noter-doc-split-fraction '(0.6 . 0.5)))
-  :custom
-      (org-noter-highlight-selected-text t)
-      (org-noter-notes-search-path '("~/sbzi/personal/org-noter/"))
-      (org-noter-auto-save-last-location t)
-)
-
-
-
-(define-key org-noter-doc-mode-map (kbd "M-i") nil)
-(define-key pdf-view-mode-map (kbd "C-u") nil)
-(define-key org-noter-doc-mode-map (kbd "M-i") #'dm/insert-precise)
-
-(defun dm/insert-precise (&optional optional)
-  (interactive "P")
-  (org-noter-insert-precise-note 't))
-
-;; (push "~/workspace/org-noter-plus-djvu" load-path)
-;; (push "~/workspace/org-noter-plus-djvu/other" load-path)
-;; (push "~/workspace/org-noter-plus-djvu/modules" load-path)
-
-;; (require 'org-noter)
-;; (require 'org-noter-nov)
-;; (require 'org-noter-pdf)
-
-
-(define-advice org-noter--insert-heading (:after (level title &optional newlines-number location) add-full-body-quote)
-  "Advice for org-noter--insert-heading.
-
-When inserting a precise note insert the text of the note in the body as an org mode QUOTE block.
-
-=org-noter-max-short-length= should be set to a large value to short circuit the normal behavior:
-=(setq org-noter-max-short-length 80000)="
-
-  ;; this tells us it's a precise note that's being invoked.
-  (if (consp location)
-      (insert (format "#+BEGIN_QUOTE\n%s\n#+END_QUOTE" title))))
-
-;; ;; (require 'org-noter-nov-overlay)
-;; doesn't work. (require 'org-noter-integration)
-
-
-;;  (use-package pdf-tools-org-noter-helpers
-;;   :straight (
-;;              :type git :repo "https://github.com/analyticd/pdf-tools-org-noter-helpers")
-;;   :config
-;; (require 'pdf-tools-org-noter-helpers))
-
 (use-package org-capture
 :ensure nil
 :bind ("C-c ;" . (lambda () (interactive) (org-capture)))
@@ -2139,82 +2123,6 @@ When inserting a precise note insert the text of the note in the body as an org 
 
 (define-key global-map (kbd "C-,") 'embark-act)
 
-(defun my-pdf-scroll-local()
-   (message ">>> [ my-pdf-scroll-local ] ")
-
-   ;;
-   ;; Rebind
-   ;;
-   (define-key evil-normal-state-local-map (kbd "k") 'pdf-view-scroll-down-or-previous-page)
-   (define-key evil-normal-state-local-map (kbd "j") 'pdf-view-scroll-up-or-next-page)
-   (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
-   (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
-   (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
-   (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
-   (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
-
-   ;;
-   ;; Rebind all SPC related bindings to local buffer scope
-   ;;
-   (rebind-general-leader-x-bindings-to-local-buffer-scope)
-   (rebind-colemak-leader-x-bindings-to-local-buffer-scope)
-)
-
-(dolist (hook '(pdf-view-mode-hook
-                ))
-   (add-hook hook #'my-pdf-scroll-local)
-)
-
-(defun my-org-noter-local()
-    (message ">>> [ my-pdf-org-noter-local ] ")
-
-    ;;
-    ;; Rebind
-    ;;
-    ;;(define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-    (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-    (define-key evil-normal-state-local-map (kbd "M-a") 'org-noter-insert-note)
-    (define-key evil-normal-state-local-map (kbd "M-p") 'org-noter-insert-precise-note)
-    (define-key evil-normal-state-local-map (kbd "M-o") 'org-noter-create-skeleton)
-    (define-key evil-normal-state-local-map (kbd "M-q") 'org-noter-kill-session)
-    ;;(define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
-    (define-key evil-normal-state-local-map (kbd "M-s") 'org-noter-set-auto-save-last-location)
-    (define-key evil-normal-state-local-map (kbd "M-.") 'org-noter-sync-next-note)
-    (define-key evil-normal-state-local-map (kbd "M-,") 'org-noter-sync-prev-note)
-    (define-key evil-normal-state-local-map (kbd "M-/") 'org-noter-sync-current-note)
-    ;;(define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
-    ;;(define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
-    (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-page-or-chapter)
-
-
-
-  ;; (if my-enable-which-key-customized-description
-  ;;      (progn
-  ;;          ;;(which-key-add-key-based-replacements "C-c n" "Noter")
-  ;;          (which-key-add-key-based-replacements "C-c n n" "Open session")
-  ;;          (which-key-add-key-based-replacements "C-c n o" "Outline")
-  ;;          (which-key-add-key-based-replacements "C-c n k" "Kill session")
-  ;;          (which-key-add-key-based-replacements "C-c n h" "Hide other")
-  ;;          (which-key-add-key-based-replacements "C-c n a" "Save last location")
-  ;;          (which-key-add-key-based-replacements "C-c n c" "current")
-  ;;          (which-key-add-key-based-replacements "C-c n /" "current page")
-  ;;          (which-key-add-key-based-replacements "C-c n >" "next note")
-  ;;          (which-key-add-key-based-replacements "C-c n <" "prev note")
-  ;;          (which-key-add-key-based-replacements "C-c n ]" "next chapter note")
-  ;;          (which-key-add-key-based-replacements "C-c n [" "prev chapter note")
-  ;;      ))
-
-    (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
-)
-
-(dolist (hook '(org-mode-hook
-                pdf-view-mode-hook
-                ))
-   (add-hook hook #'my-org-noter-local)
-)
-
-;(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
-
 (defun my-denote-local()
     (message ">>> [ my-denote-local ] ")
 
@@ -2256,3 +2164,164 @@ When inserting a precise note insert the text of the note in the body as an org 
 )
 
 (message ">>>>>>>>>")
+
+(use-package general
+  :defer 1
+  :config
+  (general-evil-setup t)
+
+  (general-create-definer
+    my/leader-def
+    :states '(normal visual insert emacs)
+    :prefix "SPC"
+    :global-prefix "M-SPC"
+    :keymap 'override)
+(general-create-definer
+my/insert-leader-def
+:states '(insert emacs)
+:global-prefix "M-SPC"
+:keymap 'override)
+  (my/insert-leader-def
+    "SPC" '(cycle-spacing :which-key "cycle spacing")))
+
+(defvar bootstrap-version)
+;; 修复 Emacs 29 修改了 native-compile 相关变量导致的 bug
+(unless (version<= emacs-version "28.2")
+  (setq straight-repository-branch "develop"))
+(setq straight-check-for-modifications '(check-on-save find-when-checking))
+
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;;  (defun my-pdf-scroll-local()
+;;     (message ">>> [ my-pdf-scroll-local ] ")
+;;
+;;     ;;
+;;     ;; Rebind
+;;     ;;
+;;     (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
+;;     (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
+;;     (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
+;;     (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
+;;     (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
+;;     (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
+;;     (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
+;;
+;;     ;;
+;;     ;; Rebind all SPC related bindings to local buffer scope
+;;     ;;
+;;     (rebind-general-leader-x-bindings-to-local-buffer-scope)
+;;     (rebind-colemak-leader-x-bindings-to-local-buffer-scope)
+;;  )
+;;
+;;    (dolist (hook '(pdf-view-mode-hook
+;;                    ))
+;;    (add-hook hook #'my-pdf-scroll-local)
+;;    )
+
+(defun my-org-download-local-bindings()
+    (message ">>> [ my-org-download-local-bindings ] ")
+
+    (define-key evil-normal-state-local-map (kbd "SPC i y") 'org-download-yank)
+    (define-key evil-normal-state-local-map (kbd "SPC i p") 'org-download-clipboard)
+    (define-key evil-normal-state-local-map (kbd "SPC i d") 'org-download-delete)
+    (define-key evil-normal-state-local-map (kbd "SPC i e") 'org-download-edit)
+    (define-key evil-normal-state-local-map (kbd "SPC i s") 'org-download-screenshot)
+
+    (message ">>> [ my-org-download-local-bindings ] - rebind successfully. ")
+)
+
+(add-hook 'org-mode-hook #'my-org-download-local-bindings)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC i y" "image/insert")
+        (which-key-add-key-based-replacements "SPC i p" "image/paste")
+        (which-key-add-key-based-replacements "SPC i d" "image/delete")
+        (which-key-add-key-based-replacements "SPC i e" "image/edit")
+        (which-key-add-key-based-replacements "SPC i s" "image/screenshot")
+    ))
+
+;;(use-package pdf-tools)
+
+(use-package org-noter
+  :config
+      (setq org-noter-max-short-selected-text-length 20)
+      (setq org-noter-max-short-length 80000)
+      (setq org-noter-always-create-frame nil) ;; Prevent use new frame!!!
+      (setq org-noter-default-heading-title "Note from $p$ page") ;; Prevent use new frame!!!
+      (if (> 999 (display-pixel-height)) 
+         (setq org-noter-doc-split-fraction '(0.6 . 0.5)))
+  :custom
+      (org-noter-highlight-selected-text t)
+      (org-noter-notes-search-path '("~/sbzi/personal/org-noter/"))
+      (org-noter-auto-save-last-location t)
+)
+(define-key org-noter-doc-mode-map (kbd "M-i") nil)
+(define-key pdf-view-mode-map (kbd "C-u") nil)
+(define-key org-noter-doc-mode-map (kbd "M-i") #'dm/insert-precise)
+
+(defun dm/insert-precise (&optional optional)
+  (interactive "P")
+  (org-noter-insert-precise-note 't))
+
+;; (push "~/workspace/org-noter-plus-djvu" load-path)
+;; (push "~/workspace/org-noter-plus-djvu/other" load-path)
+;; (push "~/workspace/org-noter-plus-djvu/modules" load-path)
+
+;; (require 'org-noter)
+;; (require 'org-noter-nov)
+;; (require 'org-noter-pdf)
+
+
+(define-advice org-noter--insert-heading (:after (level title &optional newlines-number location) add-full-body-quote)
+  "Advice for org-noter--insert-heading.
+
+When inserting a precise note insert the text of the note in the body as an org mode QUOTE block.
+
+=org-noter-max-short-length= should be set to a large value to short circuit the normal behavior:
+=(setq org-noter-max-short-length 80000)="
+
+  ;; this tells us it's a precise note that's being invoked.
+  (if (consp location)
+      (insert (format "#+BEGIN_QUOTE\n%s\n#+END_QUOTE" title))))
+
+(defun my-org-noter-local()
+    (message ">>> [ my-pdf-org-noter-local ] ")
+    ;;
+    ;; Rebind
+    ;;
+    ;;(define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
+    (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
+    (define-key evil-normal-state-local-map (kbd "M-a") 'org-noter-insert-note)
+    (define-key evil-normal-state-local-map (kbd "M-p") 'org-noter-insert-precise-note)
+    (define-key evil-normal-state-local-map (kbd "M-o") 'org-noter-create-skeleton)
+    (define-key evil-normal-state-local-map (kbd "M-q") 'org-noter-kill-session)
+    ;;(define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
+    (define-key evil-normal-state-local-map (kbd "M-s") 'org-noter-set-auto-save-last-location)
+    (define-key evil-normal-state-local-map (kbd "M-/") 'org-noter-sync-next-note)
+    (define-key evil-normal-state-local-map (kbd "M-,") 'org-noter-sync-prev-note)
+    (define-key evil-normal-state-local-map (kbd "M-.") 'org-noter-sync-current-note)
+    ;;(define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
+    ;;(define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
+    (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-page-or-chapter)
+
+    (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
+)
+
+(dolist (hook '(org-mode-hook
+                pdf-view-mode-hook
+                ))
+   (add-hook hook #'my-org-noter-local)
+)
+
+;(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
