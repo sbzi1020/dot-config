@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: Hashmap
-# key: hm
-# --
-var $1 = std.StringHashMap($0).init(allocator);
-defer $1.deinit();
-

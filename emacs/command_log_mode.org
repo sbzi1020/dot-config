@@ -1,9 +1,0 @@
-* =Command-log-mode= Settings
-
-#+BEGIN_SRC emacs-lisp
-  (use-package command-log-mode
-  :defer t
-  :config
-  (global-command-log-mode 1)
-  )
-#+END_SRC

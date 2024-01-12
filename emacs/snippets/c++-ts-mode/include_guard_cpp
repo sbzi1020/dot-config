@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: include_guard_cpp
-# key: include_guard_cpp
-# --
-#pragma once
-
-$0

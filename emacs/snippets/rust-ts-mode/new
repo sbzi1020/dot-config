@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: new
-# key: new
-# --
-fn new(${1:parameter}) -> Self {
-    $0
-}

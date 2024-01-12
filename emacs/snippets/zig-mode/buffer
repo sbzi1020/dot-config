@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: buffer
-# key: buf
-# --
-var $1: [$0]u8 = undefined;
