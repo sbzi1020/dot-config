@@ -2922,1421 +2922,6 @@ The folder structure looks like this (aka, ~snippet tables~):
 
 
 
-** My keybindgins
-
-1. All my custom keybindings have a pattern:
-
-    =<leader>xxx= is equal to =C-c xxx=
-
-    That said I can use =s-c xxx= (means =Command-c xxx=) in terminal, as I map the =CMD-c= (from MacOS Parallels Desktop) to =C-c= (in Arch Linux VM).
-
-
-2. About =Evil state=
-
-    =Evil mode= has the following =state keymaps= you can used to set your own keybindings:
-
-    + evil-insert-state-map
-    + evil-emacs-state-map
-    + evil-normal-state-map
-    + evil-visual-state-map
-    + evil-motion-state-map
-    + evil-operator-state-map
-    + evil-outer-text-objects-map
-    + evil-inner-text-objects-map
-    + evil-replace-state-map
-    + evil-normal-state-local-map
-
-    The main reason =motion= state exists is for use with =read-only= modes where insertion keybindings aren’t useful. 
-
-    If you bind key to =montion= state, that means you bind the key to =normal, visual and operator= state as well. That's quite convenient to save a lot of bindings!!!
-
-*** Control whether enable =which-key= customize description or not
-
-By default, =which-key= only show the function name with the keybindings like below:
-
-#+BEGIN_SRC
- b → consult-buffer 
- o → +prefix
-#+END_SRC
-
-That's fine but not very convenient, as I might forget what the ~o~ prefix means. By using the following settings:
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (which-key-add-key-based-replacements "b" "Switch to buffer")
-  (which-key-add-key-based-replacements "o" "(Quick) Open...")
-#+END_SRC
-
-Then I got a better =which-key= list like this:
-
-#+BEGIN_SRC
- b → Switch to buffer
- o → (Quick) Open...
-#+END_SRC
-
-
-That means I need to write a lot of ~(which-key-add-key-based-replacements)~ function calls for all of my keybindings, but what if I don't need that (or I prefer to switch back to the original function name display style)? So, for a better choice, I add a global variable ~my-enable-which-key-customized-description~ to enable or disbale that feature just by setting it to ~t~ or ~nil~:
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Enable
-  ;;
-  (setq my-enable-which-key-customized-description t)
-
-  ;;
-  ;; Disable
-  ;;
-  ;; (setq my-enable-which-key-customized-description nil)
-#+END_SRC
-
-
-
-*** Unbind all keybindings for the following modes
-
-Why do this?
-
-For example the =help-mode-map= already have the default keybinding like =SPC= to scrollup, that said all =<leader>xx= evil binding won't work, as =<leader>= key is =SPC=.
-
-That's why I unbind all of those buffer mode maps I don't care, this make the evil binding works!!!
-
-#+begin_src emacs-lisp 
-  (setf (cdr help-mode-map) nil)
-#+end_src
-
-
-*** =ESC= acts like ~C-g~
-
-#+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-#+END_SRC
-
-
-*** Disable ~C-z~
-
-By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, but I don't need that.
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-insert-state-map
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "C-z") nil)
-  )
-#+END_SRC
-
-
-*** Fix =error: Key sequence SPC X starts with non-prefix key SPC=
-
-#+BEGIN_SRC emacs-lisp
-  (define-key evil-motion-state-map (kbd "<SPC>") nil)
-  (define-key evil-normal-state-map (kbd "<SPC>") nil)
-#+END_SRC
-
-
-*** +Toggle spell checking+
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; (dolist (map (list
-  ;;               evil-motion-state-map
-  ;;               ))
-  ;;   (define-key map (kbd "<leader>sc") 'flyspell-mode)
-  ;;   (define-key map (kbd "C-c s c") 'flyspell-mode)
-  ;; )
-#+END_SRC
-
-
-*** Kill current window by ~Q~ and exit =Emacs= by ~<leader>q~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-      (define-key map (kbd "Q") 'delete-window)
-      (define-key map (kbd "SPC q") 'save-buffers-kill-terminal)
-      (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
-      ;; (message ">>> bind 'Q/<leader>q/C-c q' in '%s'" map);
-  )
-
-
-  ;;
-  ;; Bind to the local buffer keymap against the following delay modes
-  ;;
-  (defun my-bind-q-kill-current-window-local()
-    (define-key evil-normal-state-local-map (kbd "Q") 'delete-window)
-  )
-
-  (dolist (hook '(
-                 dired-mode-hook
-                 xref--xref-buffer-mode-hook
-                 ))
-    (add-hook hook #'my-bind-q-kill-current-window-local)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC q" "Save and exit")
-          (which-key-add-key-based-replacements "C-c q" "Save and exit")
-      ))
-#+END_SRC
-
-
-*** Call =describe-xxxx= functions by ~<leader>df/v/k/b~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-    (define-key map (kbd "SPC d f") 'helpful-callable)
-    (define-key map (kbd "C-c d f") 'helpful-callable)
-    (define-key map (kbd "SPC d v") 'helpful-variable)
-    (define-key map (kbd "C-c d v") 'helpful-variable)
-    (define-key map (kbd "SPC d k") 'describe-key)
-    (define-key map (kbd "C-c d k") 'helpful-key)
-    (define-key map (kbd "SPC d b") 'describe-bindings)
-    (define-key map (kbd "C-c d b") 'describe-bindings)
-    (define-key map (kbd "SPC d m") 'describe-mode)
-    (define-key map (kbd "C-c d m") 'describe-mode)
-    ;;(message "State: %s" state);
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC d" "Describe ...")
-          (which-key-add-key-based-replacements "C-c d" "Describe ...")
-
-          (which-key-add-key-based-replacements "SPC d f" "Function")
-          (which-key-add-key-based-replacements "C-c d f" "Function")
-          (which-key-add-key-based-replacements "SPC d v" "Variable")
-          (which-key-add-key-based-replacements "C-c d v" "Variable")
-          (which-key-add-key-based-replacements "SPC d k" "Keys")
-          (which-key-add-key-based-replacements "C-c d k" "Keys")
-          (which-key-add-key-based-replacements "SPC d m" "Mode")
-          (which-key-add-key-based-replacements "C-c d m" "Mode")
-          (which-key-add-key-based-replacements "SPC d b" "Bindings")
-          (which-key-add-key-based-replacements "C-c d b" "Bindings")
-      ))
-#+END_SRC
-
-
-*** Toggle-command-log-mode by ~<leader>l~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC l") 'clm/toggle-command-log-buffer)
-    (define-key map (kbd "C-c l") 'clm/toggle-command-log-buffer)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC l" "Command Log")
-          (which-key-add-key-based-replacements "C-c l" "Command Log")
-      ))
-#+END_SRC
-
-
-*** Evaluate lisp expression by ~<leader>ee~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC e e") 'eval-last-sexp)
-    (define-key map (kbd "C-c e e") 'eval-last-sexp)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC e" "Evalute/Emoji")
-          (which-key-add-key-based-replacements "C-c e" "Evalute/Emoji")
-          (which-key-add-key-based-replacements "SPC e e" "Evalute Lisp")
-          (which-key-add-key-based-replacements "C-c e e" "Evalute Lisp")
-      ))
-#+END_SRC
-
-
-
-*** Save buffer by ~W~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "W") 'save-buffer)
-  )
-#+END_SRC
-
-
-*** Go back to normal mode by ~jj~
-
-#+BEGIN_SRC emacs-lisp
-  (defun xwl-jj-as-esc ()
-  (interactive)
-  (if (memq evil-state '(insert replace))
-      (let ((changed? (buffer-modified-p)))
-          (insert "j")
-          (let* ((tm (current-time))
-              (ch (read-key)))
-          (if (and (eq ch ?j)
-                  (< (time-to-seconds (time-since tm)) 0.3))
-              (save-excursion
-                  (delete-char -1)
-                  (evil-force-normal-state)
-                  (set-buffer-modified-p changed?))
-              (insert ch))))
-  (call-interactively 'evil-next-line)))
-
-  (define-key evil-insert-state-map  "j" 'xwl-jj-as-esc)
-  (define-key evil-replace-state-map "j" 'xwl-jj-as-esc)
-#+END_SRC
-
-
-*** Move to beginning and ending of the line by ~H~ and ~L~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "H") 'evil-first-non-blank)
-    (define-key map (kbd "L") 'evil-end-of-line)
-    ;;(message "State: %s" state);
-  )
-#+END_SRC
-
-
-*** Go back to last marked position by ~gb~
-
-I can't call ~evil-set-mark~ in my custom function, as it calls ~read-char~ when the function runs, so I can't pass a char in that way.
-
-As a workaround, I can use the default evil keybinding =m= to set a =M= to current position, MAKE SURE that's an uppercase =M=, otherwise, you can go back if you jump to another buffer!!!
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-goto-last-marked-position()
-    (interactive)
-    (evil-goto-mark ?M)
-  )
-
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "gb") 'my-goto-last-marked-position)
-      ;;(message "State: %s" state);
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "gb" "Go back")
-      ))
-#+END_SRC
-
-
-*** Open files or buffers by ~<leader>f/b~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC f") 'find-file)
-    (define-key map (kbd "C-c f") 'find-file)
-    (define-key map (kbd "SPC b") 'consult-buffer)
-    (define-key map (kbd "C-c b") 'consult-buffer)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC f" "Find files")
-          (which-key-add-key-based-replacements "C-c f" "Find files")
-          (which-key-add-key-based-replacements "SPC b" "Buffer list")
-          (which-key-add-key-based-replacements "C-c b" "Buffer list")
-      ))
-#+END_SRC
-
-
-*** Project scope fuzzy searching files and related actions by ~<leader>p f~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC p f") 'project-find-file)
-    (define-key map (kbd "C-c p f") 'project-find-file)
-
-    (define-key map (kbd "SPC p d") 'project-dired)
-    (define-key map (kbd "C-c p d") 'project-dired)
-
-    (define-key map (kbd "SPC p s") 'project-switch-project)
-    (define-key map (kbd "C-c p s") 'project-switch-project)
-
-    (define-key map (kbd "SPC p b") 'project-switch-to-buffer)
-    (define-key map (kbd "C-c p b") 'project-switch-to-buffer)
-
-    (define-key map (kbd "SPC p c") 'project-async-shell-command)
-    (define-key map (kbd "C-c p c") 'project-async-shell-command)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC p" "Projects")
-          (which-key-add-key-based-replacements "SPC p f" "Fuzzy searching in project")
-          (which-key-add-key-based-replacements "SPC p d" "Open dired in project")
-          (which-key-add-key-based-replacements "SPC p b" "Switch buffer in project")
-          (which-key-add-key-based-replacements "SPC p s" "Switch to another project")
-          (which-key-add-key-based-replacements "SPC p c" "Run async shell command")
-      ))
-#+END_SRC
-
-
-*** Switch between last buffers ~<leader>SPC~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC SPC") 'switch-to-last-buffer)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC SPC" "Last Buffer")
-      ))
-#+END_SRC
-
-
-*** Toggle =Olivetti= mode (works like =Goyo= in =Neovim=) by ~<leader>RET~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC RET") 'olivetti-mode)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC RET" "Toggle Focus mode")
-      ))
-#+END_SRC
-
-
-*** Search and replace cursor word by ~C-s~ 
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Unbind the default <C-s> for 'isearch-forward'
-  ;;
-  (define-key global-map (kbd "C-s") nil)
-  
-  ;;
-  ;; Replace current word or selection using vim style for evil mode
-  ;;
-  (defun evil-replace-word-selection()
-    (interactive)
-    (if (use-region-p)
-        (let ((selection (buffer-substring-no-properties (region-beginning) (region-end))))
-            (if (= (length selection) 0)
-                (message "empty string")
-                (evil-ex (concat "'<,'>s/" selection "/"))
-            )
-        )
-        (evil-ex (concat "%s/" (thing-at-point 'word) "/"))))
-
-  ;;
-  ;; Rebind <C-s>
-  ;;
-  (define-key evil-motion-state-map (kbd "C-s") 'evil-replace-word-selection)
-#+END_SRC
-
-
-*** Rg on cursor word by ~<leader>r~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC r") 'consult-ripgrep)
-    (define-key map (kbd "C-c r") 'consult-ripgrep)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC r" "Rg search")
-          (which-key-add-key-based-replacements "C-c r" "Rg search")
-      ))
-#+END_SRC
-
-
-*** ~imenu~ (function and variable list) by ~<leader>im~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC i m") 'consult-imenu)
-    (define-key map (kbd "C-c i m") 'consult-imenu)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC i" "iMenu/Insert")
-          (which-key-add-key-based-replacements "C-c i" "iMenu/Insert")
-      ))
-#+END_SRC
-
-
-*** Window split by ~<leader>vs~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "SPC v s") 'evil-window-vsplit)
-    (define-key map (kbd "C-c v s") 'evil-window-vsplit)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC v" "Vertical split")
-          (which-key-add-key-based-replacements "C-c v" "Vertical split")
-          (which-key-add-key-based-replacements "SPC v s" "Vertical split")
-          (which-key-add-key-based-replacements "C-c v s" "Vertical split")
-      ))
-#+END_SRC
-
-
-*** Window movement by ~C-h, C-l~ (Only for jumping between left and right windows, Disable the up and down windows)
-
-For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-    (define-key map (kbd "C-l") 'evil-window-right)
-    (define-key map (kbd "C-h") 'evil-window-left)
-    (define-key map (kbd "C-j") 'evil-window-down)
-    (define-key map (kbd "C-k") 'evil-window-up)
-    ;;(message "State: %s" state);
-  )
-#+END_SRC
-
-
-*** Change window size by ~-/+/=~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-increase-window-width ()
-    (interactive)
-    (evil-window-increase-width 5)
-  )
-
-  (defun my-decrease-window-width ()
-    (interactive)
-    (evil-window-increase-width -5)
-  )
-
-  (defun my-increase-window-height ()
-    (interactive)
-    (evil-window-increase-height 5)
-  )
-
-  (defun my-decrease-window-height ()
-    (interactive)
-    (evil-window-increase-height -5)
-  )
-
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-    (define-key map (kbd "|") 'balance-windows)
-    (define-key map (kbd "=") 'my-increase-window-width)
-    (define-key map (kbd "-") 'my-decrease-window-width)
-    (define-key map (kbd "+") 'my-increase-window-height)
-    (define-key map (kbd "_") 'my-decrease-window-height)
-  )
-
-  ;;
-  ;; Bind to the local buffer keymap against the following delay modes
-  ;;
-  (defun my-bind-window-resize-local()
-    (define-key evil-normal-state-local-map (kbd "|") 'balance-windows)
-    (define-key evil-normal-state-local-map (kbd "=") 'my-increase-window-width)
-    (define-key evil-normal-state-local-map (kbd "-") 'my-decrease-window-width)
-    (define-key evil-normal-state-local-map (kbd "+") 'my-increase-window-height)
-    (define-key evil-normal-state-local-map (kbd "_") 'my-decrease-window-height)
-  )
-
-  (dolist (hook '(
-                 dired-mode-hook
-                 ))
-    (add-hook hook #'my-bind-window-resize-local)
-  )
-#+END_SRC
-
-
-*** Open something quickly
-
-**** Open ~configuration.org~ by ~<leader>oc~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-open-emacs-configuration-file()
-     (interactive)
-     (find-file "~/.config/emacs/configuration.org")
-  )
-
-  ;; Unbind this!!!
-  (define-key global-map (kbd "C-c o") nil)
-
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-    (define-key map (kbd "SPC o c") 'my-open-emacs-configuration-file)
-    (define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC o" "Open ....")
-          (which-key-add-key-based-replacements "C-c o" "Open ....")
-          (which-key-add-key-based-replacements "SPC o c" "Config file")
-          (which-key-add-key-based-replacements "C-c o c" "Config file")
-      ))
-#+END_SRC
-
-
-**** Open ~Yasnippet~ folder by ~<leader>os~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-open-yasnippet-folder()
-     (interactive)
-     (find-file-other-window "~/.config/emacs/snippets")
-  )
-
-  ;; Unbind this!!!
-  (define-key global-map (kbd "C-c o") nil)
-
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-    (define-key map (kbd "SPC o s") 'my-open-yasnippet-folder)
-    (define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC o s" "Snippet folder")
-          (which-key-add-key-based-replacements "C-c o s" "Snippet folder")
-      ))
-#+END_SRC
-
-
-
-*** Emoji
-
-**** Emoji insert by ~<leader>ei~
-
- #+BEGIN_SRC emacs-lisp
-   (dolist (map (list
-                 evil-motion-state-map
-                 evil-normal-state-map
-                 ))
-     (define-key map (kbd "SPC e i") 'emoji-insert)
-     (define-key map (kbd "C-c e i") 'emoji-insert)
-   )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC e i" "Insert emoji")
-          (which-key-add-key-based-replacements "C-c e i" "Insert emoji")
-      ))
- #+END_SRC
-
-
-**** Emoji recent by ~<leader>er~
-
- #+BEGIN_SRC emacs-lisp
-    (dolist (map (list
-                  evil-motion-state-map
-                  evil-normal-state-map
-                  ))
-      (define-key map (kbd "SPC e r") 'emoji-recent)
-      (define-key map (kbd "C-c e r") 'emoji-recent)
-    )
-
-   (if my-enable-which-key-customized-description
-       (progn
-           (which-key-add-key-based-replacements "SPC e r" "Recent emoji")
-           (which-key-add-key-based-replacements "C-c e r" "Recent emoji")
-       ))
- #+END_SRC
-
-
-*** Improve ~C-j~ and ~C-k~ for the modes I needed
-
-**** Disable ~C-j~ and ~C-k~ from the following modes
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                global-map
-                evil-window-map
-                evil-normal-state-map
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "C-j") nil)
-      (define-key map (kbd "C-k") nil)
-      ;;(message "State: %s" state);
-  )
-
-  (evil-define-key 'normal org-mode-map (kbd "C-j") nil)
-  (evil-define-key 'normal org-mode-map (kbd "C-k") nil)
-#+END_SRC
-
-
-**** Enable ~C-j~ and ~C-k~ for the following modes
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                vertico-map
-                ))
-    (define-key map (kbd "C-j") 'vertico-next)
-    (define-key map (kbd "C-k") 'vertico-previous)
-  )
-
-  ;;
-  ;; 'org-mode'
-  ;;
-  (defun my-org-next-heading()
-    (interactive)
-    (org-forward-heading-same-level nil)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (defun my-org-previous-heading()
-    (interactive)
-    (org-backward-heading-same-level nil)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (evil-define-key 'normal org-mode-map (kbd "C-j") 'my-org-next-heading)
-  (evil-define-key 'normal org-mode-map (kbd "C-k") 'my-org-previous-heading)
-
-  ;;
-  ;; Bind to the local buffer keymap against the following delay modes
-  ;;
-  (defun my-markdown-next-heading()
-    (interactive)
-    (outline-next-visible-heading 1)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (defun my-markdown-previous-heading()
-    (interactive)
-    (outline-next-visible-heading -1)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (defun my-bind-markdown-heading-jumping-local()
-    (define-key evil-normal-state-local-map (kbd "C-j") 'my-markdown-next-heading)
-    (define-key evil-normal-state-local-map (kbd "C-k") 'my-markdown-previous-heading)
-  )
-
-  (dolist (hook '(
-                 markdown-mode-hook
-                 markdown-view-mode-hook
-                 ))
-    (add-hook hook #'my-bind-markdown-heading-jumping-local)
-  )
-#+END_SRC
-
-
-*** Improve ~n~ and ~N~ search
-
-#+begin_src emacs-lisp
-  ;;
-  ;; Unbind 'n' and 'N'
-  ;;
-  (define-key evil-motion-state-map (kbd "n") nil)
-  (define-key evil-motion-state-map (kbd "N") nil)
-
-  (defun my-search-next()
-    (interactive)
-    (evil-search-next)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (defun my-search-previous()
-    (interactive)
-    (evil-search-previous)
-    (evil-scroll-line-to-center nil)
-  )
-
-  (define-key evil-motion-state-map (kbd "n") 'my-search-next)
-  (define-key evil-motion-state-map (kbd "N") 'my-search-previous)
-#+end_src
-
-
-*** Org mode
-
-**** +org-mode insert code block+
-
-#+begin_src emacs-lisp :tangle no
-  ;; (defun my-org-mode-create-elisp-code-block()
-  ;;   (interactive)
-  ;;   (org-insert-structure-template "SRC emacs-lisp")
-  ;; )
-  ;; 
-  ;; (defun my-org-mode-create-elisp-code-block-local()
-  ;;   (define-key evil-normal-state-local-map (kbd "<leader>cb") 'my-org-mode-create-elisp-code-block)
-  ;;   (define-key evil-normal-state-local-map (kbd "C-c c b") 'my-org-mode-create-elisp-code-block)
-  ;; )
-#+end_src
-
-
-**** ~org-mode~ fold or unfold when cursor is on heading by ~<RET>~
-
-#+begin_src emacs-lisp 
-  (defun my-org-mode-return-cycle-local()
-    (define-key evil-normal-state-local-map (kbd "RET") 'org-cycle)
-  )
-#+end_src
-
-
-**** ~org-mode~ insert/edit a link by ~<leader>il~ and open a link by ~<leader>ol~ 
-
-#+begin_src emacs-lisp 
-  (defun my-org-mode-insert-and-open-link-local()
-    (define-key evil-normal-state-local-map (kbd "SPC i l") 'org-insert-link)
-    (define-key evil-normal-state-local-map (kbd "C-c i l") 'org-insert-link)
-    (define-key evil-normal-state-local-map (kbd "SPC o l") 'org-open-at-point)
-    (define-key evil-normal-state-local-map (kbd "C-c o l") 'org-open-at-point)
-
-    (if my-enable-which-key-customized-description
-        (progn
-            (which-key-add-key-based-replacements "SPC o l" "Open at point")
-            (which-key-add-key-based-replacements "C-c o l" "Open at point")
-            (which-key-add-key-based-replacements "SPC i l" "Insert link")
-            (which-key-add-key-based-replacements "C-c i l" "Insert link")
-        ))
-  )
-#+end_src
-
-
-**** Bind all bindings above in the 'org-mode-hook' once
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-mode-local-bindings()
-     ;; (my-org-mode-create-elisp-code-block-local)
-     (my-org-mode-return-cycle-local)
-     (my-org-mode-insert-and-open-link-local)
-  )
-
-  (add-hook 'org-mode-hook #'my-org-mode-local-bindings)
-#+END_SRC
-
-
-*** Markdown
-
-**** ~markdown-mode~ fold or unfold when cursor is on heading by ~<RET>~
-
-#+begin_src emacs-lisp 
-  (evil-define-key 'normal markdown-mode-map (kbd "RET") 'markdown-cycle)
-  (evil-define-key 'normal markdown-view-mode-map (kbd "RET") 'markdown-cycle)
-#+end_src
-
-
-*** Fast kill buffers and windows
-
-**** Kill all helpful buffers and opend window by ~<leader>kh~
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Close the 'helful' window and kill its buffer
-  ;;
-  (defun kill-helpful-window-and-buffers ()
-      (interactive)
-      (message ">>> [ kill-helpful-window-and-buffers ] - ....... ")
-
-      (cl-loop for buf in (buffer-list)
-              do (if (string-match-p "^*helpful" (buffer-name buf))
-                 (progn
-                     ;;
-                     ;; Try to close its window first if exists.
-                     ;;
-                     (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
-                     (if window-to-be-killed
-                        (progn
-                            (delete-window window-to-be-killed)
-                            (message ">>> [ kill-helpful-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
-                        )
-                     )
-
-                     ;;
-                     ;; Kill buffer.
-                     ;;
-                     (message ">>> [ kill-helpful-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
-                     (kill-buffer buf)
-                 )
-              )
-      )
-
-      (message ">>> [ kill-helpful-window-and-buffers ] - [done] ")
-  )
-
-  (define-key evil-motion-state-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
-  (define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC k" "Kill")
-          (which-key-add-key-based-replacements "C-c k" "Kill")
-          (which-key-add-key-based-replacements "SPC k h" "Help window and buffer")
-          (which-key-add-key-based-replacements "C-c k h" "Help window and buffer")
-      ))
-#+END_SRC
-
-
-**** Kill all eldoc buffers and opend window by ~<leader>kd~
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Close the 'eldoc' window and kill its buffer
-  ;;
-  (defun kill-eldoc-window-and-buffers ()
-      (interactive)
-      (message ">>> [ kill-eldoc-window-and-buffers ] - ....... ")
-
-      (cl-loop for buf in (buffer-list)
-         do (if (string-match-p "^*eldoc" (buffer-name buf))
-             (progn
-                ;;
-                ;; Try to close its window first if exists.
-                ;;
-                (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
-                (if window-to-be-killed
-                    (progn
-                        (delete-window window-to-be-killed)
-                        (message ">>> [ kill-eldoc-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
-                    )
-                )
-
-                ;;
-                ;; Kill buffer.
-                ;;
-                (message ">>> [ kill-eldoc-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
-                (kill-buffer buf)
-             )
-         )
-      )
-
-      (message ">>> [ kill-eldoc-window-and-buffers ] - [done] ")
-  )
-
-  (define-key evil-motion-state-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
-  (define-key evil-normal-state-map (kbd "C-c k d") 'kill-eldoc-window-and-buffers)
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC k d" "Doc window and buffer")
-          (which-key-add-key-based-replacements "C-c k d" "Doc window and buffer")
-      ))
-#+END_SRC
-
-
-**** Kill all embark buffers and opend window by ~<leader>ke~
-
-#+BEGIN_SRC emacs-lisp
-  ;;
-  ;; Close the 'embark' window and kill its buffer
-  ;;
-  (defun kill-embark-window-and-buffers ()
-     (interactive)
-     (message ">>> [ kill-embark-window-and-buffers ] - ....... ")
-
-     (cl-loop for buf in (buffer-list)
-        do (if (string-match-p "^*Embark" (buffer-name buf))
-           (progn
-               ;;
-               ;; Try to close its window first if exists.
-               ;;
-               (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
-               (if window-to-be-killed
-                   (progn
-                       (delete-window window-to-be-killed)
-                       (message ">>> [ kill-embark-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
-                   )
-               )
-
-               ;;
-               ;; Kill buffer.
-               ;;
-               (message ">>> [ kill-embark-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
-               (kill-buffer buf)
-           )
-        )
-     )
-
-     (message ">>> [ kill-embark-window-and-buffers ] - [done] ")
-  )
-
-  (define-key evil-motion-state-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
-  (define-key evil-normal-state-map (kbd "C-c k e") 'kill-embark-window-and-buffers)
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC k e" "Embark window and buffer")
-          (which-key-add-key-based-replacements "C-c k e" "Embark window and buffer")
-      ))
-#+END_SRC
-
-
-*** Rebind general ~<leader>X~ bindings to local buffer scope by calling this function
-
-All the ~<leader>X~ bindings above are targeted to =evil-motion-state-map= (which covers =Normal/Motion/Visual= evil states), it should work for most situtations.
-
-But for some particular modes, you still should rebind all of them ~<leader>X~ bindings to the given modes' local buffer scope to make sure to override the packages' level bindings IF you want your ~<leader>X~ bindings work on that mode!!!
-
-So, the following function is designed for that purpose: Call one function in ~xxxx-mode-hook~ to rebind all ~<leader>X~ bindings to the given modes' local buffer scope!!!
-
-#+BEGIN_SRC emacs-lisp
-  (defun rebind-general-leader-x-bindings-to-local-buffer-scope()
-    ;;
-    ;; Quick
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
-
-    ;;
-    ;; Describe related
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC d f") 'helpful-callable)
-    (define-key evil-normal-state-local-map (kbd "SPC d v") 'helpful-variable)
-    (define-key evil-normal-state-local-map (kbd "SPC d k") 'describe-key)
-    (define-key evil-normal-state-local-map (kbd "SPC d b") 'describe-bindings)
-    (define-key evil-normal-state-local-map (kbd "SPC d m") 'describe-mode)
-
-    ;;
-    ;; Command log
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC l") 'clm/toggle-command-log-buffer)
-
-    ;;
-    ;; Evalate
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC e e") 'eval-last-sexp)
-
-    ;;
-    ;; Find and switch related
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
-    (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
-    (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
-    (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
-
-    ;;
-    ;; Project scope related
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC p f") 'project-find-file)
-    (define-key evil-normal-state-local-map (kbd "SPC p d") 'project-dired)
-    (define-key evil-normal-state-local-map (kbd "SPC p s") 'project-switch-project)
-    (define-key evil-normal-state-local-map (kbd "SPC p b") 'project-switch-to-buffer)
-    (define-key evil-normal-state-local-map (kbd "SPC p c") 'project-async-shell-command)
-
-    ;;
-    ;; Focus mode
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC RET") 'olivetti-mode)
-
-    ;;
-    ;; iMenu
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC i m") 'consult-imenu)
-
-
-
-    ;;
-    ;; Window split and movement
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC v s") 'evil-window-vsplit)
-
-    ;;
-    ;; Quick open related
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
-    (define-key evil-normal-state-local-map (kbd "SPC o s") 'my-open-yasnippet-folder)
-
-    ;;
-    ;; Emoji related
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC e i") 'emoji-insert)
-    (define-key evil-normal-state-local-map (kbd "SPC e r") 'emoji-recent)
-
-    ;;
-    ;; Kill specific buffer and opened windows
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
-    (define-key evil-normal-state-local-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
-    (define-key evil-normal-state-local-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
-
-    (message "[ rebind-general-leader-x-bindings-to-local-buffer-scope ] - Done.")
-  )
-#+END_SRC
-
-
-*** Dired
-
-**** Go up dir by ~h~ and into dir or open file by ~l~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-dired-h-l-to-directory-navigating-local()
-    (define-key evil-normal-state-local-map (kbd "h") 'dired-up-directory)
-    (define-key evil-normal-state-local-map (kbd "l") 'dired-find-file)
-  )
-#+END_SRC
-
-
-**** Open file to other window by ~o~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-dired-o-to-open-file-local()
-    (define-key evil-normal-state-local-map (kbd "o") 'dired-find-file-other-window)
-  )
-#+END_SRC
-
-
-**** Jump back to ~dired buffer~ corresponding to current buffer by ~C-c j~
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "C-c j") 'dired-jump)
-  )
-#+END_SRC
-
-
-**** Quickly go to particular directories by ~gX~
-
-- ~gh~: Go home       =~/=
-- ~gb~: Go backup     =~/my-shell/backup=
-- ~gc~: Go c          =~/c=
-- ~gd~: Go downloads  =~/Downloads=
-- ~ge~: Go Emacs      =~/.config/emacs=
-- ~gp~: Go Photos     =~/Photos=
-- ~gr~: Go Rust       =~/rust=
-- ~gt~: Go temp       =~/temp=
-- ~gz~: Go zig        =~/zig=
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-goto-home-directory()
-     (interactive)
-     (dired "~/")
-  )
-  (defun my-goto-shell-backup-directory()
-     (interactive)
-     (dired "~/my-shell/backup")
-  )
-  (defun my-goto-c-directory()
-     (interactive)
-     (dired "~/c")
-  )
-  (defun my-goto-emacs-directory()
-     (interactive)
-     (dired "~/.config/emacs")
-  )
-  (defun my-goto-downloads-directory()
-     (interactive)
-     (dired "~/Downloads")
-  )
-  (defun my-goto-rust-directory()
-     (interactive)
-     (dired "~/rust")
-  )
-  (defun my-goto-zig-directory()
-     (interactive)
-     (dired "~/zig")
-  )
-  (defun my-goto-temp-directory()
-     (interactive)
-     (dired "~/temp")
-  )
-  (defun my-goto-photo-directory()
-     (interactive)
-     (dired "~/Photos")
-  )
-
-  (defun my-dired-custom-go-to-local()
-    (define-key evil-normal-state-local-map (kbd "gh") 'my-goto-home-directory)
-    (define-key evil-normal-state-local-map (kbd "gb") 'my-goto-shell-backup-directory)
-    (define-key evil-normal-state-local-map (kbd "gd") 'my-goto-downloads-directory)
-    (define-key evil-normal-state-local-map (kbd "gc") 'my-goto-c-directory)
-    (define-key evil-normal-state-local-map (kbd "ge") 'my-goto-emacs-directory)
-    (define-key evil-normal-state-local-map (kbd "gp") 'my-goto-photo-directory)
-    (define-key evil-normal-state-local-map (kbd "gr") 'my-goto-rust-directory)
-    (define-key evil-normal-state-local-map (kbd "gt") 'my-goto-temp-directory)
-    (define-key evil-normal-state-local-map (kbd "gz") 'my-goto-zig-directory)
-  )
-#+END_SRC
-
-
-**** Toggle hidden files by ~<leader>h~
-
-Before this can work, you have to make sure that you have the following settings to show hidden files by default:
-
-~(setq dired-listing-switches "-lhta")~
-
-#+BEGIN_SRC emacs-lisp
-  (setq dired-omit-files "^\\...+$")
-
-  (defun my-dired-toggle-hidden-files-local()
-    (define-key evil-normal-state-local-map (kbd "SPC h") 'dired-omit-mode)
-    (define-key evil-normal-state-local-map (kbd "C-c h") 'dired-omit-mode)
-
-    (if my-enable-which-key-customized-description
-        (progn
-            (which-key-add-key-based-replacements "SPC h" "Hidden mode")
-            (which-key-add-key-based-replacements "C-c h" "Hidden mode")
-        ))
-  )
-#+END_SRC
-
-
-**** Modify the READ-ONLY buffer by ~<leader>m~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-dired-toggle-read-only-local()
-    (define-key evil-normal-state-local-map (kbd "SPC m") 'dired-toggle-read-only)
-    (define-key evil-normal-state-local-map (kbd "C-c m") 'dired-toggle-read-only)
-
-    (if my-enable-which-key-customized-description
-        (progn
-            (which-key-add-key-based-replacements "SPC m" "Modify mode")
-            (which-key-add-key-based-replacements "C-c m" "Modify mode")
-        ))
-  )
-#+END_SRC
-
-After going into the =wdired-change-to-wdired-mode=, here are the default keybindgins to accept or discard changes:
-
-+ ~C-c C-c:~ Accept changes
-+ ~C-c C-k:~ Discard changes
-
-
-**** Yank ful path by ~<leader>yp~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-dired-yank-full-path ()
-     (interactive)
-     (dired-copy-filename-as-kill 0)
-  )
-
-  (defun my-dired-yank-full-path-local()
-    (define-key evil-normal-state-local-map (kbd "SPC y p") 'my-dired-yank-full-path)
-    (define-key evil-normal-state-local-map (kbd "C-c y p") 'my-dired-yank-full-path)
-
-    (if my-enable-which-key-customized-description
-        (progn
-            (which-key-add-key-based-replacements "SPC y" "Yank")
-            (which-key-add-key-based-replacements "C-c y" "Yank")
-            (which-key-add-key-based-replacements "SPC y p" "Yank full path")
-            (which-key-add-key-based-replacements "C-c y p" "Yank full path")
-        ))
-  )
-#+END_SRC
-
-
-**** Bind all bindings above in the 'dired-mode-hook' once
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-dired-customized-bindings()
-     (my-dired-h-l-to-directory-navigating-local)
-     (my-dired-o-to-open-file-local)
-     (my-dired-custom-go-to-local)
-     (my-dired-toggle-hidden-files-local)
-     (my-dired-toggle-read-only-local)
-     (my-dired-yank-full-path-local)
-
-     ;;
-     ;; Rebind all SPC related bindings to local buffer scope
-     ;;
-     (rebind-general-leader-x-bindings-to-local-buffer-scope)
-  )
-
-  (add-hook 'dired-mode-hook #'my-dired-customized-bindings)
-#+END_SRC
-
-
-
-*** Image Dired
-
-**** Fit the rendered image to window by ~=~
-
-#+BEGIN_SRC emacs-lisp
-  (evil-define-key '(normal) image-mode-map (kbd "=") 'image-transform-fit-to-window)
-#+END_SRC
-
-
-*** LSP
-
-**** Go to next or previous error by ~C-n~ or ~C-p~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-error-jumping-in-local-buffer()
-    (define-key evil-normal-state-local-map (kbd "C-n") 'flymake-goto-next-error)
-    (define-key evil-normal-state-local-map (kbd "C-p") 'flymake-goto-prev-error)
-
-    (message ">>> [ my-lsp-error-jumping-in-local-buffer ] Set 'C-n' and 'C-p' to local buffer")
-  )
-#+END_SRC
-
-
-**** Format buffer by ~<leader>ff~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-format-buffer()
-    ;;(define-key evil-normal-state-local-map (kbd "<leader>ff") 'lsp-format-buffer)
-
-    (define-key evil-normal-state-local-map (kbd "SPC f f") 'eglot-format-buffer)
-
-    (message ">>> [ my-lsp-format-buffer ] Set '<leader>ff' to local buffer")
-  )
-#+END_SRC
-
-
-**** Rename by ~<leader>rn~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-rename-buffer()
-    ;; (define-key evil-normal-state-local-map (kbd "<leader>rn") 'lsp-rename)
-
-    (define-key evil-normal-state-local-map (kbd "SPC r n") 'eglot-rename)
-
-    (message ">>> [ my-lsp-rename-buffer ] Set '<leader>rn' to local buffer")
-  )
-#+END_SRC
-
-
-**** Show error (diagnostics buffer) ~<leader>se~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-show-error()
-    (define-key evil-normal-state-local-map (kbd "SPC s e") 'flymake-show-buffer-diagnostics)
-
-    (message ">>> [ my-lsp-show-error ] Set '<leader>se' to local buffer")
-  )
-#+END_SRC
-
-
-**** Run code action ~<leader>ca~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-code-action()
-    ;; (define-key evil-normal-state-local-map (kbd "<leader>ca") 'lsp-execute-code-action)
-    ;; (define-key evil-normal-state-local-map (kbd "C-c c a") 'lsp-execute-code-action)
-
-    (define-key evil-normal-state-local-map (kbd "SPC c a") 'eglot-code-action-quickfix)
-
-    (message ">>> [ my-lsp-code-action ] Set '<leader>ca' to local buffer")
-  )
-#+END_SRC
-
-
-**** Toggle comment by ~<leader>/~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-toggle-comment()
-    (define-key evil-visual-state-local-map (kbd "SPC /") 'evilnc-comment-or-uncomment-lines)
-
-    (message ">>> [ my-lsp-toggle-comment ] Set '<leader>/' to local buffer")
-  )
-#+END_SRC
-
-
-**** Toggle inlay hints by ~<leader>th~
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-toggle-inlay-hint()
-    (interactive)
-    (message ">>>>> called.")
-    (if eglot-inlay-hints-mode
-        (progn
-            (message ">>> [ my-lsp-toggle-inlay-hint ] Inlay hint is 'on', turn it 'off' now.")
-            (eglot-inlay-hints-mode -1)
-        )
-        (progn
-            (message ">>> [ my-lsp-toggle-inlay-hint ] Inlay hint is 'off', turn it 'on' now.")
-            (eglot-inlay-hints-mode 1)
-        )
-    )
-  )
-
-  (defun my-setup-toggle-inlay-hint()
-      (define-key evil-normal-state-local-map (kbd "SPC t h") 'my-lsp-toggle-inlay-hint)
-      (message ">>> [ my-setup-toggle-inlay-hint ] Set '<leader>th' to local buffer")
-  )
-#+END_SRC
-
-
-**** Bind all bindings above in one shot
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-lsp-bindings()
-     (my-lsp-error-jumping-in-local-buffer)
-     (my-lsp-format-buffer)
-     (my-lsp-rename-buffer)
-     (my-lsp-show-error)
-     (my-lsp-code-action)
-     (my-lsp-toggle-comment)
-     (my-setup-toggle-inlay-hint)
-
-     (if my-enable-which-key-customized-description
-         (progn
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC f" "Format")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC f f" "Format")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC r" "Rename")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC r n" "Rename")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC s" "Show errors")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC s e" "Show errors")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC c" "Code actions")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC c a" "Code actions")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC /" "Comment")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC t" "Toggle")
-             (which-key-add-major-mode-key-based-replacements major-mode "SPC t h" "Toggle hints")
-         ))
-  )
-
-  (dolist (hook '(c-mode-hook
-                  c-ts-mode-hook
-                  c++-mode-hook
-                  c++-ts-mode-hook
-                  zig-mode-hook
-                  zig-ts-mode-hook
-                  rust-mode-hook
-                  rust-ts-mode-hook
-                  typescript-mode-hook
-                  python-ts-mode-hook
-                  ))
-     (add-hook hook #'my-lsp-bindings)
-  )
-#+END_SRC
-
-
-*** Embark
-
-**** Run ~embark-act~ by ~C-e~
-
-#+BEGIN_SRC emacs-lisp
-  ;; (define-key global-map (kbd "C-,") 'embark-act)
-  (define-key global-map (kbd "C-e") 'embark-act)
-#+END_SRC
-
-
-For the =GUI= version:
-
-Because of I use =vertico-posframe= in =GUI= mode, but =Embark= doesn't work well with popup. That's why if you press =C-e=, then =Embark menu= shows under the popup which means you can't see part of it. In that situation, you can press =C-h=, then the =Embark help menu= will re-rendered inside the popup!!!
-
-
 
 ** Color theme
 
@@ -4863,6 +3448,1406 @@ Take the =org-level-1= as an example:
 #+END_SRC
 
 
+** History and auto save
+** 界面
+*** 窗口外观
+#+begin_src elisp
+  (setq default-frame-alist '((fullscreen . maximized))) ; 全屏
+  ;; (set-frame-parameter nil 'undecorated t)
+  ;; (add-to-list 'default-frame-alist '(drag-internal-border . 1))
+  ;; (add-to-list 'default-frame-alist '(internal-border-width . 5))
+  (defun my/set-window ()
+  (interactive)
+    (unless my/is-termux ; 终端下以下设置不可用
+      (tool-bar-mode 0) ; 禁用工具栏
+      (scroll-bar-mode 0)) ; 禁用滚动条
+    (menu-bar-mode 0) ; 禁用菜单栏
+    )
+#+end_src
+*** 折叠
+#+begin_src elisp
+(setq my/enable-folding (not my/is-terminal))
+#+end_src
+
+
+* My keybindings
+
+** basic note
+1. All my custom keybindings have a pattern:
+
+    =<leader>xxx= is equal to =C-c xxx=
+
+    That said I can use =s-c xxx= (means =Command-c xxx=) in terminal, as I map the =CMD-c= (from MacOS Parallels Desktop) to =C-c= (in Arch Linux VM).
+
+
+2. About =Evil state=
+
+    =Evil mode= has the following =state keymaps= you can used to set your own keybindings:
+
+    + evil-insert-state-map
+    + evil-emacs-state-map
+    + evil-normal-state-map
+    + evil-visual-state-map
+    + evil-motion-state-map
+    + evil-operator-state-map
+    + evil-outer-text-objects-map
+    + evil-inner-text-objects-map
+    + evil-replace-state-map
+    + evil-normal-state-local-map
+
+    The main reason =motion= state exists is for use with =read-only= modes where insertion keybindings aren’t useful. 
+
+    If you bind key to =montion= state, that means you bind the key to =normal, visual and operator= state as well. That's quite convenient to save a lot of bindings!!!
+
+*** Toggle spell checking
+
+#+BEGIN_SRC emacs-lisp
+   (dolist (map (list
+                 evil-motion-state-map
+                 ))
+     (define-key map (kbd "<leader>sp") 'flyspell-mode)
+     (define-key map (kbd "C-c s p") 'flyspell-mode)
+   )
+#+END_SRC
+
+*** Control whether enable =which-key= customize description or not
+
+By default, =which-key= only show the function name with the keybindings like below:
+
+#+BEGIN_SRC
+ b → consult-buffer 
+ o → +prefix
+#+END_SRC
+
+That's fine but not very convenient, as I might forget what the ~o~ prefix means. By using the following settings:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (which-key-add-key-based-replacements "b" "Switch to buffer")
+  (which-key-add-key-based-replacements "o" "(Quick) Open...")
+#+END_SRC
+
+Then I got a better =which-key= list like this:
+
+#+BEGIN_SRC
+ b → Switch to buffer
+ o → (Quick) Open...
+#+END_SRC
+
+
+That means I need to write a lot of ~(which-key-add-key-based-replacements)~ function calls for all of my keybindings, but what if I don't need that (or I prefer to switch back to the original function name display style)? So, for a better choice, I add a global variable ~my-enable-which-key-customized-description~ to enable or disbale that feature just by setting it to ~t~ or ~nil~:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Enable
+  ;;
+  (setq my-enable-which-key-customized-description t)
+
+  ;;
+  ;; Disable
+  ;;
+  ;; (setq my-enable-which-key-customized-description nil)
+#+END_SRC
+
+
+*** Unbind all keybindings for the following modes
+
+Why do this?
+
+For example the =help-mode-map= already have the default keybinding like =SPC= to scrollup, that said all =<leader>xx= evil binding won't work, as =<leader>= key is =SPC=.
+
+That's why I unbind all of those buffer mode maps I don't care, this make the evil binding works!!!
+
+#+begin_src emacs-lisp 
+  (setf (cdr help-mode-map) nil)
+#+end_src
+
+
+*** =ESC= acts like ~C-g~
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+
+
+*** Disable ~C-z~
+
+By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, but I don't need that.
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-insert-state-map
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "C-z") nil)
+  )
+#+END_SRC
+
+
+*** Fix =error: Key sequence SPC X starts with non-prefix key SPC=
+
+#+BEGIN_SRC emacs-lisp
+  (define-key evil-motion-state-map (kbd "<SPC>") nil)
+  (define-key evil-normal-state-map (kbd "<SPC>") nil)
+#+END_SRC
+
+
+
+** Kill current window: ~Q~ and exit =Emacs=: ~<leader>q~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "Q") 'delete-window)
+      (define-key map (kbd "SPC q") 'save-buffers-kill-terminal)
+      (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
+      ;; (message ">>> bind 'Q/<leader>q/C-c q' in '%s'" map);
+  )
+
+
+  ;;
+  ;; Bind to the local buffer keymap against the following delay modes
+  ;;
+  (defun my-bind-q-kill-current-window-local()
+    (define-key evil-normal-state-local-map (kbd "Q") 'delete-window)
+  )
+
+  (dolist (hook '(
+                 dired-mode-hook
+                 xref--xref-buffer-mode-hook
+                 ))
+    (add-hook hook #'my-bind-q-kill-current-window-local)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC q" "Save and exit")
+          (which-key-add-key-based-replacements "C-c q" "Save and exit")
+      ))
+#+END_SRC
+
+
+** Call =describe-xxxx= functions: ~<leader>df/v/k/b~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+    (define-key map (kbd "SPC d f") 'helpful-callable)
+    (define-key map (kbd "C-c d f") 'helpful-callable)
+    (define-key map (kbd "SPC d v") 'helpful-variable)
+    (define-key map (kbd "C-c d v") 'helpful-variable)
+    (define-key map (kbd "SPC d k") 'describe-key)
+    (define-key map (kbd "C-c d k") 'helpful-key)
+    (define-key map (kbd "SPC d b") 'describe-bindings)
+    (define-key map (kbd "C-c d b") 'describe-bindings)
+    (define-key map (kbd "SPC d m") 'describe-mode)
+    (define-key map (kbd "C-c d m") 'describe-mode)
+    ;;(message "State: %s" state);
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC d" "Describe ...")
+          (which-key-add-key-based-replacements "C-c d" "Describe ...")
+
+          (which-key-add-key-based-replacements "SPC d f" "Function")
+          (which-key-add-key-based-replacements "C-c d f" "Function")
+          (which-key-add-key-based-replacements "SPC d v" "Variable")
+          (which-key-add-key-based-replacements "C-c d v" "Variable")
+          (which-key-add-key-based-replacements "SPC d k" "Keys")
+          (which-key-add-key-based-replacements "C-c d k" "Keys")
+          (which-key-add-key-based-replacements "SPC d m" "Mode")
+          (which-key-add-key-based-replacements "C-c d m" "Mode")
+          (which-key-add-key-based-replacements "SPC d b" "Bindings")
+          (which-key-add-key-based-replacements "C-c d b" "Bindings")
+      ))
+#+END_SRC
+
+
+** Toggle-command-log-mode: ~<leader>l~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC l") 'clm/toggle-command-log-buffer)
+    (define-key map (kbd "C-c l") 'clm/toggle-command-log-buffer)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC l" "Command Log")
+          (which-key-add-key-based-replacements "C-c l" "Command Log")
+      ))
+#+END_SRC
+
+
+** Evaluate lisp expression: ~<leader>ee~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC e e") 'eval-last-sexp)
+    (define-key map (kbd "C-c e e") 'eval-last-sexp)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC e" "Evalute/Emoji")
+          (which-key-add-key-based-replacements "C-c e" "Evalute/Emoji")
+          (which-key-add-key-based-replacements "SPC e e" "Evalute Lisp")
+          (which-key-add-key-based-replacements "C-c e e" "Evalute Lisp")
+      ))
+#+END_SRC
+
+
+
+** Save =buffer=: ~W~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "W") 'save-buffer)
+  )
+#+END_SRC
+
+
+** Go back to normal mode: ~jj~
+
+#+BEGIN_SRC emacs-lisp
+  (defun xwl-jj-as-esc ()
+  (interactive)
+  (if (memq evil-state '(insert replace))
+      (let ((changed? (buffer-modified-p)))
+          (insert "j")
+          (let* ((tm (current-time))
+              (ch (read-key)))
+          (if (and (eq ch ?j)
+                  (< (time-to-seconds (time-since tm)) 0.3))
+              (save-excursion
+                  (delete-char -1)
+                  (evil-force-normal-state)
+                  (set-buffer-modified-p changed?))
+              (insert ch))))
+  (call-interactively 'evil-next-line)))
+
+  (define-key evil-insert-state-map  "j" 'xwl-jj-as-esc)
+  (define-key evil-replace-state-map "j" 'xwl-jj-as-esc)
+#+END_SRC
+
+
+** Move cursor to beginning: ~H~ and ending of the line: ~L~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "H") 'evil-first-non-blank)
+    (define-key map (kbd "L") 'evil-end-of-line)
+    ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+** Go back to last marked position: ~gb~
+
+I can't call ~evil-set-mark~ in my custom function, as it calls ~read-char~ when the function runs, so I can't pass a char in that way.
+
+As a workaround, I can use the default evil keybinding =m= to set a =M= to current position, MAKE SURE that's an uppercase =M=, otherwise, you can go back if you jump to another buffer!!!
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-goto-last-marked-position()
+    (interactive)
+    (evil-goto-mark ?M)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "gb") 'my-goto-last-marked-position)
+      ;;(message "State: %s" state);
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "gb" "Go back")
+      ))
+#+END_SRC
+
+
+** Open =files= or =buffers=: ~<leader>f/b~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC f") 'find-file)
+    (define-key map (kbd "C-c f") 'find-file)
+    (define-key map (kbd "SPC b") 'consult-buffer)
+    (define-key map (kbd "C-c b") 'consult-buffer)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC f" "Find files")
+          (which-key-add-key-based-replacements "C-c f" "Find files")
+          (which-key-add-key-based-replacements "SPC b" "Buffer list")
+          (which-key-add-key-based-replacements "C-c b" "Buffer list")
+      ))
+#+END_SRC
+
+
+** Project scope fuzzy =searching= files and related actions: ~<leader>p f~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC p f") 'project-find-file)
+    (define-key map (kbd "C-c p f") 'project-find-file)
+
+    (define-key map (kbd "SPC p d") 'project-dired)
+    (define-key map (kbd "C-c p d") 'project-dired)
+
+    (define-key map (kbd "SPC p s") 'project-switch-project)
+    (define-key map (kbd "C-c p s") 'project-switch-project)
+
+    (define-key map (kbd "SPC p b") 'project-switch-to-buffer)
+    (define-key map (kbd "C-c p b") 'project-switch-to-buffer)
+
+    (define-key map (kbd "SPC p c") 'project-async-shell-command)
+    (define-key map (kbd "C-c p c") 'project-async-shell-command)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC p" "Projects")
+          (which-key-add-key-based-replacements "SPC p f" "Fuzzy searching in project")
+          (which-key-add-key-based-replacements "SPC p d" "Open dired in project")
+          (which-key-add-key-based-replacements "SPC p b" "Switch buffer in project")
+          (which-key-add-key-based-replacements "SPC p s" "Switch to another project")
+          (which-key-add-key-based-replacements "SPC p c" "Run async shell command")
+      ))
+#+END_SRC
+
+
+** Switch between last buffers: ~<leader><leader>~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC SPC") 'switch-to-last-buffer)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC SPC" "Last Buffer")
+      ))
+#+END_SRC
+
+
+** Toggle focus mode(fullscreen) : ~<leader>Enter~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC RET") 'olivetti-mode)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC RET" "Toggle Focus mode")
+      ))
+#+END_SRC
+
+
+** Search and change current word: ~C-s~ 
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Unbind the default <C-s> for 'isearch-forward'
+  ;;
+  (define-key global-map (kbd "C-s") nil)
+  
+  ;;
+  ;; Replace current word or selection using vim style for evil mode
+  ;;
+  (defun evil-replace-word-selection()
+    (interactive)
+    (if (use-region-p)
+        (let ((selection (buffer-substring-no-properties (region-beginning) (region-end))))
+            (if (= (length selection) 0)
+                (message "empty string")
+                (evil-ex (concat "'<,'>s/" selection "/"))
+            )
+        )
+        (evil-ex (concat "%s/" (thing-at-point 'word) "/"))))
+
+  ;;
+  ;; Rebind <C-s>
+  ;;
+  (define-key evil-motion-state-map (kbd "C-s") 'evil-replace-word-selection)
+#+END_SRC
+
+
+** Search word from all files: ~<leader>r~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC r") 'consult-ripgrep)
+    (define-key map (kbd "C-c r") 'consult-ripgrep)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC r" "Rg search")
+          (which-key-add-key-based-replacements "C-c r" "Rg search")
+      ))
+#+END_SRC
+
+
+** ~i menu~ (list all functions name at the file): ~<leader>im~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC i m") 'consult-imenu)
+    (define-key map (kbd "C-c i m") 'consult-imenu)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC i" "iMenu/Insert")
+          (which-key-add-key-based-replacements "C-c i" "iMenu/Insert")
+      ))
+#+END_SRC
+
+
+** split Window: ~<leader>vs~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "SPC v s") 'evil-window-vsplit)
+    (define-key map (kbd "C-c v s") 'evil-window-vsplit)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC v" "Vertical split")
+          (which-key-add-key-based-replacements "C-c v" "Vertical split")
+          (which-key-add-key-based-replacements "SPC v s" "Vertical split")
+          (which-key-add-key-based-replacements "C-c v s" "Vertical split")
+      ))
+#+END_SRC
+
+
+** Window jumping movement by ~C-h, C-l, C-j, C-k~ 
+
+For jumping between up and down windows, I prefer to use ~C-w j~ and ~C-w k~.
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+    (define-key map (kbd "C-l") 'evil-window-right)
+    (define-key map (kbd "C-h") 'evil-window-left)
+    (define-key map (kbd "C-j") 'evil-window-down)
+    (define-key map (kbd "C-k") 'evil-window-up)
+    ;;(message "State: %s" state);
+  )
+#+END_SRC
+
+
+** Change window size: ~-/+/=~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-increase-window-width ()
+    (interactive)
+    (evil-window-increase-width 5)
+  )
+
+  (defun my-decrease-window-width ()
+    (interactive)
+    (evil-window-increase-width -5)
+  )
+
+  (defun my-increase-window-height ()
+    (interactive)
+    (evil-window-increase-height 5)
+  )
+
+  (defun my-decrease-window-height ()
+    (interactive)
+    (evil-window-increase-height -5)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+    (define-key map (kbd "|") 'balance-windows)
+    (define-key map (kbd "=") 'my-increase-window-width)
+    (define-key map (kbd "-") 'my-decrease-window-width)
+    (define-key map (kbd "+") 'my-increase-window-height)
+    (define-key map (kbd "_") 'my-decrease-window-height)
+  )
+
+  ;;
+  ;; Bind to the local buffer keymap against the following delay modes
+  ;;
+  (defun my-bind-window-resize-local()
+    (define-key evil-normal-state-local-map (kbd "|") 'balance-windows)
+    (define-key evil-normal-state-local-map (kbd "=") 'my-increase-window-width)
+    (define-key evil-normal-state-local-map (kbd "-") 'my-decrease-window-width)
+    (define-key evil-normal-state-local-map (kbd "+") 'my-increase-window-height)
+    (define-key evil-normal-state-local-map (kbd "_") 'my-decrease-window-height)
+  )
+
+  (dolist (hook '(
+                 dired-mode-hook
+                 ))
+    (add-hook hook #'my-bind-window-resize-local)
+  )
+#+END_SRC
+
+
+** Open =emacs config=: ~<leader>oc~
+
+#+BEGIN_SRC emacs-lisp
+(defun my-open-emacs-configuration-file()
+    (interactive)
+    (find-file "~/.config/emacs/configuration.org")
+)
+
+;; Unbind this!!!
+(define-key global-map (kbd "C-c o") nil)
+
+(dolist (map (list
+            evil-motion-state-map
+            evil-normal-state-map
+            ))
+(define-key map (kbd "SPC o c") 'my-open-emacs-configuration-file)
+(define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
+)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC o" "Open ....")
+        (which-key-add-key-based-replacements "C-c o" "Open ....")
+        (which-key-add-key-based-replacements "SPC o c" "Config file")
+        (which-key-add-key-based-replacements "C-c o c" "Config file")
+    ))
+#+END_SRC
+
+
+** Open =snippet= folder: ~<leader>os~
+
+#+BEGIN_SRC emacs-lisp
+(defun my-open-yasnippet-folder()
+    (interactive)
+    (find-file-other-window "~/.config/emacs/snippets")
+)
+
+;; Unbind this!!!
+(define-key global-map (kbd "C-c o") nil)
+
+(dolist (map (list
+            evil-motion-state-map
+            evil-normal-state-map
+            ))
+(define-key map (kbd "SPC o s") 'my-open-yasnippet-folder)
+(define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
+)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC o s" "Snippet folder")
+        (which-key-add-key-based-replacements "C-c o s" "Snippet folder")
+    ))
+#+END_SRC
+
+
+
+** Open EShell: ~<leader>s~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "SPC s s") 'nil)
+      (define-key map (kbd "C-c s s") 'nil)
+  )
+
+  (defun my-open-eshell()
+     (interactive)
+     (split-window-below)
+     (windmove-down)
+     (eshell)
+  )
+
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "SPC s s") 'my-open-eshell)
+      (define-key map (kbd "C-c s s") 'my-open-eshell)
+
+      (if my-enable-which-key-customized-description
+          (progn
+              (which-key-add-key-based-replacements "SPC s s" "Shell")
+              (which-key-add-key-based-replacements "C-c s s" "Shell")
+          ))
+  )
+#+END_SRC
+
+
+** Open =sbzi= dired: ~<leader>od~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-open-sbzi-folder()
+    (interactive)
+    (dired "~/sbzi")
+  )
+
+  ;;
+  ;; Bind
+  ;;
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
+      (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC o d" "directory")
+          (which-key-add-key-based-replacements "C-C o d" "directory")
+      ))
+#+END_SRC
+
+** Emoji
+
+*** Emoji insert: ~<leader>ei~ and exit: ~C-g~
+ #+BEGIN_SRC emacs-lisp
+   (dolist (map (list
+                 evil-motion-state-map
+                 evil-normal-state-map
+                 ))
+     (define-key map (kbd "SPC e i") 'emoji-insert)
+     (define-key map (kbd "C-c e i") 'emoji-insert)
+   )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC e i" "Insert emoji")
+          (which-key-add-key-based-replacements "C-c e i" "Insert emoji")
+      ))
+ #+END_SRC
+
+
+*** Emoji recent by ~<leader>er~
+
+ #+BEGIN_SRC emacs-lisp
+    (dolist (map (list
+                  evil-motion-state-map
+                  evil-normal-state-map
+                  ))
+      (define-key map (kbd "SPC e r") 'emoji-recent)
+      (define-key map (kbd "C-c e r") 'emoji-recent)
+    )
+
+   (if my-enable-which-key-customized-description
+       (progn
+           (which-key-add-key-based-replacements "SPC e r" "Recent emoji")
+           (which-key-add-key-based-replacements "C-c e r" "Recent emoji")
+       ))
+ #+END_SRC
+
+
+** Next search: ~n~ and Prev search: ~N~ 
+
+#+begin_src emacs-lisp
+  ;;
+  ;; Unbind 'n' and 'N'
+  ;;
+  (define-key evil-motion-state-map (kbd "n") nil)
+  (define-key evil-motion-state-map (kbd "N") nil)
+
+  (defun my-search-next()
+    (interactive)
+    (evil-search-next)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (defun my-search-previous()
+    (interactive)
+    (evil-search-previous)
+    (evil-scroll-line-to-center nil)
+  )
+
+  (define-key evil-motion-state-map (kbd "n") 'my-search-next)
+  (define-key evil-motion-state-map (kbd "N") 'my-search-previous)
+#+end_src
+
+
+** Org mode
+
+*** ~org-mode~ fold or unfold when cursor is on heading by ~<RET>~
+
+#+begin_src emacs-lisp 
+  (defun my-org-mode-return-cycle-local()
+    (define-key evil-normal-state-local-map (kbd "RET") 'org-cycle)
+  )
+#+end_src
+
+
+*** ~org-mode~ insert/edit a link by ~<leader>il~ and open a link by ~<leader>ol~ 
+
+#+begin_src emacs-lisp 
+  (defun my-org-mode-insert-and-open-link-local()
+    (define-key evil-normal-state-local-map (kbd "SPC i l") 'org-insert-link)
+    (define-key evil-normal-state-local-map (kbd "C-c i l") 'org-insert-link)
+    (define-key evil-normal-state-local-map (kbd "SPC o l") 'org-open-at-point)
+    (define-key evil-normal-state-local-map (kbd "C-c o l") 'org-open-at-point)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC o l" "Open at point")
+            (which-key-add-key-based-replacements "C-c o l" "Open at point")
+            (which-key-add-key-based-replacements "SPC i l" "Insert link")
+            (which-key-add-key-based-replacements "C-c i l" "Insert link")
+        ))
+  )
+#+end_src
+
+
+*** Bind all bindings above in the 'org-mode-hook' once
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-org-mode-local-bindings()
+     ;; (my-org-mode-create-elisp-code-block-local)
+     (my-org-mode-return-cycle-local)
+     (my-org-mode-insert-and-open-link-local)
+  )
+
+  (add-hook 'org-mode-hook #'my-org-mode-local-bindings)
+#+END_SRC
+
+
+** Markdown
+
+*** ~markdown-mode~ fold or unfold when cursor is on heading by ~<RET>~
+
+#+begin_src emacs-lisp 
+  (evil-define-key 'normal markdown-mode-map (kbd "RET") 'markdown-cycle)
+  (evil-define-key 'normal markdown-view-mode-map (kbd "RET") 'markdown-cycle)
+#+end_src
+
+
+** Fast kill buffers and windows
+
+*** Kill all helpful buffers and opend window by ~<leader>kh~
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Close the 'helful' window and kill its buffer
+  ;;
+  (defun kill-helpful-window-and-buffers ()
+      (interactive)
+      (message ">>> [ kill-helpful-window-and-buffers ] - ....... ")
+
+      (cl-loop for buf in (buffer-list)
+              do (if (string-match-p "^*helpful" (buffer-name buf))
+                 (progn
+                     ;;
+                     ;; Try to close its window first if exists.
+                     ;;
+                     (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+                     (if window-to-be-killed
+                        (progn
+                            (delete-window window-to-be-killed)
+                            (message ">>> [ kill-helpful-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                        )
+                     )
+
+                     ;;
+                     ;; Kill buffer.
+                     ;;
+                     (message ">>> [ kill-helpful-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+                     (kill-buffer buf)
+                 )
+              )
+      )
+
+      (message ">>> [ kill-helpful-window-and-buffers ] - [done] ")
+  )
+
+  (define-key evil-motion-state-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
+  (define-key evil-normal-state-map (kbd "C-c k h") 'kill-helpful-window-and-buffers)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC k" "Kill")
+          (which-key-add-key-based-replacements "C-c k" "Kill")
+          (which-key-add-key-based-replacements "SPC k h" "Help window and buffer")
+          (which-key-add-key-based-replacements "C-c k h" "Help window and buffer")
+      ))
+#+END_SRC
+
+
+*** Kill all eldoc buffers and opend window by ~<leader>kd~
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Close the 'eldoc' window and kill its buffer
+  ;;
+  (defun kill-eldoc-window-and-buffers ()
+      (interactive)
+      (message ">>> [ kill-eldoc-window-and-buffers ] - ....... ")
+
+      (cl-loop for buf in (buffer-list)
+         do (if (string-match-p "^*eldoc" (buffer-name buf))
+             (progn
+                ;;
+                ;; Try to close its window first if exists.
+                ;;
+                (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+                (if window-to-be-killed
+                    (progn
+                        (delete-window window-to-be-killed)
+                        (message ">>> [ kill-eldoc-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                    )
+                )
+
+                ;;
+                ;; Kill buffer.
+                ;;
+                (message ">>> [ kill-eldoc-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+                (kill-buffer buf)
+             )
+         )
+      )
+
+      (message ">>> [ kill-eldoc-window-and-buffers ] - [done] ")
+  )
+
+  (define-key evil-motion-state-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
+  (define-key evil-normal-state-map (kbd "C-c k d") 'kill-eldoc-window-and-buffers)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC k d" "Doc window and buffer")
+          (which-key-add-key-based-replacements "C-c k d" "Doc window and buffer")
+      ))
+#+END_SRC
+
+
+*** Kill all embark buffers and opend window by ~<leader>ke~
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Close the 'embark' window and kill its buffer
+  ;;
+  (defun kill-embark-window-and-buffers ()
+     (interactive)
+     (message ">>> [ kill-embark-window-and-buffers ] - ....... ")
+
+     (cl-loop for buf in (buffer-list)
+        do (if (string-match-p "^*Embark" (buffer-name buf))
+           (progn
+               ;;
+               ;; Try to close its window first if exists.
+               ;;
+               (setq window-to-be-killed (get-buffer-window (buffer-name buf) nil))
+               (if window-to-be-killed
+                   (progn
+                       (delete-window window-to-be-killed)
+                       (message ">>> [ kill-embark-window-and-buffers] - Closed window associated with buffer: %s" (buffer-name buf))
+                   )
+               )
+
+               ;;
+               ;; Kill buffer.
+               ;;
+               (message ">>> [ kill-embark-window-and-buffers] - Killed buffer: %s" (buffer-name buf))
+               (kill-buffer buf)
+           )
+        )
+     )
+
+     (message ">>> [ kill-embark-window-and-buffers ] - [done] ")
+  )
+
+  (define-key evil-motion-state-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
+  (define-key evil-normal-state-map (kbd "C-c k e") 'kill-embark-window-and-buffers)
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC k e" "Embark window and buffer")
+          (which-key-add-key-based-replacements "C-c k e" "Embark window and buffer")
+      ))
+#+END_SRC
+
+
+** Rebind general ~<leader>X~ bindings to local buffer scope by calling this function
+
+All the ~<leader>X~ bindings above are targeted to =evil-motion-state-map= (which covers =Normal/Motion/Visual= evil states), it should work for most situtations.
+
+But for some particular modes, you still should rebind all of them ~<leader>X~ bindings to the given modes' local buffer scope to make sure to override the packages' level bindings IF you want your ~<leader>X~ bindings work on that mode!!!
+
+So, the following function is designed for that purpose: Call one function in ~xxxx-mode-hook~ to rebind all ~<leader>X~ bindings to the given modes' local buffer scope!!!
+
+#+BEGIN_SRC emacs-lisp
+  (defun rebind-general-leader-x-bindings-to-local-buffer-scope()
+    ;;
+    ;; Quick
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC q") 'save-buffers-kill-terminal)
+
+    ;;
+    ;; Describe related
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC d f") 'helpful-callable)
+    (define-key evil-normal-state-local-map (kbd "SPC d v") 'helpful-variable)
+    (define-key evil-normal-state-local-map (kbd "SPC d k") 'describe-key)
+    (define-key evil-normal-state-local-map (kbd "SPC d b") 'describe-bindings)
+    (define-key evil-normal-state-local-map (kbd "SPC d m") 'describe-mode)
+
+    ;;
+    ;; Command log
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC l") 'clm/toggle-command-log-buffer)
+
+    ;;
+    ;; Evalate
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC e e") 'eval-last-sexp)
+
+    ;;
+    ;; Find and switch related
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC f") 'find-file)
+    (define-key evil-normal-state-local-map (kbd "SPC r") 'consult-ripgrep)
+    (define-key evil-normal-state-local-map (kbd "SPC b") 'consult-buffer)
+    (define-key evil-normal-state-local-map (kbd "SPC SPC") 'switch-to-last-buffer)
+
+    ;;
+    ;; Project scope related
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC p f") 'project-find-file)
+    (define-key evil-normal-state-local-map (kbd "SPC p d") 'project-dired)
+    (define-key evil-normal-state-local-map (kbd "SPC p s") 'project-switch-project)
+    (define-key evil-normal-state-local-map (kbd "SPC p b") 'project-switch-to-buffer)
+    (define-key evil-normal-state-local-map (kbd "SPC p c") 'project-async-shell-command)
+
+    ;;
+    ;; Focus mode
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC RET") 'olivetti-mode)
+
+    ;;
+    ;; iMenu
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC i m") 'consult-imenu)
+
+
+
+    ;;
+    ;; Window split and movement
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC v s") 'evil-window-vsplit)
+
+    ;;
+    ;; Quick open related
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC o c") 'my-open-emacs-configuration-file)
+    (define-key evil-normal-state-local-map (kbd "SPC o s") 'my-open-yasnippet-folder)
+
+    ;;
+    ;; Emoji related
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC e i") 'emoji-insert)
+    (define-key evil-normal-state-local-map (kbd "SPC e r") 'emoji-recent)
+
+    ;;
+    ;; Kill specific buffer and opened windows
+    ;;
+    (define-key evil-normal-state-local-map (kbd "SPC k h") 'kill-helpful-window-and-buffers)
+    (define-key evil-normal-state-local-map (kbd "SPC k d") 'kill-eldoc-window-and-buffers)
+    (define-key evil-normal-state-local-map (kbd "SPC k e") 'kill-embark-window-and-buffers)
+
+    (message "[ rebind-general-leader-x-bindings-to-local-buffer-scope ] - Done.")
+  )
+#+END_SRC
+
+
+** Diredory
+
+*** Go up dir by ~h~ and into dir or open file by ~l~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-dired-h-l-to-directory-navigating-local()
+    (define-key evil-normal-state-local-map (kbd "h") 'dired-up-directory)
+    (define-key evil-normal-state-local-map (kbd "l") 'dired-find-file)
+  )
+#+END_SRC
+
+
+*** Open file to other window by ~o~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-dired-o-to-open-file-local()
+    (define-key evil-normal-state-local-map (kbd "o") 'dired-find-file-other-window)
+  )
+#+END_SRC
+
+
+*** Jump back to ~dired buffer~ corresponding to current buffer by ~C-c j~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                ))
+      (define-key map (kbd "C-c j") 'dired-jump)
+  )
+#+END_SRC
+
+
+*** Quickly go to particular directories by ~gX~
+
+- ~gh~: Go home       =~/=
+- ~gb~: Go backup     =~/my-shell/backup=
+- ~gc~: Go c          =~/c=
+- ~gd~: Go downloads  =~/Downloads=
+- ~ge~: Go Emacs      =~/.config/emacs=
+- ~gp~: Go Photos     =~/Photos=
+- ~gr~: Go Rust       =~/rust=
+- ~gt~: Go temp       =~/temp=
+- ~gz~: Go zig        =~/zig=
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-goto-home-directory()
+     (interactive)
+     (dired "~/")
+  )
+  (defun my-goto-shell-backup-directory()
+     (interactive)
+     (dired "~/my-shell/backup")
+  )
+  (defun my-goto-c-directory()
+     (interactive)
+     (dired "~/c")
+  )
+  (defun my-goto-emacs-directory()
+     (interactive)
+     (dired "~/.config/emacs")
+  )
+  (defun my-goto-downloads-directory()
+     (interactive)
+     (dired "~/Downloads")
+  )
+  (defun my-goto-rust-directory()
+     (interactive)
+     (dired "~/rust")
+  )
+  (defun my-goto-zig-directory()
+     (interactive)
+     (dired "~/zig")
+  )
+  (defun my-goto-temp-directory()
+     (interactive)
+     (dired "~/temp")
+  )
+  (defun my-goto-photo-directory()
+     (interactive)
+     (dired "~/Photos")
+  )
+
+  (defun my-dired-custom-go-to-local()
+    (define-key evil-normal-state-local-map (kbd "gh") 'my-goto-home-directory)
+    (define-key evil-normal-state-local-map (kbd "gb") 'my-goto-shell-backup-directory)
+    (define-key evil-normal-state-local-map (kbd "gd") 'my-goto-downloads-directory)
+    (define-key evil-normal-state-local-map (kbd "gc") 'my-goto-c-directory)
+    (define-key evil-normal-state-local-map (kbd "ge") 'my-goto-emacs-directory)
+    (define-key evil-normal-state-local-map (kbd "gp") 'my-goto-photo-directory)
+    (define-key evil-normal-state-local-map (kbd "gr") 'my-goto-rust-directory)
+    (define-key evil-normal-state-local-map (kbd "gt") 'my-goto-temp-directory)
+    (define-key evil-normal-state-local-map (kbd "gz") 'my-goto-zig-directory)
+  )
+#+END_SRC
+
+
+*** Toggle hidden files by ~<leader>h~
+
+Before this can work, you have to make sure that you have the following settings to show hidden files by default:
+
+~(setq dired-listing-switches "-lhta")~
+
+#+BEGIN_SRC emacs-lisp
+  (setq dired-omit-files "^\\...+$")
+
+  (defun my-dired-toggle-hidden-files-local()
+    (define-key evil-normal-state-local-map (kbd "SPC h") 'dired-omit-mode)
+    (define-key evil-normal-state-local-map (kbd "C-c h") 'dired-omit-mode)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC h" "Hidden mode")
+            (which-key-add-key-based-replacements "C-c h" "Hidden mode")
+        ))
+  )
+#+END_SRC
+
+
+*** Modify the READ-ONLY buffer by ~<leader>m~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-dired-toggle-read-only-local()
+    (define-key evil-normal-state-local-map (kbd "SPC m") 'dired-toggle-read-only)
+    (define-key evil-normal-state-local-map (kbd "C-c m") 'dired-toggle-read-only)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC m" "Modify mode")
+            (which-key-add-key-based-replacements "C-c m" "Modify mode")
+        ))
+  )
+#+END_SRC
+
+After going into the =wdired-change-to-wdired-mode=, here are the default keybindgins to accept or discard changes:
+
++ ~C-c C-c:~ Accept changes
++ ~C-c C-k:~ Discard changes
+
+
+*** Yank ful path by ~<leader>yp~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-dired-yank-full-path ()
+     (interactive)
+     (dired-copy-filename-as-kill 0)
+  )
+
+  (defun my-dired-yank-full-path-local()
+    (define-key evil-normal-state-local-map (kbd "SPC y p") 'my-dired-yank-full-path)
+    (define-key evil-normal-state-local-map (kbd "C-c y p") 'my-dired-yank-full-path)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC y" "Yank")
+            (which-key-add-key-based-replacements "C-c y" "Yank")
+            (which-key-add-key-based-replacements "SPC y p" "Yank full path")
+            (which-key-add-key-based-replacements "C-c y p" "Yank full path")
+        ))
+  )
+#+END_SRC
+
+
+*** Bind all bindings above in the 'dired-mode-hook' once
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-dired-customized-bindings()
+     (my-dired-h-l-to-directory-navigating-local)
+     (my-dired-o-to-open-file-local)
+     (my-dired-custom-go-to-local)
+     (my-dired-toggle-hidden-files-local)
+     (my-dired-toggle-read-only-local)
+     (my-dired-yank-full-path-local)
+
+     ;;
+     ;; Rebind all SPC related bindings to local buffer scope
+     ;;
+     (rebind-general-leader-x-bindings-to-local-buffer-scope)
+  )
+
+  (add-hook 'dired-mode-hook #'my-dired-customized-bindings)
+#+END_SRC
+
+
+
+** Image Diredory
+
+*** Fit the rendered image to window by ~=~
+
+#+BEGIN_SRC emacs-lisp
+  (evil-define-key '(normal) image-mode-map (kbd "=") 'image-transform-fit-to-window)
+#+END_SRC
+
+
+** LSP
+
+*** Go to next or previous error by ~C-n~ or ~C-p~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-error-jumping-in-local-buffer()
+    (define-key evil-normal-state-local-map (kbd "C-n") 'flymake-goto-next-error)
+    (define-key evil-normal-state-local-map (kbd "C-p") 'flymake-goto-prev-error)
+
+    (message ">>> [ my-lsp-error-jumping-in-local-buffer ] Set 'C-n' and 'C-p' to local buffer")
+  )
+#+END_SRC
+
+
+*** Format buffer by ~<leader>ff~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-format-buffer()
+    ;;(define-key evil-normal-state-local-map (kbd "<leader>ff") 'lsp-format-buffer)
+
+    (define-key evil-normal-state-local-map (kbd "SPC f f") 'eglot-format-buffer)
+
+    (message ">>> [ my-lsp-format-buffer ] Set '<leader>ff' to local buffer")
+  )
+#+END_SRC
+
+
+*** Rename by ~<leader>rn~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-rename-buffer()
+    ;; (define-key evil-normal-state-local-map (kbd "<leader>rn") 'lsp-rename)
+
+    (define-key evil-normal-state-local-map (kbd "SPC r n") 'eglot-rename)
+
+    (message ">>> [ my-lsp-rename-buffer ] Set '<leader>rn' to local buffer")
+  )
+#+END_SRC
+
+
+*** Show error (diagnostics buffer) ~<leader>se~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-show-error()
+    (define-key evil-normal-state-local-map (kbd "SPC s e") 'flymake-show-buffer-diagnostics)
+
+    (message ">>> [ my-lsp-show-error ] Set '<leader>se' to local buffer")
+  )
+#+END_SRC
+
+
+*** Run code action ~<leader>ca~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-code-action()
+    ;; (define-key evil-normal-state-local-map (kbd "<leader>ca") 'lsp-execute-code-action)
+    ;; (define-key evil-normal-state-local-map (kbd "C-c c a") 'lsp-execute-code-action)
+
+    (define-key evil-normal-state-local-map (kbd "SPC c a") 'eglot-code-action-quickfix)
+
+    (message ">>> [ my-lsp-code-action ] Set '<leader>ca' to local buffer")
+  )
+#+END_SRC
+
+
+*** Toggle comment by ~<leader>/~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-toggle-comment()
+    (define-key evil-visual-state-local-map (kbd "SPC /") 'evilnc-comment-or-uncomment-lines)
+
+    (message ">>> [ my-lsp-toggle-comment ] Set '<leader>/' to local buffer")
+  )
+#+END_SRC
+
+
+*** Toggle inlay hints by ~<leader>th~
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-toggle-inlay-hint()
+    (interactive)
+    (message ">>>>> called.")
+    (if eglot-inlay-hints-mode
+        (progn
+            (message ">>> [ my-lsp-toggle-inlay-hint ] Inlay hint is 'on', turn it 'off' now.")
+            (eglot-inlay-hints-mode -1)
+        )
+        (progn
+            (message ">>> [ my-lsp-toggle-inlay-hint ] Inlay hint is 'off', turn it 'on' now.")
+            (eglot-inlay-hints-mode 1)
+        )
+    )
+  )
+
+  (defun my-setup-toggle-inlay-hint()
+      (define-key evil-normal-state-local-map (kbd "SPC t h") 'my-lsp-toggle-inlay-hint)
+      (message ">>> [ my-setup-toggle-inlay-hint ] Set '<leader>th' to local buffer")
+  )
+#+END_SRC
+
+
+*** Bind all bindings above in one shot
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-lsp-bindings()
+     (my-lsp-error-jumping-in-local-buffer)
+     (my-lsp-format-buffer)
+     (my-lsp-rename-buffer)
+     (my-lsp-show-error)
+     (my-lsp-code-action)
+     (my-lsp-toggle-comment)
+     (my-setup-toggle-inlay-hint)
+
+     (if my-enable-which-key-customized-description
+         (progn
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC f" "Format")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC f f" "Format")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC r" "Rename")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC r n" "Rename")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC s" "Show errors")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC s e" "Show errors")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC c" "Code actions")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC c a" "Code actions")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC /" "Comment")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC t" "Toggle")
+             (which-key-add-major-mode-key-based-replacements major-mode "SPC t h" "Toggle hints")
+         ))
+  )
+
+  (dolist (hook '(c-mode-hook
+                  c-ts-mode-hook
+                  c++-mode-hook
+                  c++-ts-mode-hook
+                  zig-mode-hook
+                  zig-ts-mode-hook
+                  rust-mode-hook
+                  rust-ts-mode-hook
+                  typescript-mode-hook
+                  python-ts-mode-hook
+                  ))
+     (add-hook hook #'my-lsp-bindings)
+  )
+#+END_SRC
+
+
+** Embark
+
+*** Run ~embark-act~ by ~C-e~
+
+#+BEGIN_SRC emacs-lisp
+  ;; (define-key global-map (kbd "C-,") 'embark-act)
+  (define-key global-map (kbd "C-e") 'embark-act)
+#+END_SRC
+
+
+For the =GUI= version:
+
+Because of I use =vertico-posframe= in =GUI= mode, but =Embark= doesn't work well with popup. That's why if you press =C-e=, then =Embark menu= shows under the popup which means you can't see part of it. In that situation, you can press =C-h=, then the =Embark help menu= will re-rendered inside the popup!!!
+
+
 ** =org-download= for copy images from anywhere
 #+BEGIN_SRC emacs-lisp
   (use-package org-download
@@ -4871,31 +4856,6 @@ Take the =org-level-1= as an example:
       (add-hook 'dired-mode-hook 'org-download-enable)
   )
 #+END_SRC
-
-
-** =Denote= notetaker
- #+BEGIN_SRC emacs-lisp
-      (use-package denote
-        :commands (denote denote-signature denote-subdirectory denote-rename-file-using-front-matter
-                          denote-keywords-prompt
-                          denote-rename-file
-                          denote-link-or-create)
-        :hook (dired-mode . denote-dired-mode-in-directories)
-        :config
-        (setq denote-directory (expand-file-name "~/denote"))
-
-        (setq denote-directory (expand-file-name "~/sbzi/personal/denote/")
-              denote-known-keywords '("dev" "liter" "books" "dailies" "personal")
-              denote-infer-keywords t
-              denote-sort-keywords t
-              denote-allow-multi-word-keywords t
-              denote-date-prompt-use-org-read-date t
-              denote-link-fontify-backlinks t
-              denote-front-matter-date-format 'org-timestamp
-              denote-prompts '(title keywords)))
- #+END_SRC
-
- 
 
 
 ** pdf
@@ -4909,13 +4869,6 @@ Take the =org-level-1= as an example:
     :config
     (pdf-tools-install t nil t nil))
 #+END_SRC
- 
-#+BEGIN_SRC emacs-lisp
-;;  (add-to-list 'load-path "~/.config/emacs/site-lisp/emacs-application-framework/")
-;;  (require 'eaf)
-;;  (require 'eaf-pdf-viewer)
-#+END_SRC
-
 
 
 ** =org-capture=
@@ -4955,83 +4908,30 @@ Take the =org-level-1= as an example:
 #+END_SRC
  
 
-** Colemak
 
-*** Open EShell =<leader>s=
-
-#+BEGIN_SRC emacs-lisp
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-      (define-key map (kbd "SPC s s") 'nil)
-      (define-key map (kbd "C-c s s") 'nil)
-  )
-
-  (defun my-open-eshell()
-     (interactive)
-     (split-window-below)
-     (windmove-down)
-     (eshell)
-  )
-
-  (dolist (map (list
-                evil-motion-state-map
-                ))
-      (define-key map (kbd "SPC s s") 'my-open-eshell)
-      (define-key map (kbd "C-c s s") 'my-open-eshell)
-
-      (if my-enable-which-key-customized-description
-          (progn
-              (which-key-add-key-based-replacements "SPC s s" "Shell")
-              (which-key-add-key-based-replacements "C-c s s" "Shell")
-          ))
-  )
-#+END_SRC
-
-*** Dired
-
-**** Open dired by =<leader>od=
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-open-sbzi-folder()
-    (interactive)
-    (dired "~/sbzi")
-  )
-
-  ;;
-  ;; Bind
-  ;;
-  (dolist (map (list
-                evil-motion-state-map
-                evil-normal-state-map
-                ))
-      (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
-      (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
-  )
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC o d" "directory")
-          (which-key-add-key-based-replacements "C-C o d" "directory")
-      ))
-#+END_SRC
-
-
-*** Embark
-
-**** Run ~embark-act~ by =C-,=
-
-#+BEGIN_SRC emacs-lisp
-  (define-key global-map (kbd "C-,") 'embark-act)
-#+END_SRC
-
-
-
-
-*** =denote=
+** =denote= notetaker
  #+BEGIN_SRC emacs-lisp
+      (use-package denote
+        :commands (denote denote-signature denote-subdirectory denote-rename-file-using-front-matter
+                          denote-keywords-prompt
+                          denote-rename-file
+                          denote-link-or-create)
+        :hook (dired-mode . denote-dired-mode-in-directories)
+        :config
+        (setq denote-directory (expand-file-name "~/denote"))
 
+        (setq denote-directory (expand-file-name "~/sbzi/personal/denote/")
+              denote-known-keywords '("dev" "liter" "books" "dailies" "personal")
+              denote-infer-keywords t
+              denote-sort-keywords t
+              denote-allow-multi-word-keywords t
+              denote-date-prompt-use-org-read-date t
+              denote-link-fontify-backlinks t
+              denote-front-matter-date-format 'org-timestamp
+              denote-prompts '(title keywords)))
+ #+END_SRC
+
+ #+BEGIN_SRC emacs-lisp
    (defun my-denote-local()
        (message ">>> [ my-denote-local ] ")
 
@@ -5082,1646 +4982,4 @@ Take the =org-level-1= as an example:
 
 
 
-** =python=
 
-#+BEGIN_SRC emacs-lisp :tangle no
-   ;; (use-package lsp-pyright
-   ;; :ensure t
-   ;; :config
-   ;; :hook
-   ;; (python-mode . (lambda ()
-   ;;                 (require 'lsp-pyright)
-   ;;                 (lsp-deferred))))
- ;; (use-package python-mode
- ;;   :ensure nil
- ;;   :after flycheck
- ;;   :mode "\\.py\\'"
- ;;   :custom
- ;;   (python-indent-offset 4)
- ;;   (flycheck-python-pycompile-executable "python3")
- ;;   (python-shell-interpreter "python3"))
-
- ;; (use-package lsp-pyright
- ;; :hook (python-mode . (lambda () (require 'lsp-pyright)))
- ;; :custom
- ;; (lsp-pyright-multi-root nil))
-#+END_SRC
-
-
-
-* 检测系统与环境
-*** general(key)
-#+BEGIN_SRC emacs-lisp
-  (use-package general
-  :defer 1
-  :config
-  (general-evil-setup t)
-
-  (general-create-definer
-    my/leader-def
-    :states '(normal visual insert emacs)
-    :prefix "SPC"
-    :global-prefix "M-SPC"
-    :keymap 'override)
-(general-create-definer
-my/insert-leader-def
-:states '(insert emacs)
-:global-prefix "M-SPC"
-:keymap 'override)
-  (my/insert-leader-def
-    "SPC" '(cycle-spacing :which-key "cycle spacing"))) 
-#+END_SRC
-*** Straight
-#+BEGIN_SRC emacs-lisp
-(defvar bootstrap-version)
-;; 修复 Emacs 29 修改了 native-compile 相关变量导致的 bug
-(unless (version<= emacs-version "28.2")
-  (setq straight-repository-branch "develop"))
-(setq straight-check-for-modifications '(check-on-save find-when-checking))
-
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-#+END_SRC
-* 历史记录与自动保存
-** 命令历史记录
-#+begin_src elisp
-  (use-package savehist
-    :defer 1
-    :config (savehist-mode))
-#+end_src
-** 保存光标位置
-#+begin_src elisp
-  (use-package saveplace
-    :defer 1
-    :config
-    (save-place-mode 1))
-#+end_src
-** 自动保存文件
-#+begin_src elisp
-  (use-package super-save
-    :defer 1
-    :custom
-    (super-save-auto-save-when-idle t)
-    :config
-    (super-save-mode +1))
-#+end_src
-** 自动更新 buffer
-#+begin_src elisp
-  (global-auto-revert-mode 1)
-  (setq global-auto-revert-non-file-buffers nil)
-#+end_src
-* 编码, 字体及输入法
-** 编码
-#+begin_src elisp
-  (prefer-coding-system 'utf-8) ; 默认编码
-  (setq-default buffer-file-coding-system 'utf-8-unix) ; 默认 EOL 设置
-#+end_src
-** 字体大小变量
-#+begin_src elisp
-  (defvar my/font-height 130)
-  (defvar my/latex-preview-scale 1.3)
-
-  (defun my/set-font-size ()
-    (interactive) 
-    (cond (my/is-termux
-           (setq my/font-height 125
-                 my/latex-preview-scale 1.25))
-          (t (pcase (display-pixel-height)
-               ((pred (> 999))
-                (setq my/font-height 130
-                      my/latex-preview-scale 1.3))
-               ((pred (> 1300))
-                (setq my/font-height 160
-                      my/latex-preview-scale 1.6))
-               (_ (setq my/font-height 180
-                        my/latex-preview-scale 1.8))))))
-  (my/set-font-size)
-#+end_src
-** 字体设置
-#+begin_src elisp
-  (defun my/set-font ()
-    (interactive)
-    (setq my/default-font "Fira Code") ; fonts-firacode (apt) 或 ttf-fira-code (pacman)
-    (setq my/math-font "Latin Modern Math") ; texlive 字体
-    (setq my/chinese-font
-          (cond (my/is-termux "Roboto")
-                (my/is-manjaro "AR PL UKai CN") ; ttf-arphic-ukai (pacman)
-                (my/is-linux "AR PL KaitiM GB") ; fonts-arphic-gkai00mp (apt)
-                (my/is-windows "Kaiti")
-                (t "Fira code")))
-    (setq my/variable-pitch-font
-          (cond 
-           (my/is-linux "Iosevka Aile") 
-           (my/is-windows  "Segoe Print")
-           (t "Fira Code")))
-    (setq my/fixed-pitch-font "JetBrains Mono") ; fonts-jetbrains-mono (apt) 或 ttf-jetbrains-mono (pacman)
-
-    (if (find-font (font-spec :name my/default-font))
-        (set-face-attribute 'default nil :font my/default-font :height my/font-height)  ; 默认字体及字号.
-      (message (format "cannot find %s for the default font" my/default-font))
-      (set-face-attribute 'default nil :height my/font-height)) ; 找不到字体只设置字号
-
-    (if (find-font (font-spec :name my/variable-pitch-font))
-        (set-face-attribute 'variable-pitch nil :font my/variable-pitch-font :height my/font-height) ; 比例字体 
-      (message (format "cannot find %s for the variable pitch font"  my/variable-pitch-font)))
-
-    (if (find-font (font-spec :name my/fixed-pitch-font))
-        (set-face-attribute 'fixed-pitch nil :font my/fixed-pitch-font :height my/font-height) ; 等宽字体 
-      (message (format "cannot find %s for the fixed pitch font"  my/fixed-pitch-font)))
-
-    (unless my/is-terminal ; 非图形界面 set-fontset-font
-      (if (find-font (font-spec :name my/math-font))
-          (set-fontset-font "fontset-default" 'mathematical my/math-font) ; 数学符号默认字体
-        (message (format "cannot find %s for the math font"  my/math-font)))
-      (if (find-font (font-spec :name my/chinese-font))
-          (set-fontset-font "fontset-default" 'han my/chinese-font) ; 中文默认字体
-        (message (format "cannot find %s for the chinese font"  my/chinese-font))))
-
-    (setq inhibit-compacting-font-caches t) ; 汉字及 Unicode 显示问题
-    (setq auto-window-vscroll nil)) ; 不根据行高做上下滚动调整 
-#+end_src
-** 中文输入法 (=pyim=)
-*** =pyim= 自定义探针函数
-#+begin_src elisp
-  (defun my/pyim-probe-latex-mode ()
-   "latex-mode 中的数学环境自动切换到英文输入."
-   (and (eq major-mode 'latex-mode)
-        (if (fboundp 'texmathp) (texmathp) nil)))
-#+end_src
-*** =pyim= 设置
-#+begin_src elisp
-      (use-package popup) ; 选词框
-      (use-package pyim-wbdict
-    :defer 5) ; 五笔输入法
-      (use-package pyim 
-    :defer 5
-        :after pyim-wbdict
-        :bind
-        ("M-j" . 'pyim-convert-string-at-point)
-        :config
-        (setq default-input-method "pyim")
-        (setq pyim-default-scheme 'wubi)
-        (pyim-wbdict-v86-enable)
-        (require 'popup)
-        (setq pyim-page-tooltip '(minibuffer)) ; 需要候选框可以使用 popup, 但是会影响速度
-        (setq-default pyim-punctuation-translate-p '(no)); 总是输入半角标点. 
-        (setq-default pyim-english-input-switch-functions
-                    '(pyim-probe-auto-english
-                      pyim-probe-isearch-mode
-                      pyim-probe-program-mode
-                      pyim-probe-org-structure-template
-                      pyim-probe-org-latex-mode
-                      my/pyim-probe-latex-mode))
-        (setq-default pyim-punctuation-half-width-functions
-                    '(pyim-probe-punctuation-line-beginning
-                      pyim-probe-punctuation-after-punctuation)))
-#+end_src
-* 界面
-** 窗口外观
-#+begin_src elisp
-  (setq default-frame-alist '((fullscreen . maximized))) ; 全屏
-  ;; (set-frame-parameter nil 'undecorated t)
-  ;; (add-to-list 'default-frame-alist '(drag-internal-border . 1))
-  ;; (add-to-list 'default-frame-alist '(internal-border-width . 5))
-  (defun my/set-window ()
-  (interactive)
-    (unless my/is-termux ; 终端下以下设置不可用
-      (tool-bar-mode 0) ; 禁用工具栏
-      (scroll-bar-mode 0)) ; 禁用滚动条
-    (menu-bar-mode 0) ; 禁用菜单栏
-    )
-#+end_src
-** 折叠
-#+begin_src elisp
-(setq my/enable-folding (not my/is-terminal))
-#+end_src
-* 窗口管理
-** 默认打开新窗口方式
-#+begin_src elisp
-  (setq split-height-threshold nil) ; 默认左右分屏
-  (setq display-buffer-base-action
-        '((display-buffer-reuse-window ; 针对 *eshell* 等重名 buffer
-           display-buffer-reuse-mode-window ; 默认使用当前窗口的模式
-           display-buffer-in-previous-window ; 在用过的窗口中打开
-           display-buffer-same-window))) ; 在当前窗口中打开
-#+end_src
-** 弹出窗口管理 (=popper=)
-#+begin_src elisp
-  (setq my/right-popper-buffer-regexp "\\(\\*scratch\\|\\*draft\\|\\*help\\|\\*Message\\|\\*Customize\\)") ; 在右侧打开的临时窗口
-  (setq my/bottom-popper-buffer-regexp "\\(\^\\*shell\\|\*compilation\\|\\*Backtrace\\|\\*Warnings\\|output\\*$\\)") ; 在下方打开的临时窗口
-
-  (use-package popper
-    :defer 2
-    :after perspective ; use perspective to group
-    ;; 修正了 popper-echo.el 中一个 bug. 若不同时使用 echo-mode 与 group-function 也可以使用原有版本(删去下一行)
-    :straight (:local-repo "../../lisp/popper/" :type nil) 
-    :bind (("C-M-'" . popper-toggle-latest)
-           ("M-'" .  popper-cycle)
-           ("C-M-;" . popper-toggle-type))
-    :custom
-    (popper-reference-buffers `(,my/bottom-popper-buffer-regexp ,my/right-popper-buffer-regexp))
-    (popper-group-function #'popper-group-by-perspective) ; 用 perspective 分类弹出窗口
-    (popper-display-control nil) ; 用 display-buffer-list 管理弹出窗口行为
-    :config
-    ;; 在 termux 中不能使用 C-', 在 EXWM 窗口中不能使用 C-M. 这里定义备用快捷键
-    (my/leader-def
-      "pl"  'popper-toggle-latest 
-      "pt"  'popper-toggle-type 
-      "pc"  'popper-cycle)
-    (popper-mode +1)
-    (popper-echo-mode +1))
-#+end_src
-** 新窗口显示管理
-设置 =display-buffer-alist= 变量
-*** 弹出窗口管理与 =dsiplay-buffer-alist= 初始化
-#+begin_src elisp
-  (setq window-side-slots '(0 0 2 2)) ; 左上右下最大临时窗口数
-  (setq display-buffer-alist
-        `((,my/bottom-popper-buffer-regexp ; 下侧打开的窗口
-           (display-buffer-in-previous-window display-buffer-reuse-mode-window display-buffer-in-side-window)
-           (window-height . 0.2)
-           (window-min-height . 7)
-           (side . bottom)
-           (reusable-frames . visible))
-          (,my/right-popper-buffer-regexp ; 右侧打开的窗口
-           (display-buffer-reuse-mode-window display-buffer-in-side-window)
-           (reusable-frames . visible)
-           (side . right)
-           (direction . rightmost)
-           (window-width . 0.33))))
- #+end_src
-*** LaTeX 相关窗口管理 (=pdf= 与 =tex=)
-#+begin_src elisp
-  (add-to-list 'display-buffer-alist '(".*pdf$" ; 默认右侧打开 pdf
-                                       (display-buffer-in-direction
-                                        display-buffer-in-previous-window)
-                                       (direction . rightmost)))
-  (add-to-list 'display-buffer-alist '(".*tex$" (display-buffer-in-previous-window))) ; 默认在原来的窗口中打开 tex 文件
-#+end_src
-*** =org-roam= 相关窗口管理
-#+begin_src elisp
-  ;; org-roam 默认在右侧打开
-  (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
-                 (display-buffer-in-direction)
-                 (direction . right)
-                 (window-width . 0.33)
-                 (window-height . fit-window-to-buffer)))
-#+end_src
-*** =org-capture= 相关窗口管理
-#+begin_src elisp
-  ;; org-roam capture 与 *Org-Select* 默认右侧打开
-  (add-to-list 'display-buffer-alist '("\\(^CAPTURE.*\.org$\\|\\*Org.*Select\\*$\\)"
-                                       (display-buffer-in-side-window)
-                                       (side . right)
-                                       (slot . 0)
-                                       (window-width . 60)))
-#+end_src
-** 快速窗口切换
-#+begin_src elisp
-  (use-package ace-window
-    :defer 2
-    :bind ("M-o" . ace-window)
-    :custom
-    (aw-scope 'global)
-    (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-    :config
-    (ace-window-display-mode 1))
-#+end_src
-** 窗口布局历史记录 (=Winner mode=)
-#+begin_src elisp
-  (use-package winner
-    :defer 2
-    :config
-    (winner-mode))
-#+end_src
-
-* 补全 (minibuffer)
-** Vertico
-#+begin_src elisp
-  (defun my/minibuffer-backward-kill (arg)
-    "When minibuffer is completing a file name delete up to parent
-    folder, otherwise delete a word"
-    (interactive "p")
-    (if minibuffer-completing-file-name
-        ;; Borrowed from https://github.com/raxod502/selectrum/issues/498#issuecomment-803283608
-        (if (string-match-p "/." (minibuffer-contents))
-            (zap-up-to-char (- arg) ?/)
-          (delete-minibuffer-contents))
-      (delete-word (- arg))))
-  (setq completion-ignore-case 't) ; minibuffer 补全忽略大小写
-  (use-package vertico
-    :defer 1
-    :custom
-    (verticle-cycle t)
-    :config
-    (vertico-mode)
-    :bind (:map minibuffer-local-map
-                ("M-h" .  my/minibuffer-backward-kill)))
-#+end_src
-** 额外补全信息 (Marginalia)
-#+begin_src elisp
-  (use-package marginalia
-    ;; Either bind `marginalia-cycle' globally or only in the minibuffer
-    :bind (("M-A" . marginalia-cycle)
-           :map minibuffer-local-map
-           ("M-A" . marginalia-cycle))
-    :defer 1
-    :config
-    (marginalia-mode))
-#+end_src
-** 乱序补全 (Orderless)
-#+begin_src elisp
-  (use-package orderless
-    :defer 1
-    :custom
-    (completion-styles '(orderless basic))
-    (completion-category-defaults nil)
-    (completion-category-overrides '((file (styles partial-completion)))))
-#+end_src
-* 帮助信息优化
-** 快捷键提示 (which-key)
-#+begin_src elisp
-  (use-package which-key
-    :defer 3
-    :custom (which-key-idle-delay 1)
-    :config (which-key-mode))
-#+end_src
-** 帮助界面优化 (helpful)
-#+begin_src elisp
-  (use-package helpful
-    :defer 3
-    :bind ; 这里更好的选择可能是用 [remap]
-    (([remap describe-function] . #'helpful-callable)
-     ([remap describe-variable] . #'helpful-variable)
-     ([remap describe-key] . #'helpful-key)
-     ([remap describe-command] . #'helpful-command)
-     ([remap describe-symbol] . #'helpful-symbol)
-     ("C-h C-d" . #'helpful-at-point)
-     ("C-h F" . #'helpful-function))
-    :config
-    (add-hook 'helpful-mode-hook 'visual-line-mode)) ; 侧窗显示的帮助界面需要自动换行
-#+end_src
-** 当前按键显示 (keycast)
-#+begin_src elisp
-  (use-package keycast
-    :demand t
-    :after doom-modeline
-    :config
-    (keycast-header-line-mode 1)) ; 默认在 header 显示
-#+end_src
-* 文本编辑
-** 彩色括号 (=rainbow-delimiters=)
-#+begin_src elisp
-  (use-package rainbow-delimiters
-    :hook prog-mode) ; 在编程模式中启用
-#+end_src
-** prettify 设置
-#+begin_src elisp
-(setq prettify-symbols-unprettify-at-point my/enable-folding) ; 光标附近自动展开
-#+end_src
-** 文本补全 (company mode)
-#+begin_src elisp
-  (use-package company
-    :hook (org-mode LaTeX-mode prog-mode) ; 加载 company 的主模式
-    :custom
-    (company-minimum-prefix-length 3)
-    (company-idle-delay 0.3)
-    (company-tootip-idle-delay 0.5)
-    (company-tooltip-offset-display 'line)
-    (company-tooltip-align-annotation t)
-    (company-show-quick-access t)
-    (company-backends
-     '((company-capf :with company-dabbrev-code company-keywords)
-       (company-dabbrev)
-       (company-ispell)
-       (company-files)))
-    (company-dabbrev-ignore-case 'keep-prefix)
-    (company-transformers '(company-sort-by-occurrence company-sort-by-backend-importance))
-    (company-show-quick-access 'left)
-    :bind
-    (:map company-active-map 
-          ("M-/" . company-complete)
-          ("<tab>" . company-indent-or-complete-common))
-    :config
-    (set-face-attribute 'company-tooltip nil :inherit 'fixed-pitch))
-#+end_src
-
-** 跳转 (avy-jump)
-#+begin_src elisp
-  (use-package avy 
-    :demand 1
-  :after general
-    :config
-    (my/leader-def
-      "j" '(:ignore t :which-key "jump")
-      "jj" '(avy-goto-char :which-key "jump to char")
-      "jw" '(avy-goto-word-0 :which-key "jump to word")
-      "jl" '(avy-goto-line :which-key "jump to line")))
-#+end_src
-
-
-* 拼写检查
-** =ispell= 词典设置
-#+begin_src elisp
-  ;; 个人词典
-  (setq my/enchant-personal-dic-en "~/.config/enchant/en_US.dic")
-  (unless (file-exists-p my/enchant-personal-dic-en)
-    (setq my/enchant-personal-dic-en nil))
-  (setq ispell-personal-dictionary my/enchant-personal-dic-en)
-
-  ;; 主要用于 company-ispell 的拼写补全字典
-  (setq my/completion-dic-en "~/.config/english-word.txt") ; 主要用于 company-ispell
-  (unless (file-exists-p my/completion-dic-en)
-    (setq my/completion-dic-en nil))
-  (setq ispell-alternate-dictionary my/completion-dic-en
-        ispell-complete-word-dict my/completion-dic-en) 
-
-#+end_src
-** =flyspell=
-需要安装 =aspell= 或 =hunspell=. =Windows= 可通过 =msys2= 安装 =libenchant= 及相关字典
-#+begin_src elisp
-  
-  (use-package flyspell
-    :if (or my/is-windows)
-    :hook (LaTeX-mode org-mode))
-
-#+end_src
-** Jinx
-https://github.com/minad/jinx
-#+begin_src elisp
-  (unless my/is-windows ; windows 下 jinx 无法编译
-    (use-package jinx
-      :hook (emacs-startup . global-jinx-mode)
-      :bind ([remap ispell-word] . jinx-correct)
-      :config 
-      (add-to-list 'jinx-exclude-regexps '(t "\\cc"))) ; 拼写检查忽略中文
-    )
-#+end_src
-
-
-* 其它设置
-** Hydra
-#+begin_src elisp
-  (use-package hydra)
-#+end_src
-
-** 临时文件目录
-防止 =Windows= 用 =<user name>~1= 命名家目录, 修复一个 =preview-latex= 的 bug
-#+begin_src elisp
-  (if (eq system-type 'windows-nt)
-    (setq temporary-file-directory "~/AppData/Local/Temp/"))
-#+end_src
-** 安全的文件变量
-#+begin_src elisp
-  (setq safe-local-variable-values
-        '((code . utf-8)
-          (eval setq-local org-roam-db-location (file-truename "./org-roam.db")) ; 允许多个 org-roam 目录
-          (eval setq-local org-roam-directory (file-truename "./"))))
-#+end_src
-* LaTeX 设置
-** pdf-tools 设置
-#+begin_src elisp
-  (use-package pdf-tools
-        :straight (:host github :repo "vedang/pdf-tools"
-                         :branch "feature/emacs-26.3" ; 不使用最新版
-                         :build (:not native-compile)) ; 禁用本地化编译
-    :mode ("\\.pdf\\'" . pdf-view-mode) ; pdf 文件默认打开方式
-   :bind
-    (:map pdf-view-mode-map
-     ("j" . pdf-view-next-page-command)
-     ("k" . pdf-view-previous-page-command)
-     ("l" . pdf-view-scroll-up-or-next-page)
-     ("h" . pdf-view-scroll-down-or-previous-page)
-     ("G" . pdf-view-goto-page)
-     ("|" . pdf-view-fit-page-to-window)
-     ("<" . pdf-view-first-page)
-     ("<" . pdf-view-last-page)
-
-     :map pdf-history-minor-mode-map
-     ("B" . pdf-history-backward)
-     :map pdf-annot-minor-mode-map
-     ("C-a a" . pdf-annot-add-highlight-markup-annotation)
-     ("C-a s" . pdf-annot-add-squiggly-markup-annotation)
-     ("C-a u" . pdf-annot-add-underline-markup-annotation)
-     ("C-a d" . pdf-annot-delete))
-    :custom
-    (pdf-view-midnight-colors '("#000000" . "#9bCD9b")) ; 夜间模式设置绿色底色
-    :config
-    (require 'pdf-annot) ; 设置 pdf-annot-mimor-mode-map 必须
-    (require 'pdf-history) ; 设置 pdf-history-minor-mode-map 必须
-    (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window) ; 默认适应页宽
-    (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode) ; 默认夜间模式
-    (pdf-tools-install))
-#+end_src
-
-#+BEGIN_SRC emacs-lisp
-;;  (defun my-pdf-scroll-local()
-;;     (message ">>> [ my-pdf-scroll-local ] ")
-;;
-;;     ;;
-;;     ;; Rebind
-;;     ;;
-;;     (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
-;;     (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
-;;     (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
-;;     (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
-;;     (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
-;;     (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
-;;     (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
-;;
-;;     ;;
-;;     ;; Rebind all SPC related bindings to local buffer scope
-;;     ;;
-;;     (rebind-general-leader-x-bindings-to-local-buffer-scope)
-;;     (rebind-colemak-leader-x-bindings-to-local-buffer-scope)
-;;  )
-;;
-;;    (dolist (hook '(pdf-view-mode-hook
-;;                    ))
-;;    (add-hook hook #'my-pdf-scroll-local)
-;;    )
-#+END_SRC
-** cdlatex
-*** cdlatex 自定义变量
-**** 补全命令模板
-#+begin_src elisp
-  (defun my/set-cdlatex-command-alist ()
-      (setq cdlatex-command-alist
-            '(("eq" "insert pairs of \\[ \\]" "\\[ ? \\]" cdlatex-position-cursor nil t t)
-              ("exe" "Insert exercise" "\\begin{exercise}\n? \n\\end{exercise}" cdlatex-position-cursor nil t nil)
-              ("ons" "" "\\onslide<?>{ }" cdlatex-position-cursor nil t t)
-              ("prop" "insert proposition" "" cdlatex-environment ("proposition") t nil)
-              ("aali" "insert equation" "\\left\\{\\begin{aligned}\n? \n\\end{aligned}\\right." cdlatex-position-cursor nil nil t)
-              ("te" "insert text" "\\text{?}" cdlatex-position-cursor nil nil t)
-              ("st" "stackrel" "\\stackrel{?}{}" cdlatex-position-cursor nil nil t)
-              ("fra" "insert frame (for beamer)" "" cdlatex-environment ("frame") t nil)
-              ("lr<" "insert bra-ket" "\\langle ? \\rangle" cdlatex-position-cursor nil nil t)
-              ("spl" "insert split" "" cdlatex-environment ("split") nil t)
-              ("equ*" "insert unlabel equation" "" cdlatex-environment ("equation*") t nil)
-              ("ipite" "insert in paragraph itemize" "" cdlatex-environment ("inparaitem") t nil)
-              ("ipenu" "insert in paragraph enumerate" "" cdlatex-environment ("inparaenum") t nil)
-              ("des" "insert description" "" cdlatex-environment ("description") t nil)
-              ("lem" "insert lemma env" "" cdlatex-environment ("lemma") t nil)
-              ("thm" "insert theorem env" "" cdlatex-environment ("theorem") t nil)
-              ("pro" "insert proof env" "" cdlatex-environment ("proof") t nil)
-              ("def" "insert definition env" "" cdlatex-environment ("definition") t nil)
-              ("liml" "insert \\lim\\limits_{}" "\\lim\\limits_{?}" cdlatex-position-cursor nil nil t)
-              ("prodl" "insert \\prod\\limits_{}^{}" " \\prod\\limits_{?}^{}" cdlatex-position-cursor nil nil t)
-              ("cupl" "insert \\bigcup\\limits_{}^{}" "\\bigcup\\limits_{?}^{}" cdlatex-position-cursor nil nil t)
-              ("capl" "insert \\bigcap\\limits_{}^{}" "\\bigcap\\limits_{?}^{}" cdlatex-position-cursor nil nil t)
-              ("big(" "insert big ()" "\\big( ? \\big" cdlatex-position-cursor nil nil t)
-              ("Big(" "insert Big ()" "\\Big( ? \\Big" cdlatex-position-cursor nil nil t)
-              ("bigg(" "insert bigg()" "\\bigg( ? \\bigg" cdlatex-position-cursor nil nil t)
-              ("big|" "insert big|" "\\big| ? \\big|" cdlatex-position-cursor nil nil t)
-              ("Big|" "insert Big|" "\\Big| ? \\Big|" cdlatex-position-cursor nil nil t)
-              ("bigg|" "insert bigg|" "\\bigg| ? \\bigg|" cdlatex-position-cursor nil nil t)
-              ("Big\\|" "insert Big \\|" "\\Big\\| ? \\Big\\|" cdlatex-position-cursor nil nil t)
-              ("bigg\\|" "insert bigg\\|" "\\bigg\\| ? \\bigg\\|" cdlatex-position-cursor nil nil t)
-              ("case" "insert cases" "\\begin{cases}\n? & \\\\\n &\n\\end{cases}" cdlatex-position-cursor nil nil t)
-              ("big\\|" "insert big \\|" "\\big\\| ? \\big\\|" cdlatex-position-cursor nil nil t)
-              ("se" "insert \\{\\}" "\\{ ? \\}" cdlatex-position-cursor nil nil t)
-              ("big{" "insert big {}" "\\big\\{ ? \\big\\" cdlatex-position-cursor nil nil t)
-              ("big[" "insert big []" "\\big[ ? \\big" cdlatex-position-cursor nil nil t)
-              ("Big{" "insert Big{}" "\\Big\\{ ? \\Big\\" cdlatex-position-cursor nil nil t)
-              ("bigg{" "insert bigg{}" "\\bigg\\{ ? \\bigg\\" cdlatex-position-cursor nil nil t)
-              ("Big[" "insert Big[" "\\Big[ ? \\Big" cdlatex-position-cursor nil nil t)
-              ("bigg[" "insert bigg[" "\\bigg[ ? \\bigg" cdlatex-position-cursor nil nil t)
-              ("pa" "insert pause" "\\pause" ignore nil t nil)
-              ("enu*" "insert enu" "\\begin{enumerate}\n\\item ?\n\\end{enumerate}" cdlatex-position-cursor nil t nil)
-              ("it" "insert \\item" "\\item?" cdlatex-position-cursor nil t nil))))
-#+end_src
-**** 环境模板
-#+begin_src elisp 
-  (defun my/set-cdlatex-env-alist ()
-      (setq cdlatex-env-alist
-            '(("equation*" "\\begin{equation*}\n? \n\\end{equation*}" nil)
-              ("frame" "\\begin{frame}\n\\frametitle{?}\n\n\\end{frame}" nil)
-              ("inparaitem" "\\begin{inparaitem}\n\\item ?\n\\end{inparaitem}" "\\item ?")
-              ("enumerate" "\\begin{enumerate}[?]\n\\item \n\\end{enumerate}" "\\item ?")
-              ("inparaenum" "\\begin{inparaenum}\n\\item ? \n\\end{inparaenum}" "\\item ?")
-              ("theorem" "\\begin{theorem}\n\\label{thm:?}\n\n\\end{theorem}" nil)
-              ("lemma" "\\begin{lemma}\n\\label{lem:?}\n\n\\end{lemma}" nil)
-              ("proof" "\\begin{proof}?\n\n\\end{proof}" nil)
-              ("definition" "\\begin{definition}\n\\label{def:?}\n\n\\end{definition}" nil)
-              ("proposition" "\\begin{proposition}\n\n\\end{proposition}" nil)
-              ("exercise" "\\begin{exercise}[?]\n\n\\end{exercise}" nil))))
-#+end_src
-**** 数学字体修饰设置
-#+begin_src elisp
-  (defun my/set-cdlatex-math-modify-alist ()
-      (setq cdlatex-math-modify-alist
-            '((?t "\\mathbb" "" t nil nil))))
-#+end_src
-**** 数学符号
-#+begin_src elisp
-  (defun my/set-cdlatex-math-symbol-alist ()
-        (setq cdlatex-math-symbol-alist
-              '((?0 ("\\varnothing" "\\emptyset"))
-                (?1 ("\\ONE" "\\one"))
-                (?. ("\\cdot" "\\circ"))
-                (?v ("\\vee" "\\bigvee"))
-                (?& ("\\wedge" "\\bigwedge"))
-                (?9 ("\\cap" "\\bigcap"))
-                (?+ ("\\cup" "\\bigcup"))
-                (?- ("\\rightharpoonup" "\\hookrightarrow" "\\circlearrowleft"))
-                (?= ("\\equiv" "\\Leftrightarrow" "\\Longleftrightarrow"))
-                (?~ ("\\sim" "\\approx" "\\propto"))
-                (?7 ("\\otimes" "\\bigotimes"))
-                (?6 ("\\oplus" "\\bigoplus"))
-                (?L ("\\Lambda" "\\lim_{?}^{}" "\\lim\\limits_{?}^{}"))
-                (?* ("\\times" "\\prod"))
-                (?e ("\\eps" "\\epsilon" "\\exp\\Big( ? \\Big)"))
-                (?> ("\\mapsto" "\\longrightarrow" "\\rightrightarrows"))
-                (?< ("\\preceq" "\\leftarrow" "\\longleftarrow"))
-                (?| ("\\parallel" "\\perp"))
-                (?S ("\\Sigma" "\\sum_{?}^{}"))
-                (?{ ("\\subset" "\\subseteq"))
-                (?} ("\\supset" "\\supseteq")))))
- #+end_src
-*** use-package 模块 
-#+begin_src elisp
-  (use-package cdlatex
-    :straight (:host github :repo "cdominik/cdlatex" )
-    :defer 10
-    :after tex ; cdlatex 需要 auctex 中的 texmathp.el
-    :config
-    ;; 导入 cdlatex 自定义设置
-    (setq cdlatex-paired-parens "$[{(")
-    (my/set-cdlatex-math-symbol-alist)
-    (my/set-cdlatex-math-modify-alist)
-    (my/set-cdlatex-env-alist)
-    (my/set-cdlatex-command-alist))
-#+end_src
-** LaTeX 编辑
-主要使用 AucTeX 及配套插件
-*** AucTeX 变量设置
-**** 环境折叠
-#+begin_src elisp
-  (defun my/TeX-fold-config ()
-    (setq TeX-fold-type-list '(env macro comment)
-          TeX-fold-env-spec-list '(("[comment]" ("comment")) ("[proof]" ("proof")))
-          LaTeX-fold-env-spec-list '(("frame" ("frame")))
-          TeX-fold-macro-spec-list
-          '(("[f]" ("footnote" "marginpar"))
-            ("[c]" ("cite"))
-            ("[l]" ("label"))
-            ("[r]" ("ref" "pageref" "eqref"))
-            ("[i]" ("index" "glossary"))
-            ("[1]:||*" ("item"))
-            ("..." ("dots"))
-            ("(C)" ("copyright"))
-            ("(R)" ("textregistered"))
-            ("TM" ("texttrademark"))
-            (1 ("emph" "textit" "textsl" "textmd" "textrm" "textsf" "texttt" "textbf" "textsc" "textup")))))
-#+end_src
-**** 数学字体
-用 ~C-x C-e <key>~ 改变选中文字的字体.
-#+begin_src elisp
-  (defun my/TeX-fonts-config ()
-    (setq LaTeX-font-list
-          '((?m "\\textmc{" "}" "\\mathmc{" "}")
-            (?g "\\textgt{" "}" "\\mathgt{" "}")
-            (?e "\\en{" "}")
-            (?c "\\cn{" "}")
-            (?4 "$" "$")
-            (1 "" "" "\\mathcal{" "}")
-            (2 "\\textbf{" "}" "\\mathbf{" "}")
-            (3 "\\textsc{" "}")
-            (5 "\\emph{" "}")
-            (6 "\\textsf{" "}" "\\mathsf{" "}")
-            (9 "\\textit{" "}" "\\mathit{" "}")
-            (12 "\\textulc{" "}")
-            (13 "\\textmd{" "}")
-            (14 "\\textnormal{" "}" "\\mathnormal{" "}")
-            (18 "\\textrm{" "}" "\\mathrm{" "}")
-            (19 "\\textsl{" "}" "\\mathbb{" "}")
-            (20 "\\texttt{" "}" "\\mathtt{" "}")
-            (21 "\\textup{" "}")
-            (23 "\\textsw{" "}")
-            (4 "" "" t))))
-#+end_src
-**** preview-latex 设置
-#+begin_src elisp
-  (defun my/preview-latex-config ()
-    (setq preview-default-option-list
-          '("displaymath" "floats" "graphics" "textmath" "footnotes") ; 执行预览的环境
-          preview-preserve-counters t ; 保留数学公式编号
-          preview-pdf-color-adjust-method 'compatible)) ; 预览图片使用Emacs主题背景色
-#+end_src
-**** reftex
-#+begin_src elisp
-  (defun my/reftex-config ()
-    (setq  reftex-label-alist ; 交叉引用的自定义类型
-           '(("theorem" ?t "thm:" nil nil ("Theorem" "定理"))
-             ("lemma" ?a "lem:" nil nil ("Lemma")))
-           reftex-ref-macro-prompt nil ; ~cte<tab>~ 后不提示类型
-           reftex-ref-style-default-list '("Default"))) ; 默认引用风格
-#+end_src
-**** Prettify
-查找Unicode编码: [[https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode]]
-#+begin_src elisp 
-  (defun my/more-prettified-symbols ()
-    (require 'tex-mode) ; 载入 tex--prettify-symbols-alist 变量
-    (mapc (lambda (pair) (delete pair tex--prettify-symbols-alist))
-          '(("\\supset" . 8835)))
-    (mapc (lambda (pair) (cl-pushnew pair tex--prettify-symbols-alist))
-          '(("\\big(" . #x2987) ; Z Notation left image bracket
-            ("\\big)" . #x2988)
-            ("\\Big(" . #x2985) ; left white parenthesis
-            ("\\Big)" . #x2986)
-            ("\\bigg(" . #xFF5F) ; full width left white parenthesis
-            ("\\bigg)" . #xFF60)
-            ("\\big[" . #x3010) ; full width left square bracket
-            ("\\big]" . #x3011)
-            ("\\Big[" . #x27E6) ; math left white square bracket
-            ("\\Big]" . #x27E7)
-            ("\\bigg[" . #x301A) ; left white square bracket
-            ("\\bigg]" . #x301B)
-            ("\\{" . #xFF5B) ; full width curly bracket
-            ("\\}" . #xFF5D) 
-            ("\\big\\{" . #xFF5B) ; 
-            ("\\big\\}" . #xFF5D)
-            ("\\Big\\{" . #xFF5B) ; white bracket
-            ("\\Big\\}" . #xFF5D)
-            ("\\bigg\\{" . #xFF5B) ; white bracket
-            ("\\bigg\\}" . #xFF5D)
-            ("\\Z" . 8484)
-            ("\\Q" . 8474)
-            ("\\N" . 8469)
-            ("\\R" . 8477)
-            ("\\eps" . 949)
-            ("\\inf" . #x22C0) 
-            ("\\sup". #x22C1)
-            ("\\ONE" . #x1D7D9)
-            ("\\mathbb{S}" . #x1D54A)
-            ("\\PP" . #x2119)
-            ("\\Ps" . #x1D5AF )
-            ("\\Pp" . #x1D40F)
-            ("\\E" . #x1D5A4)
-            ("\\Ee" . #x1D404)
-            ("\\EE" . #x1D53C )
-            ("\\Fc" . #x2131)
-            ("\\Nc" . #x1D4A9))))
-#+end_src
-*** 大纲 (outline-minor-mode)
-#+begin_src elisp
-  (use-package outline
-    :init
-    (if my/is-windows
-        (setq outline-minor-mode-prefix (kbd "C-o"))
-      (setq outline-minor-mode-prefix (kbd "C-'")))
-    :bind
-    (:map outline-minor-mode-map
-          ("C-' t" . outline-hide-body)
-          ("C-' e" . outline-show-entry)
-          ("C-' p" . outline-previous-visible-heading)
-          ("C-' n" . outline-next-visible-heading)
-          ("C-' a" . outline-show-all)))
-#+end_src
-*** LaTeX-mode-hook 
-#+begin_src elisp
-  (defun my/latex-hook ()
-    (turn-on-cdlatex) 
-    (turn-on-reftex) 
-    (outline-minor-mode) ; 大纲预览
-    (outline-hide-body) ; 启动时折叠文件
-    (when my/enable-folding
-      (prettify-symbols-mode t)))  ; prettify 数学符号
-#+end_src
-*** 数学公式字体
-#+begin_src elisp
-  (defun my/set-latex-font ()
-    (interactive)
-    (require 'font-latex)
-  (unless my/is-terminal
-    (set-face-attribute 'font-latex-math-face nil :foreground "#f78c6c" :font my/math-font)) ; 数学符号
-    (set-face-attribute 'font-latex-script-char-face nil :foreground "#c792ea") ; 上下标字符^与_
-    (set-face-attribute 'font-latex-sedate-face nil :foreground "#ffcb6b")) ; 关键字
-#+end_src
-*** use-package 模块
-#+begin_src elisp
-  (use-package tex
-    :defer 10
-    :straight auctex
-    :custom
-    (TeX-parse-self t) ; 自动解析 tex 文件found
-    (TeX-PDF-mode t) 
-    (TeX-DVI-via-PDFTeX t)
-    ;; 正向与反向搜索设置
-    (TeX-source-correlate-mode t)
-    (TeX-source-correlate-method 'synctex)
-    (TeX-view-program-selection '((output-pdf "PDF Tools"))) ; 使用 pdf-tools 预览 pdf
-    (TeX-source-correlate-start-server t)
-    :config
-    ;; 设置 LaTeX 语法高亮颜色及字体大小
-    (setq-default TeX-master t) ; 默认询问主文件
-    (add-hook 'LaTeX-mode-hook 'my/latex-hook) ; 加载LaTeX模式设置
-    (add-hook 'TeX-after-compilation-finished-functions
-              #'TeX-revert-document-buffer) ; 编译后更新 pdf 文件
-    (my/TeX-fold-config)
-    (my/TeX-fonts-config)
-    (my/preview-latex-config)
-    (my/reftex-config)
-    (my/more-prettified-symbols))
-  #+end_src
-** pdf 预览
-#+begin_src elisp
-  (use-package auctex-latexmk
-    :straight (auctex-latexmk :fetcher github :repo "emacsmirror/auctex-latexmk") ; fix a incompatibility bug by non-author. 
-    :config
-    (auctex-latexmk-setup)
-    (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-    (add-to-list 'TeX-command-list
-                 '("myLatexMK" "latexmk %(-PDF)%S%(mode) %(file-line-error) -pvc %(extraopts) %t" TeX-run-latexmk nil (plain-tex-mode latex-mode doctex-mode) :help "Run LatexMK with -pvc")))
-#+end_src
-* Org 设置
-** 外观
-***  org-modern
-#+begin_src elisp
-    (use-package org-modern-indent
-      :straight (:host github :repo "jdtsmith/org-modern-indent"))
-
-    (use-package org-modern
-      :custom
-      (org-modern-hide-stars nil) ; adds extra indentation
-      (org-modern-table nil)
-      (org-modern-list 
-       '((?- . "•")
-         (?* . "•")
-         (?+ . "•")))
-      :hook
-      (org-mode . org-modern-mode)
-      (org-agenda-finalize . org-modern-agenda)
-      :config
-      (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
-#+end_src
-*** 自动隐藏与显示标记 (=org-appear=)
-#+begin_src elisp
-  (use-package org-appear
-    :hook org-mode)
-#+end_src
-*** 字体 (=org-face= 相关)
-#+begin_src elisp
-  (defun my/set-org-font ()
-    (interactive)
-    ;; org 字体美化
-    (require 'org-faces)
-    ;; 标题字体大小优化
-    (set-face-attribute 'org-document-title nil :weight 'bold :height 1.2)
-    (dolist (face '((org-level-1 . 1.05)
-                    (org-level-2 . 1.0)
-                    (org-level-3 . 1.0)
-                    (org-level-4 . 1.0)
-                    (org-level-5 . 1.0)
-                    (org-level-6 . 1.0)
-                    (org-level-7 . 1.0)
-                    (org-level-8 . 1.0)))
-      (set-face-attribute (car face) nil :weight 'medium :height (cdr face)))
-  
-    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block-begin-line nil :foreground nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-block-end-line nil :foreground nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-property-value nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil  :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-drawer nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-document-info-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-    (setq org-fontify-quote-and-verse-blocks t) ; 启用 org-qoute 变量为 quote 设置不同的字体
-    (set-face-attribute 'org-quote nil :inherit 'fixed-pitch)
-    (require 'org-indent)
-    (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch)))
-#+end_src
-*** 页面宽度 (=visual-fill-column=)
-#+begin_src elisp
-  (defun my/org-mode-visual-fill ()
-  (interactive)
-    (setq visual-fill-column-width 150
-          visual-fill-column-center-text t)
-    (visual-fill-column-mode 1))
-  (use-package visual-fill-column
-    :hook (org-mode . my/org-mode-visual-fill))
-#+end_src
-*** =LaTeX= 语法高亮相关
-#+begin_src elisp
-  (defun my/org-view-latex ()
-    (interactive)
-    (setq org-format-latex-options
-          `(:foreground default :background default :scale ,my/latex-preview-scale :html-foreground "Black" :html-background "Transparent" :html-scale 1.5 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")) ; 公式预览设置
-          ;; 以下为 LaTeX 语法高亮设置
-          org-highlight-latex-and-related '(native latex entities)
-          org-pretty-entities my/enable-folding
-          org-pretty-entities-include-sub-superscripts nil))
-#+end_src
-*** 数学公式预览 (=org-preview=)
-#+begin_src elisp
-  (use-package org-fragtog
-    ;; :hook (org-mode . org-fragtog-mode)
-    )
-
-  ;; 快速编译数学公式, 测试版
-  (use-package org-preview
-    :straight (:host github :repo "karthink/org-preview")
-    :hook (org-mode . org-preview-mode))
-#+end_src
-
-*** =org-tempo= 模板设置
-#+begin_src elisp
-  (defun my/org-tempo-setting ()
-    (interactive)
-    (require 'org-tempo) ; 保证 org-structure-template-alist 可用
-    (setq org-structure-template-alist ; 用 org-tempo 快速插入代码块
-          '(("el" . "src elisp")
-            ("la" . "src latex")
-            ("sh" . "src shell")
-            ("a" . "export ascii")
-            ("c" . "center")
-            ("C" . "comment")
-            ("e" . "example")
-            ("E" . "export")
-            ("h" . "export html")
-            ("l" . "export latex")
-            ("q" . "quote")
-            ("s" . "src")
-            ("v" . "verse"))))
-#+end_src
-
-** =org= 截图 (=org-download=) 
-#+begin_src elisp
-  (use-package org-download
-    :custom
-    (org-download-heading-lvl 1) ; 以一级标题作为图片文件夹
-    :after org
-   ;; :bind (:map org-mode-map
-   ;;             ("C-c i y" . org-download-yank)
-   ;;             ("C-c i d" . org-download-delete)
-   ;;             ("C-c i e" . org-download-edit))
-    :config
-    ;; 用文件名作为文件夹
-    (defun my-org-download-method (link) 
-      (let ((filename
-             (file-name-nondirectory
-              (car (url-path-and-query
-                    (url-generic-parse-url link)))))
-            (dirname (concat "./img/" (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))))
-        (setq org-download-image-dir dirname)
-        (make-directory dirname t)
-        (expand-file-name (funcall org-download-file-format-function filename) dirname)))
-    (setq org-download-method 'my-org-download-method)
-    ;; 在 Windows 系统下修复过时的convert.exe; 注意: 用户名文件夹不能含有空格!
-    (defun my/org-download-clipboard ()
-      (interactive)
-      (let ((filename (expand-file-name "screenshot.png" temporary-file-directory)))
-        (shell-command-to-string (format "magick clipboard: %s" filename))
-        (when (file-exists-p filename)
-          (org-download-image filename)
-          (delete-file filename))))
-    ; 绑定剪贴板图片的快捷键
-    (if my/is-windows
-        (define-key org-mode-map (kbd "C-M-y") #'my/org-download-clipboard)
-      (define-key org-mode-map (kbd "C-M-y") #'org-download-screenshot)))
-#+end_src
-
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-download-local-bindings()
-      (message ">>> [ my-org-download-local-bindings ] ")
-
-      (define-key evil-normal-state-local-map (kbd "SPC i y") 'org-download-yank)
-      (define-key evil-normal-state-local-map (kbd "SPC i p") 'org-download-clipboard)
-      (define-key evil-normal-state-local-map (kbd "SPC i d") 'org-download-delete)
-      (define-key evil-normal-state-local-map (kbd "SPC i e") 'org-download-edit)
-      (define-key evil-normal-state-local-map (kbd "SPC i s") 'org-download-screenshot)
-
-      (message ">>> [ my-org-download-local-bindings ] - rebind successfully. ")
-  )
-
-  (add-hook 'org-mode-hook #'my-org-download-local-bindings)
-
-  (if my-enable-which-key-customized-description
-      (progn
-          (which-key-add-key-based-replacements "SPC i y" "image/insert")
-          (which-key-add-key-based-replacements "SPC i p" "image/paste")
-          (which-key-add-key-based-replacements "SPC i d" "image/delete")
-          (which-key-add-key-based-replacements "SPC i e" "image/edit")
-          (which-key-add-key-based-replacements "SPC i s" "image/screenshot")
-      ))
-#+END_SRC
-
-** =org-table= 中文对齐 (=valign=)
-#+begin_src elisp
-  (use-package valign
-  :if (display-graphic-p)
-    :hook org-mode)
-#+end_src
-** 个人小功能
-*** 在同一窗口打开 org 文件
-#+begin_src elisp
-  (defun my/follow-link-at-current-window () 
-    (interactive)
-    (let ((org-link-frame-setup (quote ((vm . vm-visit-folder-other-frame)
-                                        (vm-imap . vm-visit-imap-folder-other-frame)
-                                        (gnus . gnus)
-                                        (file . find-file)
-                                        (wl . wl-other-frame)))))
-
-      (org-open-at-point)))
-  (defun my/follow-link-at-current-window-mouse (event)
-    (interactive (list last-command-event))
-    (posn-set-point (event-end event))
-    (let ((org-link-frame-setup (quote ((vm . vm-visit-folder-other-frame)
-                                        (vm-imap . vm-visit-imap-folder-other-frame)
-                                        (gnus . gnus)
-                                        (file . find-file)
-                                        (wl . wl-other-frame)))))
-      (org-open-at-point)))
-#+end_src
-
-*** org-cdlatex-mode 中输入成对 =$= 及括号
-#+begin_src elisp
-  (defun my/insert-inline-OCDL ()
-    (interactive)
-    (insert "\\(")
-    (save-excursion (insert " \\)" )))
-  (defun my/insert-dollar-OCDL ()
-    (interactive)
-    (insert "$")
-    (save-excursion (insert "$" )))
-  (defun my/insert-bra-OCDL ()
-    (interactive)
-    (insert "(")
-    (save-excursion (insert ")" )))
-  (defun my/insert-sq-bra-OCDL ()
-    (interactive)
-    (insert "[")
-    (save-excursion (insert "]" )))
-  (defun my/insert-curly-bra-OCDL ()
-    (interactive)
-    (insert "{")
-    (save-excursion (insert "}" )))
-  (defun my/insert-backquote ()
-    (interactive)
-    (insert "`"))
-
-
-  (defun my/set-org-cdlatex-extra-kbd ()
-    (my/insert-leader-def
-     :keymaps 'org-cdlatex-mode-map
-     "$" '(my/insert-inlline-OCDL :which-key "insert \\\( \\\)")
-     "`" '(my/insert-backquote :which-key "insert `"))
-    (general-define-key
-     :states '(insert emacs)
-     :keymaps 'org-cdlatex-mode-map
-     "$"  'my/insert-dollar-OCDL
-     "("  'my/insert-bra-OCDL
-     "["  'my/insert-sq-bra-OCDL
-     "{"  'my/insert-curly-bra-OCDL))
-#+end_src
-** =org-mode-hook=
-#+begin_src elisp
-    (defun my-org-hook ()
-      (org-indent-mode) ; 自动缩进
-      (unless (or (< (display-pixel-height) 999) my/is-terminal)
-        (variable-pitch-mode 1)) ; 比例字体
-      (org-cdlatex-mode) ; LaTeX 公式
-      (visual-line-mode 1))
-#+end_src
-** use-package 模块 
-#+begin_src elisp
-  (use-package org
-    :defer 10
-    :custom
-    (org-M-RET-may-split-line t)
-    (org-ellipsis " ▾") ; 用小箭头代替...表示折叠
-    (org-priority-lowest ?E) ; org-agenda 的优先级设为A-E
-    (org-priority-default ?D) ; org-agenda 的默认优先级设为D
-    :bind
-    (:map org-mode-map
-          ("C-c p" . nil) ; 用于 popper 快捷键
-          ("C-c n" . nil) ; 用于 org-roam 快捷键
-          ("C-c o" . my/follow-link-at-current-window) ; 在当前窗口打开 org 文件
-          ("C-<down-mouse-1>" . my/follow-link-at-current-window-mouse) ; Ctrl+鼠标点击时, 在当前窗口打开 org 文件
-          ("C-<drag-mouse-1>" . my/follow-link-at-current-window-mouse))
-    :config
-    (if t ; my/enable-folding
-        (setq org-startup-folded 'content) ; 开启时折叠大纲
-      (setq org-startup-folded 'showeverything))
-
-    (unless my/is-terminal
-      (my/set-org-font))
-    (my/org-view-latex)
-    (my/org-tempo-setting)
-    (my/set-org-cdlatex-extra-kbd)
-    (add-hook 'org-mode-hook 'my-org-hook)
-    (add-to-list 'org-babel-load-languages '(shell . t)))
-#+end_src 
-** 幻灯片展示 (=org-present=)
-#+begin_src elisp
-  (use-package org-present
-    :config
-    (defun my/org-present-prepare-slide (buffer-name heading)
-      (org-overview)  ; 仅显示顶层标题Show only top-level headlines
-      (org-show-entry); 展开当前标题Unfold the current entry
-      (org-show-children))   ; 显示当前子标题
-
-    (defun my/org-present-start () ; 开始幻灯片的设置
-      (turn-off-evil-mode)
-      (setq visual-fill-column-width 110
-            visual-fill-column-center-text t) ; 调整显示界面
-      ;; 调整字体大小
-      (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
-                                         (header-line (:height 4.0) variable-pitch)
-                                         (org-document-title (:height 1.75) org-document-title)
-                                         (org-code (:height 1.55) org-code)
-                                         (org-verbatim (:height 1.55) org-verbatim)
-                                         (org-block (:height 1.25) org-block)
-                                         (org-block-begin-line (:height 0.7) org-block)))
-      (setq header-line-format " ") ; 在标题前加入空行
-      (display-line-numbers-mode 0)
-      (org-display-inline-images) ; 显示图片
-      (read-only-mode 1)) ; 只读模式
-
-    (defun my/org-present-end () ; 重置上述设置
-      (setq-local face-remapping-alist 
-                  '((default variable-pitch default)))      
-      (setq header-line-format nil) 
-      (org-remove-inline-images)
-      (org-present-small)
-      (read-only-mode 0)
-      (display-line-numbers-mode 1)
-      (turn-on-evil-mode))
-
-
-    (add-hook 'org-present-mode-hook 'my/org-present-start)
-    (add-hook 'org-present-mode-quit-hook 'my/org-present-end)
-    (add-hook 'org-present-after-navigate-functions 'my/org-present-prepare-slide))
-#+end_src
-** org-ref
-#+begin_src elisp
-  (use-package org-ref
-    :bind (:map org-mode-map
-                ("C-c (". org-ref-insert-label-link)
-                ("C-c )". org-ref-insert-ref-link)))
-#+end_src
-* 个人知识库 (=org-roam=)
-许多设置参考了 https://www.youtube.com/watch?v=CUkuyW6hr18 及相关教程
-** 变量设置
-#+begin_src elisp
-  (setq zot_bib "~/repos/notes/ref/Main.bib" ; Zotero .bib 文件
-        zot_pdf "~/Nutstore/1/Nutstore/Zotero-Library" ; Zotero 同步文件夹
-        org_notes "~/repos/notes/ref/") ; org-roam 文献笔记目录
-
-  (unless (file-exists-p zot_bib) (setq zot_bib nil))
-  (unless (file-exists-p zot_pdf) (setq zot_pdf nil))
-  (unless (file-exists-p org_notes) (setq org_ntoes nil)) ; 防止文件不存在而报错
-
-  (setq my/daily-note-filename "%<%Y-%m-%d>.org" ; 日记默认文件名
-        my/daily-note-header "#+title: %<%Y-%m-%d %a>\n#+SETUPFILE: ~/repos/notes/latex-preamble.org\n\n[[roam:%<%Y-%B>]]\n\n") ; 日记文件头
-#+end_src
-** use-package 模块
-#+begin_src elisp
-  (use-package org-roam
-    :defer 15
-    :custom
-    (org-roam-directory "~/repos/notes/") ; 默认笔记目录
-    (org-roam-completion-everywhere t)
-    (org-roam-node-display-template ; 搜索节点信息显示
-     (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    (org-roam-db-gc-threshold most-positive-fixnum)
-    (org-roam-dailies-directory "daily/") ; 默认日记目录
-    (org-roam-dailies-capture-templates ; 日记默认模板
-     `(("d" "default" entry "* %?" ; 普通条目
-        :target (file+head ,my/daily-note-filename
-                           ,my/daily-note-header))
-       ("t" "task" entry "* TODO %?\n  %U\n  %a\n  %i" ; 待办
-        :if-new (file+head+olp ,my/daily-note-filename
-                               ,my/daily-note-header
-                               ("Tasks"))
-        :empty-lines 1) 
-       ("j" "journal" entry "* %<%I:%M %p> - Journal  :journal:\n\n%?\n\n" ; 研究日志
-        :if-new (file+head+olp ,my/daily-note-filename
-                               ,my/daily-note-header
-                               ("Log")))
-       ("m" "meeting" entry "* %<%I:%M %p> - Meeting with %^{whom}  :meetings:\n\n%?\n\n" 
-        :if-new (file+head+olp ,my/daily-note-filename
-                               ,my/daily-note-header
-                               ("Meeting")))))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n c" . org-roam-capture)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n I" . org-roam-node-insert-immediate)
-           ("C-c n t" . my/org-roam-capture-task)
-           ("C-c n k" . orb-insert-link)
-           ("C-c n a" . orb-note-actions)
-           ("C-c n d" . my/org-roam-jump-menu/body)
-           ("C-c n P" . my/org-roam-insert-new-project)
-           ("C-c n p" . my/org-roam-find-project)
-           ("C-c n u" . org-roam-ui-mode)
-           ("C-c n j" . org-roam-dailies-capture-today)
-           :map org-mode-map
-           ("C-M-i" . completion-at-point))
-    :config
-    (define-key org-roam-mode-map [mouse-1] (kbd "C-u <return>")) ; org-roam-buffer 界面左键相当于C-u <return>
-    (setq org-roam-capture-templates  ; org-roam 笔记模板
-          '(("d" "default" plain "- tag :: \n %?" ; 普及模板
-             :target
-             (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title} \n#+SETUPFILE: ./latex-preamble.org")
-             :unnarrowed t)
-            ("r" "bibliography reference in pdfs" plain ; 文献模板
-             "#+FILETAGS: reading research \n - tags :: %^{keywords} \n* %^{title}
-  :PROPERTIES:\n:Custom_ID: %^{citekey}\n:URL: %^{url}\n:AUTHOR: %^{author-or-editor}\n:NOTER_DOCUMENT: ~/Nutstore/1/Nutstore/Zotero-Library/%^{citekey}.pdf\n:NOTER_PAGE:\n:END:"      
-             :target
-             (file+head "ref/${citekey}.org" "#+title: ${title}\n#+SETUPFILE: ../latex-preamble.org\n"))
-            ("a" "article/post/blog/discussion" plain ; 其它阅读模板
-             "#+FILETAGS: reading \n- tags :: \n- sources ::\n"      
-             :target
-             (file+head "article/%<%Y%m%d%H%M%S>-reading-${slug}.org" "#+title: ${title}\n#+SETUPFILE: ../latex-preamble.org\n"))
-            ("s" "Seminar notes" plain "#+FILETAGS: seminar\n- title:\n- speaker:\n- event:\n- tags ::" ; 学术报告模板
-             :target
-             (file+head "seminar/%<%Y%m%d>-seminar-${slug}.org" "#+title: ${title}\n#+SETUPFILE: ../latex-preamble.org\n#+filetags: seminar"))))
-    (require 'org-roam-dailies) 
-    (org-roam-db-autosync-mode) ; 自动同步数据库
-    (my/org-roam-refresh-agenda-list) ; 自动收集 project 文件中的待办事项
-    (add-to-list 'org-after-todo-state-change-hook ; 将完成的待办事项备份至日记
-                 (lambda ()
-                   (when (equal org-state "DONE")
-                     (my/org-roam-copy-todo-to-today)))))
-#+end_src
-** Org-roam-ui
-org-roam-ui 可以显示节点连接图
-#+begin_src elisp
-    (use-package org-roam-ui
-      :straight
-      (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-      :after org-roam
-      :custom
-      (org-roam-ui-sync-theme t)
-      (org-roam-ui-follow t)
-      (org-roam-ui-update-on-save t)
-      (org-roam-ui-open-on-start t))
-#+end_src
-** 文献阅读 (org-noter)
- #+BEGIN_SRC emacs-lisp
-   ;;(use-package pdf-tools)
-
-   (use-package org-noter
-     :config
-         (setq org-noter-max-short-selected-text-length 20)
-         (setq org-noter-max-short-length 80000)
-         (setq org-noter-always-create-frame nil) ;; Prevent use new frame!!!
-         (setq org-noter-default-heading-title "Note from $p$ page") ;; Prevent use new frame!!!
-         (if (> 999 (display-pixel-height)) 
-            (setq org-noter-doc-split-fraction '(0.6 . 0.5)))
-     :custom
-         (org-noter-highlight-selected-text t)
-         (org-noter-notes-search-path '("~/sbzi/personal/org-noter/"))
-         (org-noter-auto-save-last-location t)
-   )
-   (define-key org-noter-doc-mode-map (kbd "M-i") nil)
-   (define-key pdf-view-mode-map (kbd "C-u") nil)
-   (define-key org-noter-doc-mode-map (kbd "M-i") #'dm/insert-precise)
-
-   (defun dm/insert-precise (&optional optional)
-     (interactive "P")
-     (org-noter-insert-precise-note 't))
-
-   ;; (push "~/workspace/org-noter-plus-djvu" load-path)
-   ;; (push "~/workspace/org-noter-plus-djvu/other" load-path)
-   ;; (push "~/workspace/org-noter-plus-djvu/modules" load-path)
-
-   ;; (require 'org-noter)
-   ;; (require 'org-noter-nov)
-   ;; (require 'org-noter-pdf)
-
-
-   (define-advice org-noter--insert-heading (:after (level title &optional newlines-number location) add-full-body-quote)
-     "Advice for org-noter--insert-heading.
-
-   When inserting a precise note insert the text of the note in the body as an org mode QUOTE block.
-
-   =org-noter-max-short-length= should be set to a large value to short circuit the normal behavior:
-   =(setq org-noter-max-short-length 80000)="
-
-     ;; this tells us it's a precise note that's being invoked.
-     (if (consp location)
-         (insert (format "#+BEGIN_QUOTE\n%s\n#+END_QUOTE" title))))
- #+END_SRC
- 
-*** =org-noter keybinding=
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-noter-local()
-      (message ">>> [ my-pdf-org-noter-local ] ")
-      ;;
-      ;; Rebind
-      ;;
-      ;;(define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-      (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-      (define-key evil-normal-state-local-map (kbd "M-a") 'org-noter-insert-note)
-      (define-key evil-normal-state-local-map (kbd "M-p") 'org-noter-insert-precise-note)
-      (define-key evil-normal-state-local-map (kbd "M-o") 'org-noter-create-skeleton)
-      (define-key evil-normal-state-local-map (kbd "M-q") 'org-noter-kill-session)
-      ;;(define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
-      (define-key evil-normal-state-local-map (kbd "M-s") 'org-noter-set-auto-save-last-location)
-      (define-key evil-normal-state-local-map (kbd "M-/") 'org-noter-sync-next-note)
-      (define-key evil-normal-state-local-map (kbd "M-,") 'org-noter-sync-prev-note)
-      (define-key evil-normal-state-local-map (kbd "M-.") 'org-noter-sync-current-note)
-      ;;(define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
-      ;;(define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
-      (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-page-or-chapter)
-
-      (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
-  )
-
-  (dolist (hook '(org-mode-hook
-                  pdf-view-mode-hook
-                  ))
-     (add-hook hook #'my-org-noter-local)
-  )
-
-  ;(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
-#+END_SRC
-
-
-** 文献笔记设置
-导入 Zotero 文献库, 并将文献笔记作为笔记节点
-*** helm-bibtex
-#+begin_src elisp
-  (use-package helm-bibtex
-    :custom
-    (bibtex-completion-notes-path org_notes)
-    (bibtex-completion-bibliography zot_bib)
-    (bibtex-completion-library-path zot_pdf))
-#+end_src
-*** org-roam-bibtex
-#+begin_src elisp
-  (use-package org-roam-bibtex
-    :after org-roam
-    :hook (org-roam-mode . org-roam-bibtex-mode)
-    :custom
-    (orb-insert-interface 'helm-bibtex)
-    (orb-insert-link-description 'citekey)
-    (orb-preformat-keywords
-     '("citekey" "title" "url" "author-or-editor" "keywords" "file"))
-    (orb-process-file-keyword t)
-    (orb-attached-file-extensions '("pdf")))
-#+end_src
-** org-roam buffer 设置
-#+begin_src elisp
-  (add-hook 'org-roam-mode-hook 'visual-line-mode) ; 自动换行
-#+end_src
-** 项目与待办管理
-实现功能:
-- 定义一类特殊笔记类型: project
-- 新增/查找项目的函数
-- 在项目中插入待办并由 org-agenda 收集
-*** 基本函数与变量  
-#+begin_src elisp
-  (defvar my/org-roam-project-template ; 项目笔记模板
-    '("p" "project" plain "** TODO %?"
-      :if-new (file+head+olp "%<%Y%m%d%H>-${slug}.org"
-                             "#+title: ${title}\n#+category: ${title}\n#+filetags: Project\n"
-                             ("Tasks"))))
-  (defun my/org-roam-filter-by-tag (tag-name) ; 按 tag 搜索笔记; 需要 lexical binding
-    (lambda (node)
-      (member tag-name (org-roam-node-tags node)))) 
-  (defun my/org-roam-list-notes-by-tag (tag-name) ; 按 tag 显示笔记
-    (mapcar #'org-roam-node-file
-            (seq-filter
-             (my/org-roam-filter-by-tag tag-name)
-             (org-roam-node-list))))
-
-#+end_src
-*** 新增/查找项目
-#+begin_src elisp
-    (defun my/org-roam-project-finalize-hook ()
-    "Adds the captured project file to `org-agenda-files' if the
-    capture was not aborted."
-    ;; Remove the hook since it was added temporarily
-    (remove-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
-    ;; Add project file to the agenda list if the capture was confirmed
-    (unless org-note-abort
-      (with-current-buffer (org-capture-get :buffer)
-        (add-to-list 'org-agenda-files (buffer-file-name)))))
-
-  (defun my/org-roam-insert-new-project ()
-    (interactive)
-    ;; Add the project file to the agenda after capture is finished
-    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
-    ;; Select a project file to open, creating it if necessary
-    (org-roam-capture- :node (org-roam-node-read
-                              nil
-                              (my/org-roam-filter-by-tag "Project"))
-                       :templates (list my/org-roam-project-template)))
-
-  (defun my/org-roam-find-project ()
-    (interactive)
-    ;; Add the project file to the agenda after capture is finished
-    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
-    ;; Select a project file to open, creating it if necessary
-    (org-roam-node-find
-     nil
-     nil
-     (my/org-roam-filter-by-tag "Project")))
-#+end_src
-把项目笔记加入 org-agenda 文件中
-#+begin_src elisp
-  (defun my/org-roam-refresh-agenda-list ()
-    (interactive)
-    (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
-#+end_src
-*** 新增项目中的待办
-#+begin_src elisp
-    (defun my/org-roam-capture-task ()
-    (interactive)
-    ;; 新增项目后, 更新 org-agende 文件列表
-    (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
-    ;; 新增待办
-    (org-roam-capture- :node (org-roam-node-read
-                              nil
-                              (my/org-roam-filter-by-tag "Project"))
-                       :templates (list my/org-roam-project-template)))
-#+end_src
-*** 日记
-月结/年终总结模板
-  #+begin_src elisp
-    (defun my/org-roam-goto-month ()
-      (interactive)
-      (org-roam-capture- :goto (when (org-roam-node-from-title-or-alias (format-time-string "%Y-%B")) '(4))
-                         :node (org-roam-node-create)
-                         :templates '(("m" "month" plain "\n* Goals\n\n%?* Summary\n\n"
-                                       :if-new (file+head "%<%Y-%B>.org"
-                                                          "#+title: %<%Y-%B>\n#+filetags: Project\n")
-                                       :unnarrowed t))))
-
-    (defun my/org-roam-goto-year ()
-      (interactive)
-      (org-roam-capture- :goto (when (org-roam-node-from-title-or-alias (format-time-string "%Y")) '(4))
-                         :node (org-roam-node-create)
-                         :templates '(("y" "year" plain "\n* Goals\n\n%?* Summary\n\n"
-                                       :if-new (file+head "%<%Y>.org"
-                                                          "#+title: %<%Y>\n#+filetags: Project\n")
-                                       :unnarrowed t))))
-  #+end_src
-Hydra 定义的日记界面
-  #+begin_src elisp
-    (defhydra my/org-roam-jump-menu (:hint nil)
-      "
-    ^Dailies^        ^Capture^       ^Jump^
-    ^^^^^^^^-------------------------------------------------
-    _t_: today       _T_: today       _m_: current month
-    _r_: tomorrow    _R_: tomorrow    _e_: current year
-    _y_: yesterday   _Y_: yesterday   ^ ^
-    _d_: date        ^ ^              ^ ^
-    "
-      ("t" org-roam-dailies-goto-today)
-      ("r" org-roam-dailies-goto-tomorrow)
-      ("y" org-roam-dailies-goto-yesterday)
-      ("d" org-roam-dailies-goto-date)
-      ("T" org-roam-dailies-capture-today)
-      ("R" org-roam-dailies-capture-tomorrow)
-      ("Y" org-roam-dailies-capture-yesterday)
-      ("m" my/org-roam-goto-month)
-      ("e" my/org-roam-goto-year)
-      ("c" nil "cancel"))
-  #+end_src
-
-*** 在日记中备份已完成待办
-#+begin_src elisp
-  (defun my/org-roam-copy-todo-to-today ()
-    (interactive)
-    (let ((org-refile-keep t) ; Set this to nil to delete the original!
-          (org-roam-dailies-capture-templates
-            '(("t" "tasks" entry "%?"
-               :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
-          (org-after-refile-insert-hook #'save-buffer)
-          today-file
-          pos)
-      (save-window-excursion
-        (org-roam-dailies--capture (current-time) t)
-        (setq today-file (buffer-file-name))
-        (setq pos (point)))
-      ;; Only refile if the target file is different than the current file
-      (unless (equal (file-truename today-file)
-                     (file-truename (buffer-file-name)))
-        (org-refile nil nil (list "Tasks" today-file nil pos)))))
-#+end_src
-** 即时加入空笔记的函数
-#+begin_src elisp
-(defun org-roam-node-insert-immediate (arg &rest args)
-  (interactive "P")
-  (let ((args (push arg args))
-        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
-                                                  '(:immediate-finish t)))))
-    (apply #'org-roam-node-insert args)))
-#+end_src
-* 项目管理
-** Magit
-#+begin_src elisp
-  (use-package magit
-    :commands magit-status
-    :autoload  magit-get-current-branch
-    :custom
-    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-#+end_src
-** Perspective 
-#+begin_src elisp
-  (use-package perspective
-    :defer 2
-    :bind (("C-x C-b" . persp-list-buffers)
-           ("C-x b" . persp-switch-to-buffer*)
-           ("C-M-k" . persp-switch)
-           ("C-M-n" . persp-next)
-           ("C-x k" . persp-kill-buffer*))
-    :custom
-    (persp-mode-prefix-key (kbd "C-x x"))
-    (persp-interactive-completion-function 'ido-completing-read)
-    (persp-show-modestring 'header)
-    :config
-    (setq persp-sort 'created)
-    (unless (equal persp-mode t) ; to avoid conflict with persp-mode
-      (persp-mode))
-    (setq persp-state-default-file (expand-file-name ".persp-save" user-emacs-directory)))
-#+end_src
-* 编程语言
-** 终端
-#+begin_src elisp
-  (use-package shell)
-#+end_src
-
-More colorful terminal
-#+begin_src elisp
-  (use-package eterm-256color
-  :if (not my/is-termux)
-  :hook term-mode)
-#+end_src
-** 字幕编辑
-#+begin_src elisp
-  (use-package subed
-    :straight
-    (:host github :repo "sachac/subed" :files ("subed/*.el"))
-    :config
-    ;; Remember cursor position between sessions
-    (add-hook 'subed-mode-hook 'save-place-local-mode)
-    ;; Break lines automatically while typing
-    (add-hook 'subed-mode-hook 'turn-on-auto-fill)
-    ;; Break lines at 40 characters
-    (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 100)))
-    ;; Some reasonable defaults
-    (add-hook 'subed-mode-hook 'subed-enable-pause-while-typing)
-    ;; As the player moves, update the point to show the current subtitle
-    (add-hook 'subed-mode-hook 'subed-enable-sync-point-to-player)
-    ;; As your point moves in Emacs, update the player to start at the current subtitle
-    (add-hook 'subed-mode-hook 'subed-enable-sync-player-to-point)
-    ;; Replay subtitles as you adjust their start or stop time with M-[, M-], M-{, or M-}
-    (add-hook 'subed-mode-hook 'subed-enable-replay-adjusted-subtitle)
-    ;; Loop over subtitles
-    (add-hook 'subed-mode-hook 'subed-enable-loop-over-current-subtitle)
-    ;; Show characters per second
-    (add-hook 'subed-mode-hook 'subed-enable-show-cps))
-#+end_src
-
-** python
-#+begin_src elisp
-  (use-package python-mode)
-#+end_src
-*** cython
-#+begin_src elisp
-  (use-package cython-mode
-      :mode "\\.pyx\\'"
-      :config
-      (add-hook 'cython-mode-hook #'flycheck-mode))
-#+end_src
-*** elpy
-follow suggestion from https://emacs.stackexchange.com/questions/10065/how-can-i-defer-loading-elpy-using-use-package to defer elpy mode
-#+begin_src elisp
-  (use-package elpy
-      :config
-      (advice-add 'python-mode :before 'elpy-enable)
-      (setq elpy-modules
-            '(elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
-#+end_src
-** yaml
-#+begin_src elisp
-  (use-package yaml-mode
-    :mode "\\.yml\\'")
-#+end_src
-** info+
-#+begin_src elisp
-  (use-package info+
-    :defer 10)
-#+end_src

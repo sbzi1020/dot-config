@@ -729,6 +729,303 @@ targets."
 
 (use-package markdown-mode)
 
+(use-package all-the-icons)
+
+(use-package doom-themes
+    :config
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+
+    ;; Load theme, pick the one you like
+    ;;(load-theme 'doom-gruvbox t)
+    ;;(load-theme 'doom-nord-aurora t)
+    ;;(load-theme 'doom-one t)
+    ;;(load-theme 'doom-solarized-dark t)
+    ;;(load-theme 'doom-solarized-light t)
+    ;;(load-theme 'doom-pine t)
+    ;;(load-theme 'doom-zenburn t)
+    ;;(load-theme 'doom-laserwave t)
+    ;;(load-theme 'doom-henna t)
+    ;;(load-theme 'doom-xcode t)
+    (load-theme 'doom-lantern t)
+    ;;(load-theme 'doom-miramare t)
+    ;;(load-theme 'doom-old-hope t)
+
+    ;; Enable flashing mode-line on errors
+    ;;(doom-themes-visual-bell-config)
+
+    ;; Enable custom neotree theme (all-the-icons must be installed!)
+    (doom-themes-neotree-config)
+    ;; or for treemacs users
+    (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+    (doom-themes-treemacs-config)
+    ;; Corrects (and improves) org-mode's native fontification.
+    (doom-themes-org-config)
+  )
+
+;; -------------------------------------------------------------------------------
+;; All custom faces (font settings)
+;; -------------------------------------------------------------------------------
+(defface my-modeline-light-blue-font '((t :foreground "#ACE6FE" :inherit italic bold)) "Modeline light blue font")
+(defface my-modeline-blue-green-font '((t :foreground "#4BB5BE")) "Modeline blue-green font")
+(defface my-modeline-light-orange-font '((t :foreground "#DEB45B")) "Modeline light-orange font")
+(defface my-modeline-orange-font '((t :foreground "#FF9F1C")) "Modeline orange font")
+(defface my-modeline-yellow-font '((t :foreground "#FFE64D")) "Modeline yellow font")
+(defface my-modeline-light-red-font '((t :foreground "#f44747")) "Modeline light-red font")
+(defface my-modeline-light-green-font '((t :foreground "#BBF0EF")) "Modeline light-green font")
+(defface my-modeline-dark-green-font '((t :foreground "#5A7387")) "Modeline dark-green font")
+(defface my-modeline-purple-font '((t :foreground "systemPurpleColor")) "Modeline purple font")
+(defface my-modeline-indigo-font '((t :foreground "systemIndigoColor")) "Modeline indigo font")
+(defface my-modeline-black-font '((t :foreground "gridColor")) "Modeline black font")
+
+
+
+;; -------------------------------------------------------------------------------
+;; Override the default face for change mode line backgroundW
+;; -------------------------------------------------------------------------------
+(set-face-attribute 'mode-line-active nil :background "#2F2F2F")
+(set-face-attribute 'mode-line-inactive nil :background "#e4e5e4")
+
+
+;; -------------------------------------------------------------------------------
+;; All modeline variables
+;; -------------------------------------------------------------------------------
+
+;;
+;; 'my-modeline-major-mode' variable related
+;;
+(defun my-get-major-mode()
+  "Return 'major-mode' as a string."
+  (string-replace "-mode" "" (symbol-name major-mode)))
+
+(defun my-get-major-mode-capitalize()
+  "Return capitalized 'major-mode' as a string."
+  (capitalize (string-replace "-mode" "" (symbol-name major-mode))))
+
+(defvar-local my-modeline-major-mode
+  '(:eval
+      (propertize (my-get-major-mode) 'face 'my-modeline-indigo-font))
+  "Mode line constructor to display major mode"
+)
+
+;;
+;; 'my-modeline-buffer-name' variable related
+;;
+(defun my-get-current-name () 
+   (if (mode-line-window-selected-p)
+       (buffer-name)
+       (format " %s" (buffer-name))
+   )
+)
+
+(defvar-local my-modeline-buffer-name
+  '(:eval
+      (propertize (my-get-current-name) 'face 'my-modeline-black-font))
+  "Mode line constructor to display buffer name"
+)
+
+(defvar-local my-modeline-buffer-file-name
+  '(:eval
+      (propertize (format " %s" (buffer-file-name)) 'face 'my-modeline-dark-green-font))
+  "Mode line constructor to display buffer name"
+)
+
+;;
+;; 'my-modeline-evil-state' variable related
+;;
+(defun my-get-evil-state()
+  "Return 'evil-state' as a string."
+  (format " %s  " (upcase (symbol-name evil-state))))
+
+(defvar-local my-modeline-evil-state
+  '(:eval
+      (when (mode-line-window-selected-p)
+         (propertize (my-get-evil-state) 'face 'my-modeline-dark-green-font)))
+  "Mode line constructor to display current evil state"
+)
+
+
+;;
+;; 'my-modeline-git-branch' variable related
+;;
+(defun my-get-git-branch-name()
+   (format "%s %s" (nerd-icons-mdicon "nf-md-source_branch") (substring vc 5))
+)
+
+(defvar-local my-modeline-git-branch
+  '(:eval
+      (when (mode-line-window-selected-p)
+          (when-let (vc vc-mode)
+              (propertize (my-get-git-branch-name) 'face 'my-modeline-yellow-font)
+          ))
+   )
+)
+
+;;
+;; 'my-modeline-flymake' variable related
+;;
+(declare-function flymake--severity "flymake" (type))
+(declare-function flymake-diagnostic-type "flymake" (diag))
+
+;; Based on `flymake--mode-line-counter'.
+(defun prot-modeline-flymake-counter (type)
+  "Compute number of diagnostics in buffer with TYPE's severity.
+TYPE is usually keyword `:error', `:warning' or `:note'."
+  (let ((count 0))
+    (dolist (d (flymake-diagnostics))
+      (when (= (flymake--severity type)
+               (flymake--severity (flymake-diagnostic-type d)))
+        (cl-incf count)))
+    (when (cl-plusp count)
+      (number-to-string count))))
+
+(defun my-get-lsp-error-indicator()
+  ;; (insert (nerd-icons-octicon "nf-oct-bug"))  2
+  ;; (insert (nerd-icons-codicon "nf-cod-bug"))  2
+  ;; (insert (nerd-icons-faicon "nf-fa-bug"))    2
+  (nerd-icons-octicon "nf-oct-bug")
+)
+
+(defun my-modeline-flymake-error()
+   (when-let (count (prot-modeline-flymake-counter (intern ":error")))
+       (propertize
+           (format " %s %s" (my-get-lsp-error-indicator) count)
+           'face
+           'my-modeline-light-red-font)
+   )
+)
+
+(defun my-get-lsp-warning-indicator()
+  ;; (insert (nerd-icons-octicon "nf-oct-copilot_warning"))  2
+  ;; (insert (nerd-icons-codicon "nf-cod-warning"))          2
+  ;; (insert (nerd-icons-faicon "nf-fa-warning"))            2
+  (nerd-icons-faicon "nf-fa-warning")
+)
+
+(defun my-modeline-flymake-warning()
+   (when-let (count (prot-modeline-flymake-counter (intern ":warning")))
+       (propertize
+           (format " %s %s" (my-get-lsp-warning-indicator) count)
+           'face
+           'my-modeline-yellow-font)
+   )
+)
+
+(defun my-get-lsp-note-indicator()
+  ;; (insert (nerd-icons-faicon "nf-fa-exclamation"))          2
+  ;; (insert (nerd-icons-mdicon "nf-md-exclamation_thick"))   󱈸 2
+  ;; (insert (nerd-icons-faicon "nf-fa-exclamation_circle"))   2
+  (nerd-icons-faicon "nf-fa-exclamation_circle")
+)
+
+(defun my-modeline-flymake-note()
+   (when-let (count (prot-modeline-flymake-counter (intern ":note")))
+       (propertize
+           (format " %s %s" (my-get-lsp-note-indicator) count)
+           'face
+           'my-modeline-dark-green-font)
+   )
+)
+
+(defvar-local my-modeline-flymake
+    `(:eval
+      (when (and (bound-and-true-p flymake-mode)
+                 (mode-line-window-selected-p))
+        (list
+         '(:eval (my-modeline-flymake-error))
+         '(:eval (my-modeline-flymake-warning))
+         '(:eval (my-modeline-flymake-note))
+         )))
+  "Mode line construct displaying `flymake-mode-line-format'.
+Specific to the current window's mode line.")
+
+
+;;
+;; 'my-modeline-misc-info' variable related
+;;
+(defvar-local my-modeline-misc-info
+    '(:eval
+      (when (mode-line-window-selected-p)
+        mode-line-misc-info))
+  "Mode line construct displaying `mode-line-misc-info'.
+Specific to the current window's mode line.")
+
+
+;; -------------------------------------------------------------------------------
+;; Keep that in mind: Each mode line variable (insdie the 'mode-line-format') must have
+;; the 'risky-local-variable' property and set to 't'!!!
+;; -------------------------------------------------------------------------------
+(dolist (my-var '(my-modeline-major-mode
+                  my-modeline-buffer-name
+                  my-modeline-evil-state
+                  my-modeline-git-branch
+                  my-modeline-flymake
+                                      my-modeline-misc-info))
+  (put my-var 'risky-local-variable t)
+)
+
+
+
+;; -------------------------------------------------------------------------------
+;;
+;; Set the 'mode-line-format' as default value.
+;;
+;; - If you use 'setq' here, then it only applies to the current local buffer, but you see
+;; the instant effects.
+;;
+;; - If you use 'setq-default' here, then it applies to all buffersc, but you can't see
+;; the instant effects until re-launch Emacs.
+;; -------------------------------------------------------------------------------
+(setq-default mode-line-format
+  '("%e"
+    my-modeline-evil-state
+    my-modeline-buffer-name
+    "  "
+    ;;(:eval (format "MODE: %s" (propertize (symbol-name major-mode) 'face 'warning)))
+    my-modeline-major-mode
+    "  "
+    my-modeline-git-branch
+    "  "
+    my-modeline-flymake
+    "  "
+    my-modeline-misc-info
+    )
+)
+
+(set-face-attribute 'mode-line-active nil :background "systemGreenColor")
+;; Function name
+(set-face-attribute 'font-lock-function-name-face nil :foreground "#2AA198" :weight 'bold)
+;; docstring
+(set-face-attribute 'font-lock-doc-face nil :foreground "#96A7A9" :weight 'normal)
+;; comment
+(set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
+(set-face-attribute 'font-lock-comment-face nil :weight 'normal)
+
+(use-package org-roam
+  :custom
+  (org-roam-directory (file-truename "~/sbzi/personal/org-roam"))
+ ;; :bind (("<leader> n l" . org-roam-buffer-toggle)
+ ;;        ("<leader> n f" . org-roam-node-find)
+ ;;        ("<leader> n g" . org-roam-graph)
+ ;;        ("<leader> n i" . org-roam-node-insert)
+ ;;        ("<leader> n c" . org-roam-capture)
+ ;;        ;; Dailies
+ ;;        ("<leader> n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
+
+(dolist (map (list
+              evil-motion-state-map
+              ))
+  (define-key map (kbd "<leader>sp") 'flyspell-mode)
+  (define-key map (kbd "C-c s p") 'flyspell-mode)
+)
+
 ;;
 ;; Enable
 ;;
@@ -1088,19 +1385,19 @@ targets."
 )
 
 (defun my-open-emacs-configuration-file()
-   (interactive)
-   (find-file "~/.config/emacs/configuration.org")
+    (interactive)
+    (find-file "~/.config/emacs/configuration.org")
 )
 
 ;; Unbind this!!!
 (define-key global-map (kbd "C-c o") nil)
 
 (dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-  (define-key map (kbd "SPC o c") 'my-open-emacs-configuration-file)
-  (define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
+            evil-motion-state-map
+            evil-normal-state-map
+            ))
+(define-key map (kbd "SPC o c") 'my-open-emacs-configuration-file)
+(define-key map (kbd "C-c o c") 'my-open-emacs-configuration-file)
 )
 
 (if my-enable-which-key-customized-description
@@ -1112,25 +1409,75 @@ targets."
     ))
 
 (defun my-open-yasnippet-folder()
-   (interactive)
-   (find-file-other-window "~/.config/emacs/snippets")
+    (interactive)
+    (find-file-other-window "~/.config/emacs/snippets")
 )
 
 ;; Unbind this!!!
 (define-key global-map (kbd "C-c o") nil)
 
 (dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-  (define-key map (kbd "SPC o s") 'my-open-yasnippet-folder)
-  (define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
+            evil-motion-state-map
+            evil-normal-state-map
+            ))
+(define-key map (kbd "SPC o s") 'my-open-yasnippet-folder)
+(define-key map (kbd "C-c o s") 'my-open-yasnippet-folder)
 )
 
 (if my-enable-which-key-customized-description
     (progn
         (which-key-add-key-based-replacements "SPC o s" "Snippet folder")
         (which-key-add-key-based-replacements "C-c o s" "Snippet folder")
+    ))
+
+(dolist (map (list
+              evil-motion-state-map
+              evil-normal-state-map
+              ))
+    (define-key map (kbd "SPC s s") 'nil)
+    (define-key map (kbd "C-c s s") 'nil)
+)
+
+(defun my-open-eshell()
+   (interactive)
+   (split-window-below)
+   (windmove-down)
+   (eshell)
+)
+
+(dolist (map (list
+              evil-motion-state-map
+              ))
+    (define-key map (kbd "SPC s s") 'my-open-eshell)
+    (define-key map (kbd "C-c s s") 'my-open-eshell)
+
+    (if my-enable-which-key-customized-description
+        (progn
+            (which-key-add-key-based-replacements "SPC s s" "Shell")
+            (which-key-add-key-based-replacements "C-c s s" "Shell")
+        ))
+)
+
+(defun my-open-sbzi-folder()
+  (interactive)
+  (dired "~/sbzi")
+)
+
+;;
+;; Bind
+;;
+(dolist (map (list
+              evil-motion-state-map
+              evil-normal-state-map
+              ))
+    (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
+    (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
+)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC o d" "directory")
+        (which-key-add-key-based-replacements "C-C o d" "directory")
     ))
 
 (dolist (map (list
@@ -1160,72 +1507,6 @@ targets."
         (which-key-add-key-based-replacements "SPC e r" "Recent emoji")
         (which-key-add-key-based-replacements "C-c e r" "Recent emoji")
     ))
-
-(dolist (map (list
-              global-map
-              evil-window-map
-              evil-normal-state-map
-              evil-motion-state-map
-              ))
-    (define-key map (kbd "C-j") nil)
-    (define-key map (kbd "C-k") nil)
-    ;;(message "State: %s" state);
-)
-
-(evil-define-key 'normal org-mode-map (kbd "C-j") nil)
-(evil-define-key 'normal org-mode-map (kbd "C-k") nil)
-
-(dolist (map (list
-              vertico-map
-              ))
-  (define-key map (kbd "C-j") 'vertico-next)
-  (define-key map (kbd "C-k") 'vertico-previous)
-)
-
-;;
-;; 'org-mode'
-;;
-(defun my-org-next-heading()
-  (interactive)
-  (org-forward-heading-same-level nil)
-  (evil-scroll-line-to-center nil)
-)
-
-(defun my-org-previous-heading()
-  (interactive)
-  (org-backward-heading-same-level nil)
-  (evil-scroll-line-to-center nil)
-)
-
-(evil-define-key 'normal org-mode-map (kbd "C-j") 'my-org-next-heading)
-(evil-define-key 'normal org-mode-map (kbd "C-k") 'my-org-previous-heading)
-
-;;
-;; Bind to the local buffer keymap against the following delay modes
-;;
-(defun my-markdown-next-heading()
-  (interactive)
-  (outline-next-visible-heading 1)
-  (evil-scroll-line-to-center nil)
-)
-
-(defun my-markdown-previous-heading()
-  (interactive)
-  (outline-next-visible-heading -1)
-  (evil-scroll-line-to-center nil)
-)
-
-(defun my-bind-markdown-heading-jumping-local()
-  (define-key evil-normal-state-local-map (kbd "C-j") 'my-markdown-next-heading)
-  (define-key evil-normal-state-local-map (kbd "C-k") 'my-markdown-previous-heading)
-)
-
-(dolist (hook '(
-               markdown-mode-hook
-               markdown-view-mode-hook
-               ))
-  (add-hook hook #'my-bind-markdown-heading-jumping-local)
-)
 
 ;;
 ;; Unbind 'n' and 'N'
@@ -1717,320 +1998,11 @@ targets."
 ;; (define-key global-map (kbd "C-,") 'embark-act)
 (define-key global-map (kbd "C-e") 'embark-act)
 
-(use-package all-the-icons)
-
-(use-package doom-themes
-    :config
-    ;; Global settings (defaults)
-    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-          doom-themes-enable-italic t) ; if nil, italics is universally disabled
-
-    ;; Load theme, pick the one you like
-    ;;(load-theme 'doom-gruvbox t)
-    ;;(load-theme 'doom-nord-aurora t)
-    ;;(load-theme 'doom-one t)
-    ;;(load-theme 'doom-solarized-dark t)
-    ;;(load-theme 'doom-solarized-light t)
-    ;;(load-theme 'doom-pine t)
-    ;;(load-theme 'doom-zenburn t)
-    ;;(load-theme 'doom-laserwave t)
-    ;;(load-theme 'doom-henna t)
-    ;;(load-theme 'doom-xcode t)
-    (load-theme 'doom-lantern t)
-    ;;(load-theme 'doom-miramare t)
-    ;;(load-theme 'doom-old-hope t)
-
-    ;; Enable flashing mode-line on errors
-    ;;(doom-themes-visual-bell-config)
-
-    ;; Enable custom neotree theme (all-the-icons must be installed!)
-    (doom-themes-neotree-config)
-    ;; or for treemacs users
-    (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-    (doom-themes-treemacs-config)
-    ;; Corrects (and improves) org-mode's native fontification.
-    (doom-themes-org-config)
-  )
-
-;; -------------------------------------------------------------------------------
-;; All custom faces (font settings)
-;; -------------------------------------------------------------------------------
-(defface my-modeline-light-blue-font '((t :foreground "#ACE6FE" :inherit italic bold)) "Modeline light blue font")
-(defface my-modeline-blue-green-font '((t :foreground "#4BB5BE")) "Modeline blue-green font")
-(defface my-modeline-light-orange-font '((t :foreground "#DEB45B")) "Modeline light-orange font")
-(defface my-modeline-orange-font '((t :foreground "#FF9F1C")) "Modeline orange font")
-(defface my-modeline-yellow-font '((t :foreground "#FFE64D")) "Modeline yellow font")
-(defface my-modeline-light-red-font '((t :foreground "#f44747")) "Modeline light-red font")
-(defface my-modeline-light-green-font '((t :foreground "#BBF0EF")) "Modeline light-green font")
-(defface my-modeline-dark-green-font '((t :foreground "#5A7387")) "Modeline dark-green font")
-(defface my-modeline-purple-font '((t :foreground "systemPurpleColor")) "Modeline purple font")
-(defface my-modeline-indigo-font '((t :foreground "systemIndigoColor")) "Modeline indigo font")
-(defface my-modeline-black-font '((t :foreground "gridColor")) "Modeline black font")
-
-
-
-;; -------------------------------------------------------------------------------
-;; Override the default face for change mode line backgroundW
-;; -------------------------------------------------------------------------------
-(set-face-attribute 'mode-line-active nil :background "#2F2F2F")
-(set-face-attribute 'mode-line-inactive nil :background "#e4e5e4")
-
-
-;; -------------------------------------------------------------------------------
-;; All modeline variables
-;; -------------------------------------------------------------------------------
-
-;;
-;; 'my-modeline-major-mode' variable related
-;;
-(defun my-get-major-mode()
-  "Return 'major-mode' as a string."
-  (string-replace "-mode" "" (symbol-name major-mode)))
-
-(defun my-get-major-mode-capitalize()
-  "Return capitalized 'major-mode' as a string."
-  (capitalize (string-replace "-mode" "" (symbol-name major-mode))))
-
-(defvar-local my-modeline-major-mode
-  '(:eval
-      (propertize (my-get-major-mode) 'face 'my-modeline-indigo-font))
-  "Mode line constructor to display major mode"
-)
-
-;;
-;; 'my-modeline-buffer-name' variable related
-;;
-(defun my-get-current-name () 
-   (if (mode-line-window-selected-p)
-       (buffer-name)
-       (format " %s" (buffer-name))
-   )
-)
-
-(defvar-local my-modeline-buffer-name
-  '(:eval
-      (propertize (my-get-current-name) 'face 'my-modeline-black-font))
-  "Mode line constructor to display buffer name"
-)
-
-(defvar-local my-modeline-buffer-file-name
-  '(:eval
-      (propertize (format " %s" (buffer-file-name)) 'face 'my-modeline-dark-green-font))
-  "Mode line constructor to display buffer name"
-)
-
-;;
-;; 'my-modeline-evil-state' variable related
-;;
-(defun my-get-evil-state()
-  "Return 'evil-state' as a string."
-  (format " %s  " (upcase (symbol-name evil-state))))
-
-(defvar-local my-modeline-evil-state
-  '(:eval
-      (when (mode-line-window-selected-p)
-         (propertize (my-get-evil-state) 'face 'my-modeline-dark-green-font)))
-  "Mode line constructor to display current evil state"
-)
-
-
-;;
-;; 'my-modeline-git-branch' variable related
-;;
-(defun my-get-git-branch-name()
-   (format "%s %s" (nerd-icons-mdicon "nf-md-source_branch") (substring vc 5))
-)
-
-(defvar-local my-modeline-git-branch
-  '(:eval
-      (when (mode-line-window-selected-p)
-          (when-let (vc vc-mode)
-              (propertize (my-get-git-branch-name) 'face 'my-modeline-yellow-font)
-          ))
-   )
-)
-
-;;
-;; 'my-modeline-flymake' variable related
-;;
-(declare-function flymake--severity "flymake" (type))
-(declare-function flymake-diagnostic-type "flymake" (diag))
-
-;; Based on `flymake--mode-line-counter'.
-(defun prot-modeline-flymake-counter (type)
-  "Compute number of diagnostics in buffer with TYPE's severity.
-TYPE is usually keyword `:error', `:warning' or `:note'."
-  (let ((count 0))
-    (dolist (d (flymake-diagnostics))
-      (when (= (flymake--severity type)
-               (flymake--severity (flymake-diagnostic-type d)))
-        (cl-incf count)))
-    (when (cl-plusp count)
-      (number-to-string count))))
-
-(defun my-get-lsp-error-indicator()
-  ;; (insert (nerd-icons-octicon "nf-oct-bug"))  2
-  ;; (insert (nerd-icons-codicon "nf-cod-bug"))  2
-  ;; (insert (nerd-icons-faicon "nf-fa-bug"))    2
-  (nerd-icons-octicon "nf-oct-bug")
-)
-
-(defun my-modeline-flymake-error()
-   (when-let (count (prot-modeline-flymake-counter (intern ":error")))
-       (propertize
-           (format " %s %s" (my-get-lsp-error-indicator) count)
-           'face
-           'my-modeline-light-red-font)
-   )
-)
-
-(defun my-get-lsp-warning-indicator()
-  ;; (insert (nerd-icons-octicon "nf-oct-copilot_warning"))  2
-  ;; (insert (nerd-icons-codicon "nf-cod-warning"))          2
-  ;; (insert (nerd-icons-faicon "nf-fa-warning"))            2
-  (nerd-icons-faicon "nf-fa-warning")
-)
-
-(defun my-modeline-flymake-warning()
-   (when-let (count (prot-modeline-flymake-counter (intern ":warning")))
-       (propertize
-           (format " %s %s" (my-get-lsp-warning-indicator) count)
-           'face
-           'my-modeline-yellow-font)
-   )
-)
-
-(defun my-get-lsp-note-indicator()
-  ;; (insert (nerd-icons-faicon "nf-fa-exclamation"))          2
-  ;; (insert (nerd-icons-mdicon "nf-md-exclamation_thick"))   󱈸 2
-  ;; (insert (nerd-icons-faicon "nf-fa-exclamation_circle"))   2
-  (nerd-icons-faicon "nf-fa-exclamation_circle")
-)
-
-(defun my-modeline-flymake-note()
-   (when-let (count (prot-modeline-flymake-counter (intern ":note")))
-       (propertize
-           (format " %s %s" (my-get-lsp-note-indicator) count)
-           'face
-           'my-modeline-dark-green-font)
-   )
-)
-
-(defvar-local my-modeline-flymake
-    `(:eval
-      (when (and (bound-and-true-p flymake-mode)
-                 (mode-line-window-selected-p))
-        (list
-         '(:eval (my-modeline-flymake-error))
-         '(:eval (my-modeline-flymake-warning))
-         '(:eval (my-modeline-flymake-note))
-         )))
-  "Mode line construct displaying `flymake-mode-line-format'.
-Specific to the current window's mode line.")
-
-
-;;
-;; 'my-modeline-misc-info' variable related
-;;
-(defvar-local my-modeline-misc-info
-    '(:eval
-      (when (mode-line-window-selected-p)
-        mode-line-misc-info))
-  "Mode line construct displaying `mode-line-misc-info'.
-Specific to the current window's mode line.")
-
-
-;; -------------------------------------------------------------------------------
-;; Keep that in mind: Each mode line variable (insdie the 'mode-line-format') must have
-;; the 'risky-local-variable' property and set to 't'!!!
-;; -------------------------------------------------------------------------------
-(dolist (my-var '(my-modeline-major-mode
-                  my-modeline-buffer-name
-                  my-modeline-evil-state
-                  my-modeline-git-branch
-                  my-modeline-flymake
-                                      my-modeline-misc-info))
-  (put my-var 'risky-local-variable t)
-)
-
-
-
-;; -------------------------------------------------------------------------------
-;;
-;; Set the 'mode-line-format' as default value.
-;;
-;; - If you use 'setq' here, then it only applies to the current local buffer, but you see
-;; the instant effects.
-;;
-;; - If you use 'setq-default' here, then it applies to all buffersc, but you can't see
-;; the instant effects until re-launch Emacs.
-;; -------------------------------------------------------------------------------
-(setq-default mode-line-format
-  '("%e"
-    my-modeline-evil-state
-    my-modeline-buffer-name
-    "  "
-    ;;(:eval (format "MODE: %s" (propertize (symbol-name major-mode) 'face 'warning)))
-    my-modeline-major-mode
-    "  "
-    my-modeline-git-branch
-    "  "
-    my-modeline-flymake
-    "  "
-    my-modeline-misc-info
-    )
-)
-
-(set-face-attribute 'mode-line-active nil :background "systemGreenColor")
-;; Function name
-(set-face-attribute 'font-lock-function-name-face nil :foreground "#2AA198" :weight 'bold)
-;; docstring
-(set-face-attribute 'font-lock-doc-face nil :foreground "#96A7A9" :weight 'normal)
-;; comment
-(set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
-(set-face-attribute 'font-lock-comment-face nil :weight 'normal)
-
-(use-package org-roam
-  :custom
-  (org-roam-directory (file-truename "~/sbzi/personal/org-roam"))
- ;; :bind (("<leader> n l" . org-roam-buffer-toggle)
- ;;        ("<leader> n f" . org-roam-node-find)
- ;;        ("<leader> n g" . org-roam-graph)
- ;;        ("<leader> n i" . org-roam-node-insert)
- ;;        ("<leader> n c" . org-roam-capture)
- ;;        ;; Dailies
- ;;        ("<leader> n j" . org-roam-dailies-capture-today))
-  :config
-  ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
-
 (use-package org-download
     ;; Drag-and-drop to `dired`
     :config
     (add-hook 'dired-mode-hook 'org-download-enable)
 )
-
-(use-package denote
-  :commands (denote denote-signature denote-subdirectory denote-rename-file-using-front-matter
-                    denote-keywords-prompt
-                    denote-rename-file
-                    denote-link-or-create)
-  :hook (dired-mode . denote-dired-mode-in-directories)
-  :config
-  (setq denote-directory (expand-file-name "~/denote"))
-
-  (setq denote-directory (expand-file-name "~/sbzi/personal/denote/")
-        denote-known-keywords '("dev" "liter" "books" "dailies" "personal")
-        denote-infer-keywords t
-        denote-sort-keywords t
-        denote-allow-multi-word-keywords t
-        denote-date-prompt-use-org-read-date t
-        denote-link-fontify-backlinks t
-        denote-front-matter-date-format 'org-timestamp
-        denote-prompts '(title keywords)))
 
 (use-package pdf-tools
   :load-path "~/.config/emacs/elpa/pdf-tools-20230611.239"
@@ -2040,10 +2012,6 @@ Specific to the current window's mode line.")
   :hook (dirvish-setup . pdf-tools-install)
   :config
   (pdf-tools-install t nil t nil))
-
-;;  (add-to-list 'load-path "~/.config/emacs/site-lisp/emacs-application-framework/")
-;;  (require 'eaf)
-;;  (require 'eaf-pdf-viewer)
 
 (use-package org-capture
 :ensure nil
@@ -2078,57 +2046,24 @@ Specific to the current window's mode line.")
                          ))
 )
 
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-    (define-key map (kbd "SPC s s") 'nil)
-    (define-key map (kbd "C-c s s") 'nil)
-)
+(use-package denote
+  :commands (denote denote-signature denote-subdirectory denote-rename-file-using-front-matter
+                    denote-keywords-prompt
+                    denote-rename-file
+                    denote-link-or-create)
+  :hook (dired-mode . denote-dired-mode-in-directories)
+  :config
+  (setq denote-directory (expand-file-name "~/denote"))
 
-(defun my-open-eshell()
-   (interactive)
-   (split-window-below)
-   (windmove-down)
-   (eshell)
-)
-
-(dolist (map (list
-              evil-motion-state-map
-              ))
-    (define-key map (kbd "SPC s s") 'my-open-eshell)
-    (define-key map (kbd "C-c s s") 'my-open-eshell)
-
-    (if my-enable-which-key-customized-description
-        (progn
-            (which-key-add-key-based-replacements "SPC s s" "Shell")
-            (which-key-add-key-based-replacements "C-c s s" "Shell")
-        ))
-)
-
-(defun my-open-sbzi-folder()
-  (interactive)
-  (dired "~/sbzi")
-)
-
-;;
-;; Bind
-;;
-(dolist (map (list
-              evil-motion-state-map
-              evil-normal-state-map
-              ))
-    (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
-    (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
-)
-
-(if my-enable-which-key-customized-description
-    (progn
-        (which-key-add-key-based-replacements "SPC o d" "directory")
-        (which-key-add-key-based-replacements "C-C o d" "directory")
-    ))
-
-(define-key global-map (kbd "C-,") 'embark-act)
+  (setq denote-directory (expand-file-name "~/sbzi/personal/denote/")
+        denote-known-keywords '("dev" "liter" "books" "dailies" "personal")
+        denote-infer-keywords t
+        denote-sort-keywords t
+        denote-allow-multi-word-keywords t
+        denote-date-prompt-use-org-read-date t
+        denote-link-fontify-backlinks t
+        denote-front-matter-date-format 'org-timestamp
+        denote-prompts '(title keywords)))
 
 (defun my-denote-local()
     (message ">>> [ my-denote-local ] ")
@@ -2171,164 +2106,3 @@ Specific to the current window's mode line.")
 )
 
 (message ">>>>>>>>>")
-
-(use-package general
-  :defer 1
-  :config
-  (general-evil-setup t)
-
-  (general-create-definer
-    my/leader-def
-    :states '(normal visual insert emacs)
-    :prefix "SPC"
-    :global-prefix "M-SPC"
-    :keymap 'override)
-(general-create-definer
-my/insert-leader-def
-:states '(insert emacs)
-:global-prefix "M-SPC"
-:keymap 'override)
-  (my/insert-leader-def
-    "SPC" '(cycle-spacing :which-key "cycle spacing")))
-
-(defvar bootstrap-version)
-;; 修复 Emacs 29 修改了 native-compile 相关变量导致的 bug
-(unless (version<= emacs-version "28.2")
-  (setq straight-repository-branch "develop"))
-(setq straight-check-for-modifications '(check-on-save find-when-checking))
-
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-;;  (defun my-pdf-scroll-local()
-;;     (message ">>> [ my-pdf-scroll-local ] ")
-;;
-;;     ;;
-;;     ;; Rebind
-;;     ;;
-;;     (define-key evil-normal-state-local-map (kbd "e") 'pdf-view-scroll-down-or-previous-page)
-;;     (define-key evil-normal-state-local-map (kbd "n") 'pdf-view-scroll-up-or-next-page)
-;;     (define-key evil-normal-state-local-map (kbd "|") 'pdf-view-fit-page-to-window)
-;;     (define-key evil-normal-state-local-map (kbd "G") 'pdf-view-goto-page)
-;;     (define-key evil-normal-state-local-map (kbd "<") 'pdf-view-first-page)
-;;     (define-key evil-normal-state-local-map (kbd ">") 'pdf-view-last-page)
-;;     (message ">>> [ my-pdf-scroll-local ] rebind pdf navigation works. ")
-;;
-;;     ;;
-;;     ;; Rebind all SPC related bindings to local buffer scope
-;;     ;;
-;;     (rebind-general-leader-x-bindings-to-local-buffer-scope)
-;;     (rebind-colemak-leader-x-bindings-to-local-buffer-scope)
-;;  )
-;;
-;;    (dolist (hook '(pdf-view-mode-hook
-;;                    ))
-;;    (add-hook hook #'my-pdf-scroll-local)
-;;    )
-
-(defun my-org-download-local-bindings()
-    (message ">>> [ my-org-download-local-bindings ] ")
-
-    (define-key evil-normal-state-local-map (kbd "SPC i y") 'org-download-yank)
-    (define-key evil-normal-state-local-map (kbd "SPC i p") 'org-download-clipboard)
-    (define-key evil-normal-state-local-map (kbd "SPC i d") 'org-download-delete)
-    (define-key evil-normal-state-local-map (kbd "SPC i e") 'org-download-edit)
-    (define-key evil-normal-state-local-map (kbd "SPC i s") 'org-download-screenshot)
-
-    (message ">>> [ my-org-download-local-bindings ] - rebind successfully. ")
-)
-
-(add-hook 'org-mode-hook #'my-org-download-local-bindings)
-
-(if my-enable-which-key-customized-description
-    (progn
-        (which-key-add-key-based-replacements "SPC i y" "image/insert")
-        (which-key-add-key-based-replacements "SPC i p" "image/paste")
-        (which-key-add-key-based-replacements "SPC i d" "image/delete")
-        (which-key-add-key-based-replacements "SPC i e" "image/edit")
-        (which-key-add-key-based-replacements "SPC i s" "image/screenshot")
-    ))
-
-;;(use-package pdf-tools)
-
-(use-package org-noter
-  :config
-      (setq org-noter-max-short-selected-text-length 20)
-      (setq org-noter-max-short-length 80000)
-      (setq org-noter-always-create-frame nil) ;; Prevent use new frame!!!
-      (setq org-noter-default-heading-title "Note from $p$ page") ;; Prevent use new frame!!!
-      (if (> 999 (display-pixel-height)) 
-         (setq org-noter-doc-split-fraction '(0.6 . 0.5)))
-  :custom
-      (org-noter-highlight-selected-text t)
-      (org-noter-notes-search-path '("~/sbzi/personal/org-noter/"))
-      (org-noter-auto-save-last-location t)
-)
-(define-key org-noter-doc-mode-map (kbd "M-i") nil)
-(define-key pdf-view-mode-map (kbd "C-u") nil)
-(define-key org-noter-doc-mode-map (kbd "M-i") #'dm/insert-precise)
-
-(defun dm/insert-precise (&optional optional)
-  (interactive "P")
-  (org-noter-insert-precise-note 't))
-
-;; (push "~/workspace/org-noter-plus-djvu" load-path)
-;; (push "~/workspace/org-noter-plus-djvu/other" load-path)
-;; (push "~/workspace/org-noter-plus-djvu/modules" load-path)
-
-;; (require 'org-noter)
-;; (require 'org-noter-nov)
-;; (require 'org-noter-pdf)
-
-
-(define-advice org-noter--insert-heading (:after (level title &optional newlines-number location) add-full-body-quote)
-  "Advice for org-noter--insert-heading.
-
-When inserting a precise note insert the text of the note in the body as an org mode QUOTE block.
-
-=org-noter-max-short-length= should be set to a large value to short circuit the normal behavior:
-=(setq org-noter-max-short-length 80000)="
-
-  ;; this tells us it's a precise note that's being invoked.
-  (if (consp location)
-      (insert (format "#+BEGIN_QUOTE\n%s\n#+END_QUOTE" title))))
-
-(defun my-org-noter-local()
-    (message ">>> [ my-pdf-org-noter-local ] ")
-    ;;
-    ;; Rebind
-    ;;
-    ;;(define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-    (define-key evil-normal-state-local-map (kbd "C-c n n") 'org-noter)
-    (define-key evil-normal-state-local-map (kbd "M-a") 'org-noter-insert-note)
-    (define-key evil-normal-state-local-map (kbd "M-p") 'org-noter-insert-precise-note)
-    (define-key evil-normal-state-local-map (kbd "M-o") 'org-noter-create-skeleton)
-    (define-key evil-normal-state-local-map (kbd "M-q") 'org-noter-kill-session)
-    ;;(define-key evil-normal-state-local-map (kbd "C-c n h") 'org-noter-set-hide-other)
-    (define-key evil-normal-state-local-map (kbd "M-s") 'org-noter-set-auto-save-last-location)
-    (define-key evil-normal-state-local-map (kbd "M-/") 'org-noter-sync-next-note)
-    (define-key evil-normal-state-local-map (kbd "M-,") 'org-noter-sync-prev-note)
-    (define-key evil-normal-state-local-map (kbd "M-.") 'org-noter-sync-current-note)
-    ;;(define-key evil-normal-state-local-map (kbd "M-}") 'org-noter-sync-next-page-or-chapter)
-    ;;(define-key evil-normal-state-local-map (kbd "M-{") 'org-noter-sync-prev-page-or-chapter)
-    (define-key evil-normal-state-local-map (kbd "M-c") 'org-noter-sync-current-page-or-chapter)
-
-    (message ">>> [ my-pdf-org-noter-local ] - rebind successfully. ")
-)
-
-(dolist (hook '(org-mode-hook
-                pdf-view-mode-hook
-                ))
-   (add-hook hook #'my-org-noter-local)
-)
-
-;(add-hook 'pdf-view-mode-hook #'my-rebind-spc-for-pdf-view-mode)
