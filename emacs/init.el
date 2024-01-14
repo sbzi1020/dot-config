@@ -588,6 +588,72 @@ targets."
   )
 )
 
+(dolist (map (list
+              global-map
+              evil-window-map
+              evil-normal-state-map
+              evil-motion-state-map
+              ))
+    (define-key map (kbd "C-j") nil)
+    (define-key map (kbd "C-k") nil)
+    ;;(message "State: %s" state);
+)
+
+(evil-define-key 'normal org-mode-map (kbd "C-j") nil)
+(evil-define-key 'normal org-mode-map (kbd "C-k") nil)
+
+(dolist (map (list
+              vertico-map
+              ))
+  (define-key map (kbd "C-j") 'vertico-next)
+  (define-key map (kbd "C-k") 'vertico-previous)
+)
+
+;;
+;; 'org-mode'
+;;
+(defun my-org-next-heading()
+  (interactive)
+  (org-forward-heading-same-level nil)
+  (evil-scroll-line-to-center nil)
+)
+
+(defun my-org-previous-heading()
+  (interactive)
+  (org-backward-heading-same-level nil)
+  (evil-scroll-line-to-center nil)
+)
+
+(evil-define-key 'normal org-mode-map (kbd "C-j") 'my-org-next-heading)
+(evil-define-key 'normal org-mode-map (kbd "C-k") 'my-org-previous-heading)
+
+;;
+;; Bind to the local buffer keymap against the following delay modes
+;;
+(defun my-markdown-next-heading()
+  (interactive)
+  (outline-next-visible-heading 1)
+  (evil-scroll-line-to-center nil)
+)
+
+(defun my-markdown-previous-heading()
+  (interactive)
+  (outline-next-visible-heading -1)
+  (evil-scroll-line-to-center nil)
+)
+
+(defun my-bind-markdown-heading-jumping-local()
+  (define-key evil-normal-state-local-map (kbd "C-j") 'my-markdown-next-heading)
+  (define-key evil-normal-state-local-map (kbd "C-k") 'my-markdown-previous-heading)
+)
+
+(dolist (hook '(
+               markdown-mode-hook
+               markdown-view-mode-hook
+               ))
+  (add-hook hook #'my-bind-markdown-heading-jumping-local)
+)
+
 (setq my-tab-width 4)
 
 ;;
@@ -738,9 +804,9 @@ targets."
           doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
     ;; Load theme, pick the one you like
-    (load-theme 'doom-gruvbox t)
+    ;; (load-theme 'doom-gruvbox t)
     ;;(load-theme 'doom-nord-aurora t)
-    ;;(load-theme 'doom-one t)
+    (load-theme 'doom-one t)
     ;;(load-theme 'doom-solarized-dark t)
     ;;(load-theme 'doom-solarized-light t)
     ;;(load-theme 'doom-pine t)
@@ -764,6 +830,15 @@ targets."
     (doom-themes-org-config)
   )
 
+(set-face-attribute 'mode-line-active nil :background "systemGreenColor")
+;; Function name
+(set-face-attribute 'font-lock-function-name-face nil :foreground "#2AA198" :weight 'bold)
+;; docstring
+(set-face-attribute 'font-lock-doc-face nil :foreground "#96A7A9" :weight 'normal)
+;; comment
+(set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
+(set-face-attribute 'font-lock-comment-face nil :weight 'normal)
+
 ;; -------------------------------------------------------------------------------
 ;; All custom faces (font settings)
 ;; -------------------------------------------------------------------------------
@@ -782,10 +857,10 @@ targets."
 
 
 ;; -------------------------------------------------------------------------------
-;; Override the default face for change mode line backgroundW
+;; Override the default face for change mode line background
 ;; -------------------------------------------------------------------------------
-(set-face-attribute 'mode-line-active nil :background "#2F2F2F")
-(set-face-attribute 'mode-line-inactive nil :background "#e4e5e4")
+(set-face-attribute 'mode-line-active nil :background "#31033d")
+(set-face-attribute 'mode-line-inactive nil :background "#322f33")
 
 
 ;; -------------------------------------------------------------------------------
@@ -992,15 +1067,6 @@ Specific to the current window's mode line.")
     my-modeline-misc-info
     )
 )
-
-(set-face-attribute 'mode-line-active nil :background "systemGreenColor")
-;; Function name
-(set-face-attribute 'font-lock-function-name-face nil :foreground "#2AA198" :weight 'bold)
-;; docstring
-(set-face-attribute 'font-lock-doc-face nil :foreground "#96A7A9" :weight 'normal)
-;; comment
-(set-face-attribute 'font-lock-comment-delimiter-face nil :weight 'normal)
-(set-face-attribute 'font-lock-comment-face nil :weight 'normal)
 
 (use-package org-roam
   :custom
@@ -1331,8 +1397,8 @@ Specific to the current window's mode line.")
               ))
   (define-key map (kbd "C-l") 'evil-window-right)
   (define-key map (kbd "C-h") 'evil-window-left)
-  (define-key map (kbd "C-j") 'evil-window-down)
-  (define-key map (kbd "C-k") 'evil-window-up)
+ ;; (define-key map (kbd "C-j") 'evil-window-down)
+ ;; (define-key map (kbd "C-k") 'evil-window-up)
   ;;(message "State: %s" state);
 )
 
