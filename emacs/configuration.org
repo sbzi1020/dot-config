@@ -934,15 +934,15 @@ If you really want to unbind all keybindings for the particular mode, do like th
           )
   )
 
-  ;; ;;
-  ;; ;; For Linux
-  ;; ;;
-  ;; (if (string-equal "gnu/linux" system-type)
-  ;;         (progn
-  ;;                 (setq x-super-keysym 'meta)
-  ;;                 (message ">>> Linux, set 'super' key as 'meta' key." system-type)
-  ;;         )
-  ;; )
+   ;;
+   ;; For Linux
+   ;;
+   (if (string-equal "gnu/linux" system-type)
+           (progn
+                   (setq x-super-keysym 'meta)
+                   (message ">>> Linux, set 'super' key as 'meta' key." system-type)
+           )
+   )
 
 #+end_src
 
@@ -2957,7 +2957,7 @@ This package includes a lot of color themes.
             doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
       ;; Load theme, pick the one you like
-      ;;(load-theme 'doom-gruvbox t)
+      (load-theme 'doom-gruvbox t)
       ;;(load-theme 'doom-nord-aurora t)
       ;;(load-theme 'doom-one t)
       ;;(load-theme 'doom-solarized-dark t)
@@ -2967,7 +2967,7 @@ This package includes a lot of color themes.
       ;;(load-theme 'doom-laserwave t)
       ;;(load-theme 'doom-henna t)
       ;;(load-theme 'doom-xcode t)
-      (load-theme 'doom-lantern t)
+      ;; (load-theme 'doom-lantern t)
       ;;(load-theme 'doom-miramare t)
       ;;(load-theme 'doom-old-hope t)
 
@@ -3600,8 +3600,8 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
                 evil-normal-state-map
                 ))
       (define-key map (kbd "Q") 'delete-window)
-      (define-key map (kbd "SPC q") 'save-buffers-kill-terminal)
-      (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
+      (define-key map (kbd "SPC q q") 'save-buffers-kill-terminal)
+      (define-key map (kbd "C-c q q") 'save-buffers-kill-terminal)
       ;; (message ">>> bind 'Q/<leader>q/C-c q' in '%s'" map);
   )
 
@@ -3622,8 +3622,8 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
 
   (if my-enable-which-key-customized-description
       (progn
-          (which-key-add-key-based-replacements "SPC q" "Save and exit")
-          (which-key-add-key-based-replacements "C-c q" "Save and exit")
+          (which-key-add-key-based-replacements "SPC q q" "Save and exit")
+          (which-key-add-key-based-replacements "C-c q q" "Save and exit")
       ))
 #+END_SRC
 

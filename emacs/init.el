@@ -8,15 +8,15 @@
         )
 )
 
-;; ;;
-;; ;; For Linux
-;; ;;
-;; (if (string-equal "gnu/linux" system-type)
-;;         (progn
-;;                 (setq x-super-keysym 'meta)
-;;                 (message ">>> Linux, set 'super' key as 'meta' key." system-type)
-;;         )
-;; )
+ ;;
+ ;; For Linux
+ ;;
+ (if (string-equal "gnu/linux" system-type)
+         (progn
+                 (setq x-super-keysym 'meta)
+                 (message ">>> Linux, set 'super' key as 'meta' key." system-type)
+         )
+ )
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -738,7 +738,7 @@ targets."
           doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
     ;; Load theme, pick the one you like
-    ;;(load-theme 'doom-gruvbox t)
+    (load-theme 'doom-gruvbox t)
     ;;(load-theme 'doom-nord-aurora t)
     ;;(load-theme 'doom-one t)
     ;;(load-theme 'doom-solarized-dark t)
@@ -748,7 +748,7 @@ targets."
     ;;(load-theme 'doom-laserwave t)
     ;;(load-theme 'doom-henna t)
     ;;(load-theme 'doom-xcode t)
-    (load-theme 'doom-lantern t)
+    ;; (load-theme 'doom-lantern t)
     ;;(load-theme 'doom-miramare t)
     ;;(load-theme 'doom-old-hope t)
 
@@ -1055,8 +1055,8 @@ Specific to the current window's mode line.")
               evil-normal-state-map
               ))
     (define-key map (kbd "Q") 'delete-window)
-    (define-key map (kbd "SPC q") 'save-buffers-kill-terminal)
-    (define-key map (kbd "C-c q") 'save-buffers-kill-terminal)
+    (define-key map (kbd "SPC q q") 'save-buffers-kill-terminal)
+    (define-key map (kbd "C-c q q") 'save-buffers-kill-terminal)
     ;; (message ">>> bind 'Q/<leader>q/C-c q' in '%s'" map);
 )
 
@@ -1077,8 +1077,8 @@ Specific to the current window's mode line.")
 
 (if my-enable-which-key-customized-description
     (progn
-        (which-key-add-key-based-replacements "SPC q" "Save and exit")
-        (which-key-add-key-based-replacements "C-c q" "Save and exit")
+        (which-key-add-key-based-replacements "SPC q q" "Save and exit")
+        (which-key-add-key-based-replacements "C-c q q" "Save and exit")
     ))
 
 (dolist (map (list
