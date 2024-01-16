@@ -1528,6 +1528,10 @@ Specific to the current window's mode line.")
   (interactive)
   (dired "~/sbzi")
 )
+(defun my-open-notes-folder()
+  (interactive)
+  (dired "~/sbzi/personal/denote")
+)
 
 ;;
 ;; Bind
@@ -1538,12 +1542,18 @@ Specific to the current window's mode line.")
               ))
     (define-key map (kbd "SPC o d") 'my-open-sbzi-folder)
     (define-key map (kbd "C-c o d") 'my-open-sbzi-folder)
+
+    (define-key map (kbd "SPC o n") 'my-open-notes-folder)
+    (define-key map (kbd "C-c o n") 'my-open-notes-folder)
 )
 
 (if my-enable-which-key-customized-description
     (progn
         (which-key-add-key-based-replacements "SPC o d" "directory")
         (which-key-add-key-based-replacements "C-C o d" "directory")
+
+        (which-key-add-key-based-replacements "SPC o n" "directory")
+        (which-key-add-key-based-replacements "C-C o n" "directory")
     ))
 
 (dolist (map (list
@@ -1855,11 +1865,11 @@ Specific to the current window's mode line.")
 )
 (defun my-goto-shell-backup-directory()
    (interactive)
-   (dired "~/my-shell/backup")
+   (dired "~/sbzi/dot-config")
 )
 (defun my-goto-c-directory()
    (interactive)
-   (dired "~/c")
+   (dired "~/sbzi/c")
 )
 (defun my-goto-emacs-directory()
    (interactive)
@@ -1869,13 +1879,9 @@ Specific to the current window's mode line.")
    (interactive)
    (dired "~/Downloads")
 )
-(defun my-goto-rust-directory()
+(defun my-goto-sbzi-directory()
    (interactive)
-   (dired "~/rust")
-)
-(defun my-goto-zig-directory()
-   (interactive)
-   (dired "~/zig")
+   (dired "~/sbzi")
 )
 (defun my-goto-temp-directory()
    (interactive)
@@ -1893,9 +1899,8 @@ Specific to the current window's mode line.")
   (define-key evil-normal-state-local-map (kbd "gc") 'my-goto-c-directory)
   (define-key evil-normal-state-local-map (kbd "ge") 'my-goto-emacs-directory)
   (define-key evil-normal-state-local-map (kbd "gp") 'my-goto-photo-directory)
-  (define-key evil-normal-state-local-map (kbd "gr") 'my-goto-rust-directory)
+  (define-key evil-normal-state-local-map (kbd "gs") 'my-goto-sbzi-directory)
   (define-key evil-normal-state-local-map (kbd "gt") 'my-goto-temp-directory)
-  (define-key evil-normal-state-local-map (kbd "gz") 'my-goto-zig-directory)
 )
 
 (setq dired-omit-files "^\\...+$")
@@ -2131,44 +2136,51 @@ Specific to the current window's mode line.")
         denote-front-matter-date-format 'org-timestamp
         denote-prompts '(title keywords)))
 
-(defun my-denote-local()
-    (message ">>> [ my-denote-local ] ")
-
-    ;;
-    ;; Unbind
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC n") nil)
-
-    ;;
-    ;; Rebind
-    ;;
-    (define-key evil-normal-state-local-map (kbd "SPC n l") 'denote-link)
-    (define-key evil-normal-state-local-map (kbd "SPC n L") 'denote-backlink)
-    (define-key evil-normal-state-local-map (kbd "SPC n t") 'denote-template)
-    (define-key evil-normal-state-local-map (kbd "SPC n a") 'denote-add-links)
-    (define-key evil-normal-state-local-map (kbd "SPC n g") 'denote-global-menu)
-    (define-key evil-normal-state-local-map (kbd "SPC n r") 'denote-rename-file)
-    (define-key evil-normal-state-local-map (kbd "SPC n k") 'denote-keywords-add)
-    (define-key evil-normal-state-local-map (kbd "SPC n K") 'denote-keywords-remove)
-    (define-key evil-normal-state-local-map (kbd "SPC n f") 'denote-find-link)
-    (define-key evil-normal-state-local-map (kbd "SPC n F") 'denote-find-backlink)
-
-
-
-  ;; (if my-enable-which-key-customized-description
-  ;;      (progn
-  ;;          ;;(which-key-add-key-based-replacements "C-c n" "Noter")
-  ;;          (which-key-add-key-based-replacements "C-c n <" "prev note")
-  ;;          (which-key-add-key-based-replacements "C-c n ]" "next chapter note")
-  ;;      ))
-
-    (message ">>> [ my-denote-local ] - rebind successfully. ")
+(define-key evil-normal-state-map (kbd "SPC n") nil)
+(dolist (map (list
+              evil-motion-state-map
+              evil-normal-state-map
+              ))
+  (define-key map (kbd "SPC n") nil)
+  (define-key map (kbd "SPC n l") nil)
 )
 
-(dolist (hook '(org-mode-hook
-		pdf-view-mode-hook
-		))
-   (add-hook hook #'my-denote-local)
+(dolist (map (list
+              evil-motion-state-map
+              ))
+  (define-key map (kbd "SPC i m") 'consult-imenu)
+  (define-key map (kbd "C-c i m") 'consult-imenu)
+
+  (define-key map (kbd "SPC n c") 'denote)
+  (define-key map (kbd "SPC n o") 'denote-open-or-create)
+  (define-key map (kbd "SPC n f") 'denote-type)
+  (define-key map (kbd "SPC n t") 'denote-template)
+  (define-key map (kbd "SPC n r") 'denote-rename-file)
+
+  (define-key map (kbd "SPC n l a") 'denote-link)
+  (define-key map (kbd "SPC n l c") 'denote-link-or-create)
+  (define-key map (kbd "SPC n l r") 'denote-add-links)
+  (define-key map (kbd "SPC n l f") 'denote-find-link)
+  (define-key map (kbd "SPC n l b") 'denote-backlinks)
 )
+
+;;
+;; 'which-key' description
+;;
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC n" "Denote")
+        (which-key-add-key-based-replacements "SPC n c" "Create note")
+        (which-key-add-key-based-replacements "SPC n o" "Open (or create) note")
+        (which-key-add-key-based-replacements "SPC n f" "Create note by file-type")
+        (which-key-add-key-based-replacements "SPC n t" "Create note by template")
+        (which-key-add-key-based-replacements "SPC n r" "Rename")
+        (which-key-add-key-based-replacements "SPC n l" "Denote Links")
+        (which-key-add-key-based-replacements "SPC n l a" "Add link")
+        (which-key-add-key-based-replacements "SPC n l c" "Add (or create) link")
+        (which-key-add-key-based-replacements "SPC n l r" "Regexp links")
+        (which-key-add-key-based-replacements "SPC n l f" "Find links")
+        (which-key-add-key-based-replacements "SPC n l b" "Back-links")
+    ))
 
 (message ">>>>>>>>>")
