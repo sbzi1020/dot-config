@@ -57,7 +57,7 @@ Enable highlight when yanked, `TextYankPost` event auto command
 --        au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=300 }
 --    augroup END
 --]]
-vim.api.nvim_create_autocmd('TextYankPost ', {
+vim.api.nvim_create_autocmd({'TextYankPost'}, {
     command = "lua vim.highlight.on_yank { higroup='IncSearch', timeout=300 }",
     group = vim.api.nvim_create_augroup('YankGroup', { clear = true })
 })

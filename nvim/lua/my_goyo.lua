@@ -6,7 +6,8 @@ goyo
 -----------------------------------------------------------------------
 --]]
 -- Make the popup window width a little bit
-vim.cmd 'let g:goyo_width=\'80%\''
+vim.cmd 'let g:goyo_width=\'60%\''
+vim.cmd 'let g:goyo_height=\'90%\''
 
 -- Enable the relative number when going into `GOYO` mode!
 function Goyo_enter()

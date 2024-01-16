@@ -59,11 +59,12 @@ Reload_package 'my_nvim_comment'
 Reload_package 'lsp/my_lsp'
 -- Reload_package 'lsp/coc'
 
--- ChatGPT
-Reload_package 'lsp/my_chatgpt'
 
 -- Themes modules
 Reload_package 'my_themes'
+
+-- Vim be good
+Reload_package 'my_vim_be_good'
 
 
 --[[

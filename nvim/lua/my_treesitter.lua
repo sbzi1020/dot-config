@@ -17,8 +17,6 @@ nvim-treesitter
 :TSInstall html
 :TSInstall css
 :TSInstall json
-:TSInstall cpp
-:TSInstall c
 :TSInstall markdown
 
 After that, all compiled language parsers will be placed into:
@@ -64,7 +62,7 @@ loaded_package.setup({
         "proto",
         "vim",
         "yaml",
-	    "zig",
+        "zig",
     },
 
     -- install languages synchronously (only applied to `ensure_installed`)

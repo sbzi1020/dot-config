@@ -90,6 +90,7 @@ return packer.startup(function(use)
     use 'tpope/vim-repeat'
     use 'jiangmiao/auto-pairs'
     use 'junegunn/goyo.vim'
+    use 'chaoren/vim-wordmotion'
 
     --[[
     For markdown plugin, before any update from repo README, plz run the 
@@ -123,11 +124,11 @@ return packer.startup(function(use)
     use 'nvim-lua/plenary.nvim'         -- Lua functions many plugins rely on
     use 'nvim-telescope/telescope.nvim'
     -- Enable fzf search syntax
-    use {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
-    }
-    use { 'dhruvmanila/telescope-bookmarks.nvim', tag = '*' } -- Search from browser bookmark
+    -- use {
+    --     'nvim-telescope/telescope-fzf-native.nvim',
+    --     run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+    -- }
+    -- use { 'dhruvmanila/telescope-bookmarks.nvim', tag = '*' } -- Search from browser bookmark
 
     --[[
     Comment and uncomment for all languages
@@ -137,7 +138,9 @@ return packer.startup(function(use)
     --[[
     Color Scheme
     --]]
-    --use 'navarasu/onedark.nvim'
+    use 'navarasu/onedark.nvim'
+    use  'ellisonleao/gruvbox.nvim'
+    use { 'luisiacc/gruvbox-baby', branch = 'main' }
 
     --[[
     LSP related
@@ -171,30 +174,13 @@ return packer.startup(function(use)
     use 'hrsh7th/vim-vsnip'
 
     --[[
-    ChatGPT related
-    --]]
-    use({
-        "jackMort/ChatGPT.nvim",
-        config = function()
-            require("chatgpt").setup()
-        end,
-        requires = {
-            "MunifTanjim/nui.nvim",
-            "nvim-lua/plenary.nvim",
-            "nvim-telescope/telescope.nvim"
-        },
-        config = function()
-            require("chatgpt").setup({
-                api_key_cmd = "echo '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'"
-            })
-        end,
-    })
-
-    --[[
     Automatically set up your configuration after cloning packer.nvim
     Put this at the end after all plugins
     --]]
     if packer_first_installed then
         require("packer").sync()
     end
+
+    -- Vim training
+    use 'ThePrimeagen/vim-be-good'
 end)

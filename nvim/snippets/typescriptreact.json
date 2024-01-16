@@ -5,12 +5,12 @@
            "import React from 'react'",
            "",
            "//",
-           "export interface Props {",
+           "export interface ${1: Props interface}Props {",
            "    classes?: any",
            "}",
            "",
            "//",
-           "const ${2: ComponentName} = (${1: Props interface}: Props) => {",
+           "const ${2: ComponentName} = (props: ${1: Props interface}Props) => {",
            "    return (",
            "       <div>",
            "           $0",
@@ -50,6 +50,20 @@
            "",
            "export default React.memo(${2: ComponentName})"
        ]
+    },
+    "Import material styles": {
+        "prefix": ["material-import"],
+        "body": [
+            "import { makeStyles, withStyles } from '@material-ui/core/styles'$0"
+        ]
+    },
+    "Create material styles": {
+        "prefix": ["material-style"],
+        "body": [
+            "const styles = makeStyles((theme: any) => ({",
+            "    ${1:// Camel-case key-value here}",
+            "}))$0"
+        ]
     },
     "<head> for TSX": {
         "prefix": ["head"],

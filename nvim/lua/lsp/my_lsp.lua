@@ -159,16 +159,16 @@ local custom_lsp_attach = function()
     vim.api.nvim_buf_set_keymap(0, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, "n", "<leader>fm", "<cmd>lua vim.lsp.buf.formatting()<CR>", mapping_options)
+    vim.api.nvim_buf_set_keymap(0, "n", "<leader>ff", "<cmd>lua vim.lsp.buf.format( {async = true} )<CR>", mapping_options)
+    -- vim.api.nvim_buf_set_keymap(0, "n", "<leader>ff", "<cmd>lua vim.lsp.buf.formatting({ tabSize = 4, insertSpaces = true })<CR>", mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', mapping_options)
+    vim.api.nvim_buf_set_keymap(0, 'n', 'rn',  '<cmd>lua vim.lsp.buf.rename()<CR>', mapping_options)
     --vim.api.nvim_buf_set_keymap(0, 'n', 'se', '<cmd>lua vim.diagnostic.setloclist()<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>sd', '<cmd>Telescope diagnostics<CR>', mapping_options)
+    vim.api.nvim_buf_set_keymap(0, 'n', 'se', '<cmd>Telescope diagnostics<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', '<c-n>', '<cmd>lua vim.diagnostic.goto_next({popup_opts = {border = \'rounded\'}})<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', '<c-p>', '<cmd>lua vim.diagnostic.goto_prev({popup_opts = {border = \'rounded\'}})<CR>', mapping_options)
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>ff',  '<cmd>lua vim.lsp.buf.code_action({only = \'quickfix\'})<CR>', mapping_options)
+    -- vim.api.nvim_buf_set_keymap(0, 'n', 'qf',  '<cmd>lua vim.lsp.buf.code_action({only = \'quickfix\'})<CR>', mapping_options)
     vim.api.nvim_buf_set_keymap(0, 'n', 'ca',  '<cmd>lua vim.lsp.buf.code_action()<CR>', mapping_options)
-
-    vim.api.nvim_buf_set_keymap(0, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', mapping_options)
 end
 
 
@@ -375,46 +375,45 @@ MacOS:
 
     After that, plz make sure add `/usr/local/opt/llvm/bin/` to your `$PATH`!!!
 
+FreeBSD:
+    In `FreeBSD`, you don't need to install any `build-base/build-essential`
+    package for coding, as `LLVM (clang/clang++)` installed with the FreeBSD
+    `base` system.
+
+    For the `clangd` (C/C++ language server), it's NOT in the `/usr/bin`. It
+    goes to `/usr/local/llvmXX/bin` which the `XX` is version number, you can
+    confirm that version by running the following command:
+
+    ```bash
+    pkg info --all | rg llvm
+    # llvm15-15.0.6_1
+    ```
+
+    That means `clangd` located in `/usr/local/llvm15/bin`, put it to your `$PATH`.
 --]]
-local cpp_package = Reload_package('clangd_extensions')
-cpp_package.setup({
-    server = {
-        on_attach = custom_lsp_attach,
-        capabilities = capabilities,
-    },
-    extensions = {
-        autoSetHints = true,
-    }
-})
-
-nvim_lsp.cssls.setup {
+nvim_lsp.clangd.setup {
     on_attach = custom_lsp_attach,
     capabilities = capabilities,
 }
 
-nvim_lsp.html.setup {
-    on_attach = custom_lsp_attach,
-    capabilities = capabilities,
-    filetypes = {'html' }
-}
 
 --[[
------------------------------------------------------------------------
 
 Build the `zls` from source:
 
 ```bash
-git clone https://github.com/zigtools/zls
+git clone --recurse-submodules https://github.com/zigtools/zls
 cd zls
 zig build -Doptimize=ReleaseSafe
 ```
 
-Then add `zig-out/bin/zls` to your path
------------------------------------------------------------------------
+Then move `zig-out/bin/zls` to your $PATH folder
+
 --]]
 nvim_lsp.zls.setup({
     on_attach = custom_lsp_attach,
     capabilities = capabilities,
+    -- More options from here: https://github.com/zigtools/zls
 })
 
 
