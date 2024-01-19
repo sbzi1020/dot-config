@@ -483,3 +483,11 @@ ex=:\
 *.pdf=:\
 *.nix=:\
 "
+
+#--------------------------------------------------------
+# Hyprland
+#--------------------------------------------------------
+abbr hpc "nvim ~/.config/hypr/hyprland.conf"
+abbr hpm "hyprctl monitors all"
+abbr exith "hyprctl dispatch exit"
+abbr cwp "swww img --transition-type wipe --transition-angle 45 ~/Photo/wallpaer"
