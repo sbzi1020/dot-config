@@ -1,0 +1,221 @@
+import = [
+   "~/.config/alacritty/themes/themes/everforest_dark.toml"
+    #"~/.config/alacritty/themes/themes/everforest_light.toml"
+]
+
+
+# # Colors (Everforest Dark)
+
+# # Default colors
+# [colors.primary]
+# background = '#2d353b'
+# foreground = '#d3c6aa'
+
+# # Normal colors
+# [colors.normal]
+# black   = '#475258'
+# red     = '#e67e80'
+# green   = '#a7c080'
+# yellow  = '#dbbc7f'
+# blue    = '#7fbbb3'
+# magenta = '#d699b6'
+# cyan    = '#83c092'
+# white   = '#d3c6aa'
+
+# # Bright colors
+# [colors.bright]
+# black   = '#475258'
+# red     = '#e67e80'
+# green   = '#a7c080'
+# yellow  = '#dbbc7f'
+# blue    = '#7fbbb3'
+# magenta = '#d699b6'
+# cyan    = '#83c092'
+# white   = '#d3c6aa'
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[cursor.style]
+blinking = "Off"
+shape = "Block"
+
+[font]
+size = 14.0
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+# family = "SauceCodePro Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+# family = "SauceCodePro Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+# family = "SauceCodePro Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+# family = "SauceCodePro Nerd Font"
+style = "Medium"
+
+[[keyboard.bindings]]
+key = "Key1"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 1"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key2"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 2"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key3"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 3"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key4"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 4"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key5"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 5"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key6"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 6"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key7"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 7"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key8"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 8"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key9"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 9"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+chars = """
+clear
+"""
+key = "K"
+mods = "Super"
+
+[[keyboard.bindings]]
+chars = "tmux rename-window "
+key = "I"
+mods = "Super"
+
+[[keyboard.bindings]]
+key = "T"
+mods = "Super"
+
+[keyboard.bindings.command]
+args = ["new-window"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "W"
+mods = "Super"
+
+[keyboard.bindings.command]
+args = ["kill-window"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "H"
+mods = "Super"
+
+[keyboard.bindings.command]
+args = ["prev"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Super"
+
+[keyboard.bindings.command]
+args = ["next"]
+program = "/usr/bin/tmux"
+
+[[keyboard.bindings]]
+key = "H"
+mods = "Super|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux swap-window -t -1 && /usr/bin/tmux previous-window"]
+program = "/usr/bin/fish"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Super|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux swap-window -t +1 && /usr/bin/tmux next-window"]
+program = "/usr/bin/fish"
+
+[[keyboard.bindings]]
+key = "J"
+mods = "Control|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux switch-client -n"]
+program = "/usr/bin/fish"
+
+[[keyboard.bindings]]
+key = "K"
+mods = "Control|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux switch-client -p"]
+program = "/usr/bin/fish"
+
+[window]
+decorations = "none"
+opacity = 0.95
+startup_mode = "Maximized"
+
+[window.padding]
+x = 10
+y = 10
