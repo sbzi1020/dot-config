@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: printf
+# key: pl
+# --
+printf("\n>>> $0");

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: buffer2
+# key: buf2
+# --
+var $1 = [_]u8 {0x00} ** $0;
