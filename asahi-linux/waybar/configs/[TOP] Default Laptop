@@ -17,6 +17,7 @@
 
 "modules-left": [
 	"hyprland/workspaces#pacman",
+	"custom/separator#blank_3",
 	"custom/separator#dot-line",
 	"custom/separator#blank_3",
 	"custom/cava_mviz",
