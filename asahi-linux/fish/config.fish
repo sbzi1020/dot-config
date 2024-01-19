@@ -168,11 +168,7 @@ abbr dc "docker-compose"
 abbr dm "docker-machine"
 
 # Vi config related and vifm
-abbr vim "lvim"
-# abbr vim "nvim"
-# abbr fc "nvim ~/.config/fish/config.fish"
-# abbr vc "nvim ~/.config/nvim/init.vim"
-# abbr vim "lvim"
+abbr vim "nvim"
 abbr fc "nvim ~/.config/fish/config.fish"
 abbr vc "cd ~/.config/nvim && nvim ~/.config/nvim/init.lua"
 abbr wison_vim "nvim -u ~/.config/nvim/init_wison.lua"
@@ -279,6 +275,10 @@ abbr pinfo "dnf info"
 abbr pginfo "dnf group info"
 abbr premove "sudo dnf remove"
 abbr pgremove "sudo dnf group remove"
+abbr pquery "dnf repoquery --installed" # Query only installed packages
+# abbr pqueryfile "dnf repoquery --installed --list"
+abbr pqueryfile "dnf repoquery --latest 1 --list" # When querying package files, query from repo latest version
+
 
 #--------------------------------------------------------
 # Node LTS
@@ -488,3 +488,11 @@ ex=:\
 *.pdf=:\
 *.nix=:\
 "
+
+#--------------------------------------------------------
+# Hyprland
+#--------------------------------------------------------
+abbr hpc "cd ~/.config/hypr && nvim ~/.config/hypr/hyprland.conf"
+abbr hpm "hyprctl monitors all"
+abbr exith "hyprctl dispatch exit"
+abbr cwp "swww img --transition-type wipe --transition-angle 45 $HOME/Pictures/wallpapers"
