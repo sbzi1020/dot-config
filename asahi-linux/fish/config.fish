@@ -277,7 +277,7 @@ abbr psearch "dnf search"
 abbr pgsearch "dnf group list | rg"
 abbr pinfo "dnf info"
 abbr pginfo "dnf group info"
-abbr premove "sudo dnf install"
+abbr premove "sudo dnf remove"
 abbr pgremove "sudo dnf group remove"
 
 #--------------------------------------------------------
