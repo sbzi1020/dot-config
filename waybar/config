@@ -14,7 +14,7 @@
     // Height and width to be used by the bar if possible, leave blank for a
     // dynamic value.
     // -----------------------------------------------------------------------
-    "height": 50, 
+    // "height": 30, 
 
     // -----------------------------------------------------------------------
     // Margins value using the css format without units (top/right/bottom/left).
@@ -132,6 +132,12 @@
             "4": [],
             "5": [],
         },
+	"format": "{icon}",
+	"format-icons": {
+	    "active": " 󰮯 ",
+	    "default": "󰊠",
+	    "persistent":"󰊠",
+	},
     },
 
 
