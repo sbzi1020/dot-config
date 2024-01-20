@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print
+# key: pl
+# --
+print("\n>>> $1\", .{$0});

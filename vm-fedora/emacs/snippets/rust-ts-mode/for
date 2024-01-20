@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: for
+# key: for
+# --
+for ${1:index_var} in ${2:var_or_range} {
+    $0
+}
