@@ -1,0 +1,96 @@
+@define-color bg_dim #232a2e;
+@define-color bg0 #2d353b;
+@define-color bg1 #343f44;
+@define-color bg2 #3d484d;
+@define-color bg3 #475258;
+@define-color bg4 #4f585e;
+@define-color bg5 #56635f;
+@define-color bg_visual #543a48;
+@define-color bg_red #514045;
+@define-color bg_green #425047;
+@define-color bg_blue #3a515d;
+@define-color bg_yellow #4d4c43;
+@define-color fg #d3c6aa;
+@define-color red #e67e80;
+@define-color orange #e69875;
+@define-color yellow #dbbc7f;
+@define-color green #a7c080;
+@define-color aqua #83c092;
+@define-color blue #7fbbb3;
+@define-color purple #d699b6;
+@define-color grey0 #7a8478;
+@define-color grey1 #859289;
+@define-color grey2 #9da9a0;
+
+window#waybar {
+    font-family: JetBrainsMono Nerd Font, FontAwesome;
+    font-size: 16px;
+    font-weight: bold;
+
+    background-color: @fg;
+    color: @bg0;
+
+    transition-property: background-color;
+    transition-duration: 0.5s;
+    transition-duration: .5s;
+
+    border-radius: 10px;
+    
+    opacity: 0.9;
+}
+
+#clock,
+#clock-date,
+#pulseaudio,
+#network {
+    background-color: @bg0;
+    color: @fg;
+
+    padding: 5px 10px 5px 10px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    border-radius: 10px;
+}
+
+#clock {
+    margin-left: 10px;
+}
+
+#network {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#workspaces {
+    margin-top: 7px;
+    margin-bottom: 7px;
+    padding: 3px 8px; 
+
+    background-color: transparent;
+
+    border: 2px solid @bg0;
+    border-radius: 30px;
+}
+
+#workspaces button {
+    font-family: JetBrainsMono Nerd Font, FontAwesome;
+    font-size: 20px;
+
+    padding: 5px 10px;
+
+    border-radius: 50px;
+
+    color: #d9e0ee;
+    background-color: @bg0;
+
+    /* animation: gradient_f 20s ease-in infinite; */
+    /* transition: all 0.5s cubic-bezier(.55,-0.68,.48,1.682); */
+}
+
+#workspaces button.active {
+    background-color: @purple;
+    /* background-color: @orange; */
+    color: @bg0;
+
+    padding: 5px;
+}
