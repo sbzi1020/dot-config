@@ -34,6 +34,7 @@ After that, the partions should look like this:
 
 *** Root password
 
+
 *** User creation
 
 
@@ -99,6 +100,7 @@ Then relogin to take effects.
 
 *** Configure git and restore my dot files
 
+
 *** Install nerd fonts
 
 #+BEGIN_SRC bash
@@ -143,3 +145,23 @@ Then relogin to take effects.
 **** Enable =wayland=
 
 Open =brave://flags= in URL bar, then search =zone=, you should be able to see the =Preferred Ozone platform= option, set it to ~Wayland~ and re-launch to take affects.
+
+
+*** =MPV= related
+
+**** Keyboard control
+
+| Keybinding   | Description                                       |
+|--------------+---------------------------------------------------|
+| =9=  / =0=       | Volume down/up                                    |
+| =<= / =>==       | Switch to previous/next track in playlist         |
+| =m=            | Toggle mute/unmute                                |
+| =space=        | Pause/unpause                                     |
+| =left= / =right= | Seek back-forward/forward 5 seconds               |
+| =[= / =]=        | Decrease/increase current playback speed by 10%.= |
+| =backspace=    | Reset playback speed to normal                    |
+| =I=            | Toggle stats info                                 |
+| =L=            | Toggle infinite loop                              |
+| =s=            | Take a screenshot                                 |
+| =S=            | Take a screenshto without subtitles               |
+|              |                                                  |
