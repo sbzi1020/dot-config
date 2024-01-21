@@ -302,9 +302,9 @@ set CPPFLAGS -I/opt/homebrew/opt/node@16/include
 #--------------------------------------------------------
 # Rust - Cargo
 #--------------------------------------------------------
-# set PATH $HOME/.cargo/bin $PATH
-# set LD_LIBRARY_PATH (rustc --print sysroot)"/lib"
-# set RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/library"
+set PATH $HOME/.cargo/bin $PATH
+set LD_LIBRARY_PATH (rustc --print sysroot)"/lib"
+set RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/library"
 
 
 #--------------------------------------------------------
@@ -498,3 +498,14 @@ abbr hpc "cd ~/.config/hypr && nvim ~/.config/hypr/hyprland.conf"
 abbr hpm "hyprctl monitors all"
 abbr exith "hyprctl dispatch exit"
 abbr cwp "swww img --transition-type wipe --transition-angle 45 $HOME/Pictures/wallpapers"
+
+
+#--------------------------------------------------------
+# MPV realted
+#--------------------------------------------------------
+abbr mpvh "mpv --ytdl --script-opts=try_ytdl_first=yes --ytdl-format=ytdl"   # Best video and audio quality
+abbr mpv  "mpv --ytdl --script-opts=try_ytdl_first=yes --ytdl-format=best"   # Middle video and audio quality
+abbr mpvl "mpv --ytdl --script-opts=try_ytdl_first=yes --ytdl-format=worst"  # Low video and audio quality
+
+
+abbr shutdown "sudo shutdown --poweroff now"
