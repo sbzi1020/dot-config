@@ -82,9 +82,9 @@ You have to install =C Development Tools and Libraries= before restoring =neovim
   sudo dnf group install "C Development Tools and Libraries"
 
   #
-  # If you need llvm and clang
+  # If you need llvm and clang, `clangd` is inside `clang-tools-extra`
   #
-  sudo dnf install llvm clang
+  sudo dnf install llvm clang clang-tools-extra
 #+END_SRC
 
 
