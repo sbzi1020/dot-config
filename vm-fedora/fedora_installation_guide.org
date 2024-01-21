@@ -54,7 +54,7 @@ Add =max_parallel_downloads=10= to ~=/etc/dnf/dnf.conf~ and then:
 *** Install everything I need
 
 #+BEGIN_SRC bash
-  sudo dnf install git bat ripgrep procs htop neofecth fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol
+  sudo dnf install git bat ripgrep procs htop btop neofecth fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol mpv cava dbus dbus-daemon
 #+END_SRC
 
 
@@ -117,3 +117,29 @@ Then relogin to take effects.
   fc-cache -fv
 #+END_SRC
 
+
+*** Install =brave= 
+
+#+BEGIN_SRC bash
+  sudo dnf install dnf-plugins-core
+  sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+  sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+  sudo dnf install brave-browser
+#+END_SRC
+
+
+**** How to launch
+
+#+BEGIN_SRC bash
+  dbus-run-session brave-browser > ~/.launch_brave_browser.log
+
+  #
+  # If you want all fonts are bigger, change `GDK_DPI_SCALE` to your value
+  #
+  GDK_DPI_SCALE=1.2 dbus-run-session brave-browser > ~/.launch_brave_browser.log
+#+END_SRC
+
+
+**** Enable =wayland=
+
+Open =brave://flags= in URL bar, then search =zone=, you should be able to see the =Preferred Ozone platform= option, set it to ~Wayland~ and re-launch to take affects.
