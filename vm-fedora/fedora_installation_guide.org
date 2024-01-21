@@ -1,0 +1,119 @@
+*  Fedora Installation Guide
+
+** Download the =Everything= net install ISO
+
+X86_64 - https://alt.fedoraproject.org/
+AARCH64 - https://alt.fedoraproject.org/alt/
+
+
+** Graphical install process
+
+The GUI install process is pretty easy, just follow this [[https://able.bio/KY64/minimal-installation-fedora-linux--73410e6d][page]] to walk through all steps.
+
+The things I need to change are below:
+
+*** No default =/home= partion
+
+=Installation Destination= -> =Custom= -> Change the partion type to =Standard partion= and then =Click here to create them automatic= -> remove the =/home/= mount point (press =-= to remove it) and add its space to the =/= partion!!!
+
+
+After that, the partions should look like this:
+
+#+BEGIN_SRC bash
+  sda
+   |-- sda1  600M EFI  /boot/efi
+   |-- sda2  1G   ext4 /boot
+   |-- sda3  62G  ext  /
+#+END_SRC
+
+
+*** Only install =Minimal Install=
+
+=Software Selection= -> =Minimal Install=
+
+
+*** Root password
+
+*** User creation
+
+
+**  Configuration
+
+*** Make sure the system is up-to-date after first login
+
+Add =max_parallel_downloads=10= to ~=/etc/dnf/dnf.conf~ and then:
+ 
+#+BEGIN_SRC bash
+  sudo dnf check-update
+
+  # If `dnf check-update` say you got something to update
+  sudo dnf update
+#+END_SRC
+
+
+*** Install everything I need
+
+#+BEGIN_SRC bash
+  sudo dnf install git bat ripgrep procs htop neofecth fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol
+#+END_SRC
+
+
+Change default shell to =fish=:
+
+#+BEGIN_SRC bash
+  chsh -s /usr/bin/fish
+#+END_SRC
+
+
+*** How to fix =ip= command not found
+
+Install =iproute= if you didn't yet (the =Minimal Install= should install it already, but the =/sbin/= doesn't include to your =$PATH= yet)
+
+#+BEGIN_SRC bash
+  sudo dnf install iproute
+#+END_SRC
+
+
+*** Install C Development tools
+
+You have to install =C Development Tools and Libraries= before restoring =neovim= configuration to =~/.config/nvim=, as it requires the =cc= compiler:
+
+#+BEGIN_SRC bash
+  sudo dnf group install "C Development Tools and Libraries"
+
+  #
+  # If you need llvm and clang
+  #
+  sudo dnf install llvm clang
+#+END_SRC
+
+
+*** Install =Rust= as =swww= doesn't exists in =Fedora=
+
+#+BEGIN_SRC bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#+END_SRC
+
+Then relogin to take effects.
+
+
+*** Configure git and restore my dot files
+
+*** Install nerd fonts
+
+#+BEGIN_SRC bash
+  # Install the basic font without nerd font icon support
+  sudo dnf install jetbrains-mono-fonts-all
+
+  # Install nerd font version
+  cd temp
+  curl -OL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+  tar xvf JetBrainsMono.tar.xz
+  rm -rf  JetBrainsMono.tar.xz
+
+  # Update font cache
+  sudo mkdir /usr/share/fonts/jetbrains-mono-nerd-fonts
+  sudo fc-cache -fv
+  fc-cache -fv
+#+END_SRC
+
