@@ -546,6 +546,7 @@ targets."
     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
     (yaml "https://github.com/ikatyang/tree-sitter-yaml")
     (fish "https://github.com/ram02z/tree-sitter-fish")
+    (java "https://github.com/tree-sitter/tree-sitter-java")
    )
 )
 
@@ -563,6 +564,7 @@ targets."
 (add-to-list 'auto-mode-alist '("bspwmrc" . bash-mode))
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 
 ;;
 ;; remap the non-treesitter mode to treesitter mode
@@ -585,6 +587,7 @@ targets."
    (tsx-mode . tsx-ts-mode)
    (typescript-mode . typescript-ts-mode)
    (yaml-mode . yaml-ts-mode)
+   (java-mode . java-ts-mode)
   )
 )
 
@@ -710,6 +713,7 @@ targets."
 (add-hook 'python-ts-mode-hook #'my-c-style-settings)
 (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
 (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
+(add-hook 'java-ts-mode-hook #'my-c-style-settings)
 
 (defun start-eglot()
    (eglot-ensure)
@@ -724,6 +728,7 @@ targets."
                 zig-mode-hook
                 python-ts-mode-hook 
                 cmake-ts-mode-hook
+                java-ts-mode-hook
                 ))
    (add-hook hook #'start-eglot)
 )
@@ -2062,6 +2067,7 @@ Specific to the current window's mode line.")
                 rust-ts-mode-hook
                 typescript-mode-hook
                 python-ts-mode-hook
+                java-ts-mode-hook
                 ))
    (add-hook hook #'my-lsp-bindings)
 )

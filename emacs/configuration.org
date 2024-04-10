@@ -2058,6 +2058,7 @@ If you can't find the language gammar in =https://github.com/tree-sitter/tree-si
       (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
       (yaml "https://github.com/ikatyang/tree-sitter-yaml")
       (fish "https://github.com/ram02z/tree-sitter-fish")
+      (java "https://github.com/tree-sitter/tree-sitter-java")
      )
   )
 
@@ -2075,6 +2076,7 @@ If you can't find the language gammar in =https://github.com/tree-sitter/tree-si
   (add-to-list 'auto-mode-alist '("bspwmrc" . bash-mode))
   (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
   (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 
   ;;
   ;; remap the non-treesitter mode to treesitter mode
@@ -2097,6 +2099,7 @@ If you can't find the language gammar in =https://github.com/tree-sitter/tree-si
      (tsx-mode . tsx-ts-mode)
      (typescript-mode . typescript-ts-mode)
      (yaml-mode . yaml-ts-mode)
+     (java-mode . java-ts-mode)
     )
   )
 #+end_src
@@ -2477,6 +2480,25 @@ Before you can active =eglot=, you have to install your language server separate
 #+END_SRC
 
 
+**** =Java language server=
+
+Download LSP from [[https://download.eclipse.org/jdtls/milestones/?d][here]]
+
+For example, download the latest version: ~jdt-language-server-1.9.0-202203031534.tar.gz~
+
+- Extract
+
+    #+BEGIN_SRC bash
+    mkdir java-lsp-server
+    tar zxf jdt-language-server-1.9.0-202203031534.tar.gz --directory java-lsp-server 
+    #+END_SRC
+
+
+- Configure =Java= LSP
+
+   Just add =java-lsp-server/bin= to your =$PATH= environment var.
+
+
 *** Setup langauge server list (optional)
 
 ~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
@@ -2670,6 +2692,7 @@ Here is the way to set the default style via the hook:
   (add-hook 'python-ts-mode-hook #'my-c-style-settings)
   (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
   (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
+  (add-hook 'java-ts-mode-hook #'my-c-style-settings)
 #+END_SRC
 
 
@@ -2691,6 +2714,7 @@ Here is the way to start =eglot= automatically:
                   zig-mode-hook
                   python-ts-mode-hook 
                   cmake-ts-mode-hook
+                  java-ts-mode-hook
                   ))
      (add-hook hook #'start-eglot)
   )
@@ -4910,6 +4934,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                   rust-ts-mode-hook
                   typescript-mode-hook
                   python-ts-mode-hook
+                  java-ts-mode-hook
                   ))
      (add-hook hook #'my-lsp-bindings)
   )
