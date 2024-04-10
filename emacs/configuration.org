@@ -1182,8 +1182,8 @@ That's why the following code has to be placed into =early-init.el= instead of =
   ;;
   (defun my-set-font()
      (set-face-attribute 'default nil
-         ;;:family "SauceCodePro Nerd Font"
-         :family "JetBrainsMono Nerd Font"
+         :family "SauceCodePro Nerd Font"
+         ;;:family "JetBrainsMono Nerd Font"
          :weight 'semi-bold
          :height 140
          ;; :italic t
@@ -2076,7 +2076,10 @@ If you can't find the language gammar in =https://github.com/tree-sitter/tree-si
   (add-to-list 'auto-mode-alist '("bspwmrc" . bash-mode))
   (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
   (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
+
 
   ;;
   ;; remap the non-treesitter mode to treesitter mode
@@ -2480,25 +2483,6 @@ Before you can active =eglot=, you have to install your language server separate
 #+END_SRC
 
 
-**** =Java language server=
-
-Download LSP from [[https://download.eclipse.org/jdtls/milestones/?d][here]]
-
-For example, download the latest version: ~jdt-language-server-1.9.0-202203031534.tar.gz~
-
-- Extract
-
-    #+BEGIN_SRC bash
-    mkdir java-lsp-server
-    tar zxf jdt-language-server-1.9.0-202203031534.tar.gz --directory java-lsp-server 
-    #+END_SRC
-
-
-- Configure =Java= LSP
-
-   Just add =java-lsp-server/bin= to your =$PATH= environment var.
-
-
 *** Setup langauge server list (optional)
 
 ~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
@@ -2692,6 +2676,7 @@ Here is the way to set the default style via the hook:
   (add-hook 'python-ts-mode-hook #'my-c-style-settings)
   (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
   (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
+  (add-hook 'typescript-ts-mode-hook #'my-c-style-settings)
   (add-hook 'java-ts-mode-hook #'my-c-style-settings)
 #+END_SRC
 
@@ -2714,6 +2699,8 @@ Here is the way to start =eglot= automatically:
                   zig-mode-hook
                   python-ts-mode-hook 
                   cmake-ts-mode-hook
+                  javascript-ts-mode-hook
+                  typescript-ts-mode-hook
                   java-ts-mode-hook
                   ))
      (add-hook hook #'start-eglot)
@@ -2898,6 +2885,7 @@ Completion to provide a dropdown selection.
       (add-hook 'zig-mode-hook #'yas-minor-mode)
       (add-hook 'org-mode-hook #'yas-minor-mode)
       (add-hook 'cmake-ts-mode-hook #'yas-minor-mode)
+      (add-hook 'java-ts-mode-hook #'yas-minor-mode)
 
       ;;
       ;; Fix 'company' can't list 'yasnippet' candidates in dropdown list
@@ -2977,32 +2965,32 @@ The folder structure looks like this (aka, ~snippet tables~):
 **** =TypeScript=
 
 #+begin_src emacs-lisp :tangle no
-  ;; (use-package typescript-mode
-  ;;   :mode "\\.ts\\'"
-  ;;   :hook (typescript-mode . lsp-deferred)
-  ;;   :config
-  ;;   (setq typescript-indent-level 4)
-  ;; )
+  ;;(use-package typescript-mode
+  ;;  :mode "\\.ts\\'"
+  ;;  :hook (typescript-mode . lsp-deferred)
+  ;;  :config
+  ;;  (setq typescript-indent-level 4)
+  ;;)
 #+end_src
 
 
 **** =Web=
 
 #+begin_src emacs-lisp :tangle no
-  ;; (use-package web-mode
-  ;;   :config
-  ;;       (setq web-mode-markup-indent-offset 4
-  ;;             web-mode-css-indent-offset 4
-  ;;             web-mode-code-indent-offset 4
-  ;;             web-mode-style-padding 4
-  ;;             web-mode-script-padding 4
-  ;;             web-mode-enable-auto-closing t
-  ;;             web-mode-enable-auto-opening t
-  ;;             web-mode-enable-auto-pairing t
-  ;;             web-mode-enable-auto-indentation t)
-  ;;   :mode
-  ;;       (".html$" "*css$" "*.tsx")
-  ;; )
+   (use-package web-mode
+     :config
+         (setq web-mode-markup-indent-offset 4
+               web-mode-css-indent-offset 4
+               web-mode-code-indent-offset 4
+               web-mode-style-padding 4
+               web-mode-script-padding 4
+               web-mode-enable-auto-closing t
+               web-mode-enable-auto-opening t
+               web-mode-enable-auto-pairing t
+               web-mode-enable-auto-indentation t)
+     :mode
+         (".html$" "*css$" "*.tsx")
+   )
 #+end_src
 
 
@@ -4932,7 +4920,7 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                   zig-ts-mode-hook
                   rust-mode-hook
                   rust-ts-mode-hook
-                  typescript-mode-hook
+                  typescript-ts-mode-hook
                   python-ts-mode-hook
                   java-ts-mode-hook
                   ))

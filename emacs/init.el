@@ -564,7 +564,10 @@ targets."
 (add-to-list 'auto-mode-alist '("bspwmrc" . bash-mode))
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
+
 
 ;;
 ;; remap the non-treesitter mode to treesitter mode
@@ -713,6 +716,7 @@ targets."
 (add-hook 'python-ts-mode-hook #'my-c-style-settings)
 (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
 (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
+(add-hook 'typescript-ts-mode-hook #'my-c-style-settings)
 (add-hook 'java-ts-mode-hook #'my-c-style-settings)
 
 (defun start-eglot()
@@ -728,6 +732,8 @@ targets."
                 zig-mode-hook
                 python-ts-mode-hook 
                 cmake-ts-mode-hook
+                javascript-ts-mode-hook
+                typescript-ts-mode-hook
                 java-ts-mode-hook
                 ))
    (add-hook hook #'start-eglot)
@@ -781,6 +787,7 @@ targets."
     (add-hook 'zig-mode-hook #'yas-minor-mode)
     (add-hook 'org-mode-hook #'yas-minor-mode)
     (add-hook 'cmake-ts-mode-hook #'yas-minor-mode)
+    (add-hook 'java-ts-mode-hook #'yas-minor-mode)
 
     ;;
     ;; Fix 'company' can't list 'yasnippet' candidates in dropdown list
@@ -2065,7 +2072,7 @@ Specific to the current window's mode line.")
                 zig-ts-mode-hook
                 rust-mode-hook
                 rust-ts-mode-hook
-                typescript-mode-hook
+                typescript-ts-mode-hook
                 python-ts-mode-hook
                 java-ts-mode-hook
                 ))
