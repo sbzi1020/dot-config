@@ -1,7 +1,7 @@
 # vim: ft=fish
 set --export CLICOLOR "xterm-color"
 set --export LSCOLORS "gxfxcxdxbxegedabagacad"
-set --export EDITOR lvim
+set --export EDITOR emacs
 # set --export EDITOR nvim
 
 #--------------------------------------------------------
@@ -130,14 +130,14 @@ set -U fish_color_user ff5f5f
 #--------------------------------------------------------
 set -g fish_key_bindings fish_vi_key_bindings
 bind -M insert -m default hh backward-char force-repaint
-bind -M insert \t accept-autosuggestion
-bind -M default e history-search-backward
-bind -M default n history-search-forward
+bind -M insert \f accept-autosuggestion
+bind -M default k history-search-backward
+bind -M default j history-search-forward
 
 #--------------------------------------------------------
 # ~/my-shell
 #--------------------------------------------------------
-set PATH /opt/homebrew/bin ~/.local/bin ~/zig/zig-nightly ~/zig/zls/zig-out/bin $PATH
+set PATH /opt/homebrew/bin ~/.local/bin ~/zig/zig-nightly ~/zig/zls/zig-out/bin /opt/homebrew/Cellar/llvm/17.0.6/bin/ ~/Desktop/nand2tetris/tools ~/sbzi/java-lsp-server/bin $PATH
 
 # Clear console
 abbr c "clear"
@@ -178,10 +178,10 @@ abbr vim "lvim"
 # abbr vim "lvim"
 abbr fc "nvim ~/.config/fish/config.fish"
 abbr vc "cd ~/.config/nvim && nvim ~/.config/nvim/init.lua"
-abbr wison_vim "nvim -u ~/.config/nvim/init_wison.lua"
-abbr wison_vc "cd ~/.config/nvim && nvim -u ~/.config/nvim/init_wison.lua ~/.config/nvim/init_wison.lua"
-abbr wison_fc "nvim -u ~/.config/nvim/init_wison.lua ~/.config/fish/config.fish"
-abbr wison_ac "nvim -u ~/.config/nvim/init_wison.lua ~/.alacritty.yml"
+abbr wison_vim "nvim -u ~/.config/nvim_backup/init_wison.lua"
+abbr wison_vc "cd ~/.config/nvim_backup && nvim -u ~/.config/nvim_backup/init_wison.lua ~/.config/nvim_backup/init_wison.lua"
+abbr wison_fc "nvim -u ~/.config/nvim_backup/init_wison.lua ~/.config/fish/config.fish"
+abbr wison_ac "nvim -u ~/.config/nvim_backup/init_wison.lua ~/.alacritty.yml"
 abbr vifm "vifm -c 'colorscheme zenburn_1' -c view"
 
 # Git related
@@ -189,7 +189,7 @@ abbr gs "git status"
 abbr gb "git branch"
 abbr gl "git log -n10 --oneline --decorate --all --graph"
 abbr ga "git add"
-abbr gf "git diff HEAD | bat"
+abbr gf "git diff HEAD"
 abbr gc "git commit -nm"
 abbr gp "git push -u origin"
 abbr gck "git checkout"
@@ -270,10 +270,23 @@ abbr gcl "gcloud config list"
 
 
 #--------------------------------------------------------
-# EMacs
+# EMacs server
+#--------------------------------------------------------
+abbr es "emacs --daemon --debug-init"
+abbr kes "emacsclient -e \(\"kill-emacs\"\)"
+
+#--------------------------------------------------------
+# EMacs client
+#--------------------------------------------------------
+abbr ect "emacsclient -t"
+abbr ec "emacsclient -c &"
+
+#--------------------------------------------------------
+# EMacs standalone
 #--------------------------------------------------------
 abbr et "emacs --no-window-system"
 abbr eg "emacs &"
+
 
 #--------------------------------------------------------
 # Node LTS
@@ -282,9 +295,10 @@ abbr eg "emacs &"
 #set LDFLAGS -L/usr/local/opt/node@10/lib
 #set CPPFLAGS -I/usr/local/opt/node@10/include
 
-set PATH /opt/homebrew/opt/node@16/bin $PATH
-set LDFLAGS -L/opt/homebrew/opt/node@16/lib
-set CPPFLAGS -I/opt/homebrew/opt/node@16/include
+set PATH /opt/homebrew/opt/node@18/bin $PATH
+set -gx LDFLAGS "-L/opt/homebrew/opt/node@18/lib"
+set -gx CPPFLAGS "-I/opt/homebrew/opt/node@18/include"/
+
 
 #--------------------------------------------------------
 # GO LANG
@@ -484,10 +498,4 @@ ex=:\
 *.nix=:\
 "
 
-#--------------------------------------------------------
-# Hyprland
-#--------------------------------------------------------
-abbr hpc "nvim ~/.config/hypr/hyprland.conf"
-abbr hpm "hyprctl monitors all"
-abbr exith "hyprctl dispatch exit"
-abbr cwp "swww img --transition-type wipe --transition-angle 45 ~/Photo/wallpaer"
+set --export HOMEBREW_NO_AUTO_UPDATE 1
