@@ -1,0 +1,287 @@
+* Git commands
+
+** Install =git= and =git-delta=
+
+#+BEGIN_SRC bash
+  # MacOS
+  brew install git git-delta
+
+  # Arch Linux
+  doas pacman --refresh --sync git git-delta xclip
+#+END_SRC
+
+
+** Generate ssh key and copy it to the clipboard
+
+#+BEGIN_SRC bash
+  ssh-keygen -t ed25519 -C "YOUR_EMAIL_HERE"
+
+  # If you're using `Fish` shell, then better change to `bash` before you run
+  # this command:
+  #
+  # bash
+  eval "$(ssh-agent -s)"
+  ssh-add ~/.ssh/id_ed25519
+
+  # If you use `MacOS` then pipe to `pbcopy` to copy the pub key content
+  cat ~/.ssh/id_ed25519.pub | pbcopy
+
+  # If you use `Linux` then use `xclip` to copy pub key content
+  xclip -selection clipboard < ~/.ssh/id_ed25519.pub
+#+END_SRC
+
+After that, add new `ssh-key` in your Github settings and paste the pub
+key content there.
+
+
+** Config git by command
+
+#+BEGIN_SRC bash
+  git config --global user.name "YOUR_PREFFERED_USER_NAME_HERE"
+  git config --global user.email "YOUR_EMAIL_HERE"
+
+  git config --global pull.rebase false
+  git config --global core.pager delta
+  git config --global interactive.diffFilter "delta --color-only"
+  git config --global delta.navigate true
+  git config --global delta.light false
+  git config --global delta.line-numbers true
+  git config --global delta.side-by-side true
+  git config --global delta.show-syntax-themes true
+  git config --global merge.conflictstyle diff3
+  git config --global diff.colorMoved default
+#+END_SRC
+
+
+** Config git by editing =~/.gitconfig=
+
+#+BEGIN_SRC bash
+  [user]
+          name = YOUR_PREFFERED_USER_NAME_HERE
+          email = YOUR_EMAIL_HERE
+  [color]
+          ui = true
+  [init]
+          defaultBranch = master
+  [pull]
+          rebase = false
+  [core]
+      pager = delta
+
+  [interactive]
+      diffFilter = delta --color-only
+  [add.interactive]
+      useBuiltin = false # required for git 2.37.0
+
+  [delta]
+      navigate = true    # use n and N to move between diff sections
+      light = false      # set to true if you're in a terminal w/ a light background color (e.g. the default macOS terminal)
+      line-numbers = true
+      side-by-side = true
+      show-syntax-themes = true
+
+  [merge]
+      conflictstyle = diff3
+
+  [diff]
+      colorMoved = default
+#+END_SRC
+
+
+** How to export a given commit version to =.tar.gz=
+
+You can export any version/moment snapshot from your repo by running the
+following command:
+
+#+BEGIN_SRC bash
+  # Use latest commit on current branch
+  git archive --format tar.gz HEAD > FILE_NAME_HERE.tar.gz
+
+  # Use the given commit on current branch
+  git archive --format tar.gz b385cc8 > FILE_NAME_HERE.tar.gz
+#+END_SRC
+
+So, you can send that `.tar.gz` to someone else without adding him/her into
+your repo.
+
+
+** How to use =submodules=
+
+You can add another git repo into the existing git repo like below:
+
+#+BEGIN_SRC bash
+  - Your-cloned-parent-repo
+  |-- README.org
+  |-- src
+  |
+  |-- Your submodules repo
+    |-- README.org
+    |-- src
+#+END_SRC
+
+Here are the steps you need to know:
+
+*** 1. For the first time you add another git repo as a submodule
+
+#+BEGIN_SRC bash
+  git submodule add YOUR_REPO_URL 
+
+  #
+  # Prefer to use this version to reduce the total size of `.git/modules/{SUBMODULE_NAME}`
+  #
+  git submodule add --depth=1 YOUR_REPO_URL 
+#+END_SRC
+
+
+For example, let's add =raylib= as a submodule:
+
+#+BEGIN_SRC bash
+  git submodule add --depth=1 https://github.com/raysan5/raylib.git
+#+END_SRC
+
+
+The command above does the following things in the current repo folder:
+
+**** Add submodule info to =.git/config=
+
+#+BEGIN_SRC bash
+  cat .git/config
+
+  # [core]
+  #         repositoryformatversion = 0
+  #         filemode = true
+  #         bare = false
+  #         logallrefupdates = true
+  # [submodule "raylib"]
+  #         url = https://github.com/raysan5/raylib.git
+  #         active = true
+#+END_SRC
+
+
+**** Add submodule info to =.gitmodules=
+
+#+BEGIN_SRC bash
+  cat .gitmodules
+
+  # [submodule "raylib"]
+  #        path = raylib
+  #        url = https://github.com/raysan5/raylib.git 
+#+END_SRC
+
+
+**** Pull the git data into =.git/modules/{SUBMODULE_NAME}=
+
+#+BEGIN_SRC bash
+  tree -L 2 .git/modules/
+
+  # .git/modules/
+  # └── raylib
+  #     ├── branches
+  #     ├── config
+  #     ├── description
+  #     ├── HEAD
+  #     ├── hooks
+  #     ├── index
+  #     ├── info
+  #     ├── logs
+  #     ├── objects
+  #     ├── packed-refs
+  #     ├── refs
+  #     └── shallow
+#+END_SRC
+
+
+From now on, you can maintain your sub git repo independently (modify, commit, push) inside that sub repo folder. The parent repo and the sub repo are independent!!!
+
+One thing you need to know about that:
+
+When making commits into your sub repo (and DO NOT forget to push), you parent repo also see new files changes, and you SHOULD add those files and make commit as well.
+
+But the point is that ~those changes files ARE NOT the sub repo files, it justs change the symbol link to the sub repo commit hash, as sub repo is totally independent from the parent repo!!!~
+
+
+*** 2. First time git clone your parent repo which includes the sub repo
+
+If you git clone your parent repo like the normal:
+
+#+BEGIN_SRC bash
+  git clone YOUR_PARENT_REPO_URL
+#+END_SRC
+
+And you will realize that the sub repo folder is empty:
+
+#+BEGIN_SRC bash
+  - Your-cloned-parent-repo
+  |-- README.org
+  |-- src
+  |
+  |-- Your submodules repo
+#+END_SRC
+
+So, you need to update and init manually:
+
+#+BEGIN_SRC bash
+  git submodule update --init --depth=1
+#+END_SRC
+
+Now, your submodule repo folder is there.
+
+
+*** 3. ~git pull~
+
+As both parent repo and sub repo are independent, that said ~git pull~ command only pull the given repo (parent repo or sub repo).
+
+If you want to run ~git pull~ in the parent repo and also ~git pull~ all sub repos, then you should run like this:
+
+#+BEGIN_SRC bash
+  # In the parent repo folder
+  git pull --recurse-submodules
+#+END_SRC
+
+~--recurse-submodules~ tells ~git pull~ to pull all submodules list in the ~.gitmodules~ files.
+
+If you want ~--recurse-submodules~ become default action, you can add it to your ~.gitconfig~ file like this:
+
+#+BEGIN_SRC bash
+  git config submodule.recurse true
+#+END_SRC
+
+
+*** 4. How to remove submodule
+
+- Remove the submodule by running ~git submodule deinit --force {SUBMODULE_NAME}~ command
+
+  #+BEGIN_SRC bash
+    #
+    # For example
+    #
+    git submodule deinit --force raylib
+
+    # Cleared directory 'raylib'
+    # Submodule 'raylib' (https://github.com/raysan5/raylib.git) unregistered for path 'raylib'
+  #+END_SRC
+
+  It removes the submodule info from the =.git/config=
+
+
+- Remove the submodule info from =.gitmodules= manually
+
+  If you only got one submodule, then just delete the =.gitmodules=
+
+
+- Stage =.gitmodules= and remove the submodule folder and =.git/modules/{SUBMODULE_NAME}= folder
+
+  #+BEGIN_SRC bash
+    git add .gitmodules
+    git rm raylib
+    rm -rf .git/modules/raylib/
+  #+END_SRC
+
+
+- Commit and push
+
+  #+BEGIN_SRC bash
+    git commit -nm "[ master ] - Removed 'raylib' submodule."
+    git push -u origin master
+  #+END_SRC
+
