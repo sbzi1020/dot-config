@@ -565,6 +565,7 @@ targets."
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 
@@ -707,6 +708,22 @@ targets."
     (setq tab-width 4)
     (message ">>> my-emacs-lisp-style-settings [done]")
 )
+;;
+;; 
+;;
+(defun my-js-ts-style-settings()
+    ;;
+    ;; Very important to reset!!!
+    ;;
+    (setq tab-width my-tab-width)                
+
+    ;;
+    ;; Back to normal TAB behavior rather than 'indent-for-tab-command' 
+    ;;
+    (define-key evil-insert-state-local-map (kbd "TAB") 'tab-to-tab-stop)
+
+    (message ">>> my-js-ts-style-settings [done]")
+)
 
 (add-hook 'c-mode-hook #'my-c-style-settings)
 (add-hook 'c-ts-mode-hook #'my-c-style-settings)
@@ -716,7 +733,8 @@ targets."
 (add-hook 'python-ts-mode-hook #'my-c-style-settings)
 (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
 (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
-(add-hook 'typescript-ts-mode-hook #'my-c-style-settings)
+(add-hook 'typescript-ts-mode-hook #'my-js-ts-style-settings)
+(add-hook 'js-ts-mode-hook #'my-js-ts-style-settings)
 (add-hook 'java-ts-mode-hook #'my-c-style-settings)
 
 (defun start-eglot()
@@ -732,7 +750,7 @@ targets."
                 zig-mode-hook
                 python-ts-mode-hook 
                 cmake-ts-mode-hook
-                javascript-ts-mode-hook
+                js-ts-mode-hook
                 typescript-ts-mode-hook
                 java-ts-mode-hook
                 ))
@@ -2073,6 +2091,7 @@ Specific to the current window's mode line.")
                 rust-mode-hook
                 rust-ts-mode-hook
                 typescript-ts-mode-hook
+                js-ts-mode-hook
                 python-ts-mode-hook
                 java-ts-mode-hook
                 ))
