@@ -92,10 +92,6 @@ set_key_mapping('n', '<leader><leader>', '<c-^>', {silent=true})
 set_key_mapping('n', '<leader>th', ':%TOhtml<CR>')
 
 
--- <leader>th: save current file to HTML
-set_key_mapping('n', '<leader>e', ':Lexplore<CR>')
-
-
 
 --[[
 ctrl+s: replace all works under cursor. Do a `/pattern` which the `pattern`
@@ -142,8 +138,8 @@ set_key_mapping('n', '<C-l>', ':wincmd l<CR>', {silent=true})
 
 -- Resize windows
 set_key_mapping('n', '-', ':vertical resize -5<CR>', {silent=true})
-set_key_mapping('n', '+', ':vertical resize +5<CR>', {silent=true})
-set_key_mapping('n', '=', '<C-w>=', {silent=true})
+set_key_mapping('n', '=', ':vertical resize +5<CR>', {silent=true})
+set_key_mapping('n', '|', '<C-w>=', {silent=true})
 
 
 
@@ -215,15 +211,15 @@ Plugin related
 set_key_mapping('n', '<leader><CR>', ':Goyo<CR>', {silent=true})
 
 
--- <leader>p: Fuzzy file searching
--- set_key_mapping('n', '<leader>p', ':FZF<CR>')
--- set_key_mapping('n', '<leader>p', ':lua require(\'telescope.builtin\').find_files()<CR>')
-set_key_mapping('n', '<leader>p', ':lua require(\'telescope.builtin\').find_files({layout_strategy = \'vertical\', layout_config = {width=0.6}, previewer = false })<CR>', {silent=true})
+-- <leader>pf: Fuzzy file searching
+-- set_key_mapping('n', '<leader>pf', ':FZF<CR>')
+-- set_key_mapping('n', '<leader>pf', ':lua require(\'telescope.builtin\').find_files()<CR>')
+set_key_mapping('n', '<leader>pf', ':lua require(\'telescope.builtin\').find_files({layout_strategy = \'vertical\', layout_config = {width=0.6}, previewer = false })<CR>', {silent=true})
 
 
 
--- <leader>f: Ripgrep full text searching
--- set_key_mapping('n', '<leader>f', ':Rg<space>')
+-- <leader>pf: Ripgrep full text searching
+-- set_key_mapping('n', '<leader>pf', ':Rg<space>')
 
 
 -- <leader>B: List opened files (to select)
@@ -272,32 +268,32 @@ Advanced searching
 
 
 --[[
-<leader>f:
+<leader>pr:
 
 * Run the external `grep` command with the given searching keyword
 * Auto jump to the first matching result
 --]]
--- set_key_mapping('n', '<leader>f', ':silent grep ')
+-- set_key_mapping('n', '<leader>pr', ':silent grep ')
 
 
 --[[
-<leader>f:
+<leader>pr:
 
 * `silent` for hiding the `grep` standard output
 * Run the external `grep` command with the given searching keyword
 * Open the quick fix list
 --]]
--- set_key_mapping('n', '<leader>f', ':silent grep!  | copen<C-Left><C-Left><C-Left>')
+-- set_key_mapping('n', '<leader>pr', ':silent grep!  | copen<C-Left><C-Left><C-Left>')
 
 
 --[[
-<leader>f:
+<leader>pr:
 
 * Use 'Telescope.builtin.live_grep()'
 * Auto jump to the first matching result
 * Open the quick fix list
 --]]
-set_key_mapping('n', '<leader>f', ':lua require(\'telescope.builtin\').live_grep({prompt_title="Search in project", prompt_prefix="  ", shorten_path=true})<CR>')
+set_key_mapping('n', '<leader>pr', ':lua require(\'telescope.builtin\').live_grep({prompt_title="Search in project", prompt_prefix="  ", shorten_path=true})<CR>')
 
 --[[
 <leader>pb: Fuzzy files searching for in `~/my-shell/backup`

@@ -3,6 +3,7 @@ vim.g.enable_vim_debug = false
 if vim.g.enable_vim_debug then print "'init.lua' has been reloaded >>>" end
 
 --[[
+
 This function to reload all packages in this file, then we can
 use this function to replace the `require` which can FORCE te
 reload a package which more easy to reload `init.lua`.
@@ -40,9 +41,9 @@ Reload_package('my_settings')
 -- Plugins modules (not include LSP)
 Reload_package 'my_plugins'
 Reload_package 'my_statusline'
---Reload_package 'my_nvim_tree'
+Reload_package 'my_nvim_tree'
 Reload_package 'my_tmuxline'
-Reload_package 'my_indent_blankline'
+-- Reload_package 'my_indent_blankline'
 Reload_package 'my_goyo'
 Reload_package 'my_firenvim'
 Reload_package 'my_markdown_preview'
@@ -51,7 +52,7 @@ Reload_package 'my_markdown_preview'
 -- Otherise, treesitter highlight will stop working!!!
 Reload_package 'my_treesitter'
 Reload_package 'my_telescope'
-Reload_package 'my_colorizer'
+-- Reload_package 'my_colorizer'
 Reload_package 'my_nvim_comment'
 
 
@@ -60,11 +61,14 @@ Reload_package 'lsp/my_lsp'
 -- Reload_package 'lsp/coc'
 
 
--- Themes modules
+-- -- Themes modules
 Reload_package 'my_themes'
 
--- Vim be good
-Reload_package 'my_vim_be_good'
+-- -- Vim be good
+-- Reload_package 'my_vim_be_good'
+
+-- Outline support
+Reload_package 'my_outline'
 
 
 --[[
@@ -83,6 +87,10 @@ Reload_package 'my_macros'
 
 -- Load auto groups
 Reload_package 'my_auto_groups'
+
+-- Load hare setup
+Reload_package 'my_hare_setup'
+
 
 
 --[[

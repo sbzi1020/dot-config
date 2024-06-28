@@ -60,31 +60,36 @@ return packer.startup(function(use)
     use "wbthomason/packer.nvim"
 
     --[[
-    Syntax highlight modules
+        Syntax highlight modules
     --]]
     use "norcalli/nvim-colorizer.lua"
     use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
     use { 'nvim-treesitter/playground' } -- Make sure enable it in `my_treesitter.lua`
 
     --[[
-    Status line
+        Status line
     --]]
-    use 'kyazdani42/nvim-web-devicons'
     use 'edkolev/tmuxline.vim'
     use { 'glepnir/galaxyline.nvim', branch = 'main' }
 
     --[[
-    File explore
+        File explore
     --]]
     --use "kyazdani42/nvim-tree.lua"
+    use {
+        'nvim-tree/nvim-tree.lua',
+        requires = {
+          'nvim-tree/nvim-web-devicons', -- optional
+        },
+    }
 
     --[[
-    Look and feel modules
+        Look and feel modules
     --]]
     use 'lukas-reineke/indent-blankline.nvim'
 
     --[[
-    Editing improvement modules
+        Editing improvement modules
     --]]
     use 'tpope/vim-surround'
     use 'tpope/vim-repeat'
@@ -93,32 +98,32 @@ return packer.startup(function(use)
     use 'chaoren/vim-wordmotion'
 
     --[[
-    For markdown plugin, before any update from repo README, plz run the 
-    following command to install:
+        For markdown plugin, before any update from repo README, plz run the 
+        following command to install:
 
-    ```
-    cd ~/.local/share/nvim/site/pack/packer/start/
-    rm -rf markdown-preview.nvim
-    git clone https://github.com/iamcco/markdown-preview.nvim.git
-    cd markdown-preview.nvim
-    yarn install
+        ```
+        cd ~/.local/share/nvim/site/pack/packer/start/
+        rm -rf markdown-preview.nvim
+        git clone https://github.com/iamcco/markdown-preview.nvim.git
+        cd markdown-preview.nvim
+        yarn install
 
-    // After finishing all of those, uncomment the below `use` command
-    ```
+        // After finishing all of those, uncomment the below `use` command
+        ```
     --]]
     use {'iamcco/markdown-preview.nvim'}
 
     --[[
-    Run neovim in browser
+        Run neovim in browser
 
-    Make sure read descrption in `my_firenvim.lua` if it doesn't work!!!
-    Make sure read descrption in `my_firenvim.lua` if it doesn't work!!!
-    Make sure read descrption in `my_firenvim.lua` if it doesn't work!!!
+        Make sure read descrption in `my_firenvim.lua` if it doesn't work!!!
+        Make sure read descrption in `my_firenvim.lua` if it doesn't work!!!
+        Make sure read descrption in `my_firenvim.lua` if it doesn't work!!!
     --]]
     use {'glacambre/firenvim', run = function() vim.fn['firenvim#install'](0) end }
 
     --[[
-    Fuzzy find and ripgrep searching
+        Fuzzy find and ripgrep searching
     --]]
     use 'nvim-lua/popup.nvim'           -- An implementation of the Popup API from vim in Neovim.
     use 'nvim-lua/plenary.nvim'         -- Lua functions many plugins rely on
@@ -131,19 +136,24 @@ return packer.startup(function(use)
     -- use { 'dhruvmanila/telescope-bookmarks.nvim', tag = '*' } -- Search from browser bookmark
 
     --[[
-    Comment and uncomment for all languages
+        Comment and uncomment for all languages
     --]]
     use 'terrortylor/nvim-comment'
 
     --[[
-    Color Scheme
+        Color Scheme
     --]]
     use 'navarasu/onedark.nvim'
     use  'ellisonleao/gruvbox.nvim'
     use { 'luisiacc/gruvbox-baby', branch = 'main' }
 
     --[[
-    LSP related
+        Outline support
+    --]]
+    use 'hedyhli/outline.nvim'
+
+    --[[
+        LSP related
     --]]
 
     -- Standard LSP config
@@ -174,13 +184,15 @@ return packer.startup(function(use)
     use 'hrsh7th/vim-vsnip'
 
     --[[
-    Automatically set up your configuration after cloning packer.nvim
-    Put this at the end after all plugins
+        Automatically set up your configuration after cloning packer.nvim
+        Put this at the end after all plugins
     --]]
     if packer_first_installed then
         require("packer").sync()
     end
 
-    -- Vim training
+    --[[
+        Vim training
+    --]]
     use 'ThePrimeagen/vim-be-good'
 end)

@@ -63,6 +63,7 @@ loaded_package.setup({
         "vim",
         "yaml",
         "zig",
+        "hare",
     },
 
     -- install languages synchronously (only applied to `ensure_installed`)
