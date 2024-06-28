@@ -12,6 +12,8 @@ local function my_on_attach(bufnr)
 
     local function go_up()
         api.tree.change_root_to_parent()
+
+        api.node.navigate.parent()
         api.tree.collapse_all()
     end
 
@@ -37,9 +39,7 @@ local function my_on_attach(bufnr)
     vim.keymap.set('n', 'gd', go_download, opts("Go download"))
     vim.keymap.set('n', 'gn', go_note, opts("Go notes"))
 
-    -- vim.keymap.set('n', 'h', api.tree.change_root_to_parent, opts('Up'))
     vim.keymap.set('n', 'h', go_up, opts('Up'))
-    -- vim.keymap.set('n', 'h',       api.node.navigate.parent,            opts('Parent Directory'))
 
     -- Open
     vim.keymap.set('n', '<CR>', api.node.open.no_window_picker, opts('Open'))
@@ -67,18 +67,25 @@ loaded_nvim_tree.setup({
         sorter = "case_sensitive",
     },
     view = {
-        width = 30,
+        width = 40,
     },
     renderer = {
         group_empty = true,
         indent_markers = {
-            icons =   {
-                corner = "└",
-                edge = "│",
-                item = "│",
-                bottom = "─",
-                none = " ",
-            },
+          enable = true,
+          inline_arrows = true,
+          icons = {
+            corner = "└",
+            edge = "│",
+            item = "│",
+            bottom = "─",
+            none = " ",
+          },
+        },
+        icons = {
+            show = {
+                git = false,
+            }
         }
     },
     filters = {
@@ -91,90 +98,17 @@ loaded_nvim_tree.setup({
     },
 })
 
--- vim.cmd([[
---     :hi      NvimTreeExecFile    guifg=#ffa0a0
---     :hi      NvimTreeSpecialFile guifg=#ff80ff gui=underline
---     :hi      NvimTreeSymlink     guifg=Yellow  gui=italic
---     :hi link NvimTreeImageFile   Title
--- ]])
-
-
 vim.keymap.set('n', '<Space>e', '<cmd>NvimTreeToggle<CR>', {noremap=true})
 
--- loaded_nvim_tree.setup {
---     disable_netrw = true,
---     hijack_netrw = true,
---     open_on_setup = false,
---     ignore_ft_on_setup = {
---         "startify",
---         "dashboard",
---         "alpha",
---     },
---     auto_close = true,
---     open_on_tab = false,
---     hijack_cursor = false,
---     update_cwd = true,
---     update_to_buf_dir = {
---         enable = true,
---         auto_open = true,
---     },
---     diagnostics = {
---         enable = true,
---         icons = {
---             hint = "",
---             info = "",
---             warning = "",
---             error = "",
---         },
---     },
---     update_focused_file = {
---         enable = true,
---         update_cwd = true,
---         ignore_list = {},
---     },
---     system_open = {
---         cmd = nil,
---         args = {},
---     },
---     filters = {
---         dotfiles = false,
---         custom = {},
---     },
---     git = {
---         enable = true,
---         ignore = true,
---         timeout = 500,
---     },
---     view = {
---         width = 40,
---         height = 30,
---         hide_root_folder = false,
---         side = "left",
---         auto_resize = true,
---         mappings = {
---             custom_only = false,
---             -- list = {
---             --     { key = { "l", "<CR>", "o" }, cb = tree_cb "edit" },
---             --     { key = "h", cb = tree_cb "close_node" },
---             --     { key = "v", cb = tree_cb "vsplit" },
---             -- },
---         },
---         number = false,
---         relativenumber = false,
---     },
---     trash = {
---         cmd = "trash",
---         require_confirm = true,
---     },
---     quit_on_open = 0,
---     git_hl = 1,
---     disable_window_picker = 0,
---     root_folder_modifier = ":t",
---     show_icons = {
---         git = 1,
---         folders = 1,
---         files = 1,
---         folder_arrows = 1,
---         tree_width = 30,
---     },
--- }
+-- [[
+-- Toggle tree (open from the given path)
+-- ]]
+-- function my_toggle_tree()
+--     require("nvim-tree.api").tree.toggle({
+--         path = "/home/fion/sbzi/",
+--         find_file = false,
+--         update_root = true,
+--         focus = true,
+--     })
+-- end
+-- vim.keymap.set('n', '<Space>e', ':lua my_toggle_tree()<CR>', {noremap=true})
