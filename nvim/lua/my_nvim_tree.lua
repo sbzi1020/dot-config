@@ -43,15 +43,16 @@ local function my_on_attach(bufnr)
 
     -- Open
     vim.keymap.set('n', '<CR>', api.node.open.no_window_picker, opts('Open'))
+    -- vim.keymap.set('n', '<CR>', api.node.open.vertical, opts('Open'))
 
     -- Folder related
-    vim.keymap.set('n', 'a',  api.fs.create, opts('Create File Or Directory'))
+    vim.keymap.set('n', 'A',  api.fs.create, opts('Create File Or Directory'))
     vim.keymap.set('n', 'C',  api.fs.copy.node, opts('Copy'))
     vim.keymap.set('n', 'P',  api.fs.paste, opts('Paste'))
     vim.keymap.set('n', 'R',  api.fs.rename, opts('Rename'))
     vim.keymap.set('n', 'D',  api.fs.remove, opts('Delete'))
     vim.keymap.set('n', 'X',  api.fs.cut, opts('Cut'))
-    vim.keymap.set('n', 'yp', api.fs.copy.absolute_path, opts('Copy Absolute Path'))
+    vim.keymap.set('n', 'Y', api.fs.copy.absolute_path, opts('Copy Absolute Path'))
     vim.keymap.set('n', 'E',  api.tree.expand_all, opts('Expand All'))
     vim.keymap.set('n', 'W',  api.tree.collapse_all, opts('Collapse'))
 
@@ -86,7 +87,8 @@ loaded_nvim_tree.setup({
             show = {
                 git = false,
             }
-        }
+        },
+        indent_width = 4,
     },
     filters = {
         dotfiles = false,
