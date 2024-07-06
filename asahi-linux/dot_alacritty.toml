@@ -1,71 +1,42 @@
-import = [
-   "~/.config/alacritty/themes/themes/everforest_dark.toml"
-    #"~/.config/alacritty/themes/themes/everforest_light.toml"
-]
+#
+# Varmilo keyboard, replace all `Super` to `Alt`
+# DygmaRise keyboard, replace all `Alt` to `Super`
+#
 
-
-# # Colors (Everforest Dark)
-
-# # Default colors
-# [colors.primary]
-# background = '#2d353b'
-# foreground = '#d3c6aa'
-
-# # Normal colors
-# [colors.normal]
-# black   = '#475258'
-# red     = '#e67e80'
-# green   = '#a7c080'
-# yellow  = '#dbbc7f'
-# blue    = '#7fbbb3'
-# magenta = '#d699b6'
-# cyan    = '#83c092'
-# white   = '#d3c6aa'
-
-# # Bright colors
-# [colors.bright]
-# black   = '#475258'
-# red     = '#e67e80'
-# green   = '#a7c080'
-# yellow  = '#dbbc7f'
-# blue    = '#7fbbb3'
-# magenta = '#d699b6'
-# cyan    = '#83c092'
-# white   = '#d3c6aa'
+import = ["/home/wison/.cache/wal/colors-alacritty.toml"]
 
 [colors]
 draw_bold_text_with_bright_colors = true
+
+# [colors.primary]
+# foreground = "#9DE2DD"
 
 [cursor.style]
 blinking = "Off"
 shape = "Block"
 
 [font]
-size = 12.0
+size = 15.0
 
 [font.bold]
 family = "JetBrainsMono Nerd Font"
-# family = "SauceCodePro Nerd Font"
 style = "Bold"
 
 [font.bold_italic]
 family = "JetBrainsMono Nerd Font"
-# family = "SauceCodePro Nerd Font"
 style = "Bold Italic"
 
 [font.italic]
 family = "JetBrainsMono Nerd Font"
-# family = "SauceCodePro Nerd Font"
 style = "Italic"
 
 [font.normal]
 family = "JetBrainsMono Nerd Font"
-# family = "SauceCodePro Nerd Font"
 style = "Medium"
 
 [[keyboard.bindings]]
 key = "Key1"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 1"]
@@ -73,7 +44,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key2"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 2"]
@@ -81,7 +52,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key3"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 3"]
@@ -89,7 +60,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key4"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 4"]
@@ -97,7 +68,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key5"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 5"]
@@ -105,7 +76,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key6"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 6"]
@@ -113,7 +84,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key7"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 7"]
@@ -121,7 +92,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key8"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 8"]
@@ -129,7 +100,7 @@ program = "/usr/bin/tmux"
 
 [[keyboard.bindings]]
 key = "Key9"
-mods = "Alt"
+mods = "Super"
 
 [keyboard.bindings.command]
 args = ["select-window", "-t 9"]
@@ -213,7 +184,7 @@ program = "/usr/bin/fish"
 
 [window]
 decorations = "none"
-opacity = 0.95
+# opacity = 0.95
 startup_mode = "Maximized"
 
 [window.padding]

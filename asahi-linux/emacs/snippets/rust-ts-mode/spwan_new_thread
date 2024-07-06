@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: spwan_new_thread
-# key: spwan_new_thread
-# --
-thread::spawn(move || {
-    $0
-});

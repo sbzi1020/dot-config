@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: pageAllocator
-# key: pageAllocator
-# --
-const allocator = std.heap.page_allocator;

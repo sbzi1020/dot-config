@@ -1,0 +1,876 @@
+*  Fedora Installation Guide
+
+** Partition configuration
+
+TOD: Copy from OpenBSD handook
+
+
+** Manage network and WIFI
+
+You need to install the =NeworkManager= package, it contains the =nmcli= command line tool to handle your network configurations.
+
+#+BEGIN_SRC bash
+  sudo dnf install NetworkManager
+#+END_SRC
+
+*** How to list all devices status
+
+#+BEGIN_SRC bash
+  nmcli device status
+  # DEVICE  TYPE      STATE                   CONNECTION
+  # enp0s5  ethernet  connected               Wired connection 1
+  # lo      loopback  connected (externally)  lo
+#+END_SRC
+
+
+*** How to show NIC ip address
+
+#+BEGIN_SRC bash
+  nmcli device show enp0s5
+  # GENERAL.DEVICE:                         enp0s5
+  # GENERAL.TYPE:                           ethernet
+  # GENERAL.HWADDR:                         00:1C:42:73:03:55
+  # GENERAL.MTU:                            1500
+  # GENERAL.STATE:                          100 (connected)
+  # GENERAL.CONNECTION:                     Wired connection 1
+  # GENERAL.CON-PATH:                       /org/freedesktop/NetworkManager/ActiveConnection/2
+  # WIRED-PROPERTIES.CARRIER:               on
+  # IP4.ADDRESS[1]:                         192.168.1.102/24
+  # IP4.GATEWAY:                            192.168.1.200
+  # IP4.ROUTE[1]:                           dst = 192.168.1.0/24, nh = 0.0.0.0, mt = 100
+  # IP4.ROUTE[2]:                           dst = 0.0.0.0/0, nh = 192.168.1.200, mt = 100
+  # IP4.DNS[1]:                             192.168.1.200
+  # IP6.ADDRESS[1]:                         fe80::f7f2:f710:c5f5:447/64
+  # IP6.GATEWAY:                            --
+  # IP6.ROUTE[1]:                           dst = fe80::/64, nh = ::, mt = 1024
+#+END_SRC
+
+
+*** WIFI related
+
+#+BEGIN_SRC bash
+  #
+  # List all in-memory or in-disk connection profiles (history of connected records)
+  # Best way to check which SSID/WIFI was connected to
+  #
+  nmcli connection show
+
+  # Show all radio switches
+  nmcli radio all
+
+  # Get Wifi status
+  nmcli radio wifi
+
+  # Turn wifi on or off
+  nmcli radio wifi <on|off>
+
+  # List available access points(AP) to connect to
+  nmcli device wifi list
+
+  # Refresh previous list
+  nmcli device wifi rescan
+
+  # Connect to WIFI, it will prompt for the password
+  nmcli device wifi connect <SSID|BSSID>
+
+  # Connect to WIFI with password directly
+  nmcli device wifi connect <SSID|BSSID> password <password>
+
+  # Connect to hidden WIFI, you HAVE TO provide the password in this case!!!
+  nmcli device wifi connect <SSID|BSSID> hidden yes password <password>
+#+END_SRC
+
+
+
+** How to use =dnf= pacakge manager
+
+*** Configuration file: =/etc/dnf/dnf.conf=:
+
+#+BEGIN_SRC text
+  # see `man dnf.conf` for defaults and possible options
+
+  [main]
+  gpgcheck=True
+  installonly_limit=3
+  clean_requirements_on_remove=True
+  best=False
+  skip_if_unavailable=True
+  allow_vendor_change=False
+  max_parallel_downloads=10
+  fastestmirror=True
+  defaultyes=True
+#+END_SRC
+
+
+*** Fish abbreviations
+
+There are a few abbreviations in =~/.config/fish/config.fish=:
+
+#+BEGIN_SRC fish
+  #--------------------------------------------------------
+  # Package manager
+  #--------------------------------------------------------
+  abbr pinstall "sudo dnf install"
+  abbr pginstall "sudo dnf group install"
+  abbr psearch "dnf search"
+  abbr pgsearch "dnf group list | rg"
+  abbr pinfo "dnf info"
+  abbr pginfo "dnf group info"
+  abbr premove "sudo dnf remove"
+  abbr pgremove "sudo dnf group remove"
+  abbr pquery "dnf repoquery --installed" # Query only installed packages
+  # abbr pqueryfile "dnf repoquery --installed --list"
+  abbr pqueryfile "dnf repoquery --latest 1 --list" # When querying package files, query from repo latest version
+#+END_SRC
+
+
+*** Quick tutorial
+
+**** Operation on single or multiple packages 
+
+#+BEGIN_SRC bash
+  # Install package
+  sudo dnf install
+
+  # Download package to current folder
+  sudo dnf download
+
+  # Search for packages
+  dnf search
+
+  # Print package info
+  dnf info
+
+  # Remove packages
+  sudo dnf remove
+  # Remove older versions of duplicated packages
+  sudo dnf remove --duplicates
+#+END_SRC
+
+
+**** Operation on groups
+
+#+BEGIN_SRC bash
+  
+  # Install package group (DO NOT install optional packages)
+  sudo dnf group install
+  # Install package group (install optional packages)
+  sudo dnf group --with-optional install
+
+  # Query package group
+  dnf group list | rg
+  # Query installed package group
+  dnf group list --installed | rg
+
+  # List  package group info
+  dnf group info
+
+  # Upgrade packge group
+  dnf group upgrade
+
+  # Install package group
+  sudo dnf group remove
+#+END_SRC
+
+
+**** Update or upgrade packages to latest
+
+#+BEGIN_SRC bash
+  # Check whether update exists or not without the real update action
+  # `dnf check-upgrade` does the same thing
+  dnf check-update
+
+  # Update to latest `update` is same with `upgrade`!!!
+  # `sudo dnf update` does the same thing
+  sudo dnf upgrade
+#+END_SRC
+
+
+**** Clean up package
+
+When you run =dnf info -v ANY_PACKAGE_NAME_HERE=, the output content contains =cachedir= like this:
+
+#+BEGIN_SRC bash
+  dnf info -v neofetch
+  # cachedir: /var/tmp/dnf-fion-d7bhs3wh
+#+END_SRC
+
+That's the way how to print the =dnf= cache dir.
+
+Also, there is the global cache dir in =/var/cache/dnf/=
+
+#+BEGIN_SRC bash
+  # Only clean cached packages
+  sudo dnf clean packages
+
+  # Only clean cached packages and meta data, `dnf` will sync the meta data next time
+  sudo dnf clean all
+
+  # Print the cachedir size
+  /usr/bin/du -ch -d1 /var/cache/dnf/
+  # 0       /var/cache/dnf/fedora-1229c74f480af200
+  # 0       /var/cache/dnf/fedora-cisco-openh264-0ceaef441f72af2f
+  # 0       /var/cache/dnf/updates-fa4e299104aa601e
+  # 0       /var/cache/dnf/rpmfusion-nonfree-nvidia-driver-fb1fbda356ce7a69
+  # 8.0M    /var/cache/dnf/
+  # 8.0M    total
+#+END_SRC
+
+Above commands only operate in =/var/cache/dnf/= but not affect =/var/tmp/dnf-XXXX= folder, you need to remove them manually when needed:
+
+
+*** =dnf group= concept
+
+**** Basic concept
+
+Groups are virtual collections of packages, it allows you to install a bunch of packages in an easy way, for example:
+
+#+BEGIN_SRC bash
+  dnf group info "C Development Tools and Libraries"
+
+  Last metadata expiration check: 0:07:42 ago on Sun 21 Jan 2024 12:56:08.
+  Group: C Development Tools and Libraries
+   Description: These tools include core development tools such as automake, gcc and debuggers.
+   Mandatory Packages:
+     autoconf
+     automake
+     binutils
+     bison
+     flex
+     gcc
+     gcc-c++
+     gdb
+     glibc-devel
+     libtool
+     make
+     pkgconf
+     strace
+   Default Packages:
+     byacc
+     ccache
+     cscope
+     ctags
+     elfutils
+     indent
+     ltrace
+     perf
+     valgrind
+   Optional Packages:
+     ElectricFence
+     astyle
+     cbmc
+     check
+     cmake
+     coan
+     cproto
+     insight
+     nasm
+     pscan
+     python3-scons
+     remake
+     scorep
+     splint
+     yasm
+     zzuf  
+#+END_SRC
+
+So, here is how you manipulate all those list packages:
+
+#+BEGIN_SRC bash
+  # All Mandatory and Default packages will  be installed  whenever  possible. 
+  sudo dnf group install "C Development Tools and Libraries"
+
+  # If you want to install `Optional Packages` as well
+  sudo dnf group install --with-optional "C Development Tools and Libraries"
+
+  # Update all group pacakges
+  sudo dnf group upgrade "C Development Tools and Libraries"
+
+  # Remove all group pacakges
+  sudo dnf group remove "C Development Tools and Libraries"
+#+END_SRC
+
+
+**** Group and subgroup
+
+
+=Group > subgroup > (many another subgroup) > packages= is the way that how =Fedora= manage package relationship, for example:
+
+#+BEGIN_SRC bash
+  dnf group info "Fedora Server Edition"
+  # Last metadata expiration check: 0:16:50 ago on Sun 21 Jan 2024 12:56:08.
+  # Environment Group: Fedora Server Edition
+  #  Description: An integrated, easier to manage server.
+  #  Mandatory Groups:
+  #    Common NetworkManager Submodules
+  #    Core
+  #    Fedora Server product core
+  #    Hardware Support
+  #    Headless Management
+  #    Standard
+  #  Optional Groups:
+  #    Container Management
+  #    Domain Membership
+  #    Guest Agents
+  #    Hardware Support for Server Systems
+
+  dnf group info "Common NetworkManager Submodules"
+  # Last metadata expiration check: 0:17:19 ago on Sun 21 Jan 2024 12:56:08.
+  # Group: Common NetworkManager Submodules
+  #  Description: This group contains NetworkManager submodules that are commonly used, but may not be wanted in some streamlined configurations.
+  #  Default Packages:
+  #    NetworkManager-bluetooth
+  #    NetworkManager-wifi
+  #    NetworkManager-wwan
+  #    dhcp-client
+  #    dnsmasq
+  #    iptables-nft
+  #    wpa_supplicant
+#+END_SRC
+
+=Fedora Server Edition= include =Common NetworkManager Submodules= subgroup and it contains a bunch of packages, that's way how it organises a lot of packages based on their relationship.
+
+Also, that's how you can figure out what packages you needed for you custom =Fedora=.
+
+For example:
+
+- =dnf group info "Hardware Support"= gives me all the available firmware package names I needed .
+- =dnf group info "Core"= gives me all necessary package names I should have as a base, then I can install extra to custom my =Fedora= on top of it.
+
+
+*** Man page and help
+For more details, plz read =man dnf=, then you can search keyword like =Install Command, Install Examples, Search Command, Search Examples, Remove Command, Remove Examples= etc, document is quite good actually!!!
+
+Or quick read from here: https://docs.fedoraproject.org/en-US/quick-docs/dnf/
+
+
+** Configuration
+
+*** Configuration file: =/etc/dnf/dnf.conf=:
+
+#+BEGIN_SRC text
+  # see `man dnf.conf` for defaults and possible options
+
+  [main]
+  gpgcheck=True
+  installonly_limit=3
+  clean_requirements_on_remove=True
+  best=False
+  skip_if_unavailable=True
+  allow_vendor_change=False
+  max_parallel_downloads=10
+  fastestmirror=True
+  defaultyes=True
+#+END_SRC
+
+
+*** Make sure the system is up-to-date after first login
+
+ 
+#+BEGIN_SRC bash
+  sudo dnf check-update
+
+  # If `dnf check-update` say you got something to update
+  sudo dnf update
+#+END_SRC
+
+
+*** Install everything I need
+
+#+BEGIN_SRC bash
+  sudo dnf install git bat ripgrep procs htop btop neofetch fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol mpv cava dbus dbus-daemon
+#+END_SRC
+
+
+Change default shell to =fish=:
+
+#+BEGIN_SRC bash
+  chsh -s /usr/bin/fish
+#+END_SRC
+
+
+*** How to fix =ip= command not found
+
+Install =iproute= if you didn't yet (the =Minimal Install= should install it already, but the =/sbin/= doesn't include to your =$PATH= yet)
+
+#+BEGIN_SRC bash
+  sudo dnf install iproute
+#+END_SRC
+
+
+*** Install C Development tools
+
+You have to install =C Development Tools and Libraries= before restoring =neovim= configuration to =~/.config/nvim=, as it requires the =cc= compiler:
+
+#+BEGIN_SRC bash
+  sudo dnf group install "C Development Tools and Libraries"
+
+  #
+  # If you need llvm and clang, `clangd` is inside `clang-tools-extra`
+  #
+  sudo dnf install llvm clang clang-tools-extra
+#+END_SRC
+
+
+*** Install =Rust= as =swww= doesn't exists in =Fedora=
+
+#+BEGIN_SRC bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+  rustup component add rust-analyzer
+#+END_SRC
+
+Then relogin to take effects.
+
+Install useful binaries:
+
+#+BEGIN_SRC bash
+  cargo install du-dust cargo-cache
+#+END_SRC
+
+
+
+*** Install =Java= development tools
+
+For more details, plz read [[https://docs.fedoraproject.org/en-US/quick-docs/installing-java/][this]]
+
+**** Search available JDKs
+
+#+BEGIN_SRC bash
+  dnf search java-\*-openjdk-devel
+
+  # Last metadata expiration check: 0:07:58 ago on Mon 29 Jan 2024 11:39:36.
+  # java-1.8.0-openjdk-devel.x86_64 : OpenJDK 8 Development Environment
+  # java-11-openjdk-devel.x86_64 : OpenJDK 11 Development Environment
+  # java-17-openjdk-devel.x86_64 : OpenJDK 17 Development Environment
+  # java-latest-openjdk-devel.x86_64 : OpenJDK 21 Development Environment
+#+END_SRC
+
+
+**** Install JDK
+
+#+BEGIN_SRC bash
+  #
+  # You're able to choose different version like this
+  #
+
+  # JDK 1.8.0 verison
+  sudo dnf install java-1.8.0-openjdk-devel
+  # JDK 11 verison
+  sudo dnf install java-11-openjdk-devel
+  # JDK 17 verison
+  sudo dnf install java-17-openjdk-devel
+  # JDK latest version
+  sudo dnf install java-latest-openjdk-devel
+#+END_SRC
+
+
+**** Query JDK install files
+
+#+BEGIN_SRC bash
+  dnf repoquery --latest 1 --list java-latest-openjdk-devel | bat
+#+END_SRC
+
+
+**** Switch between different =Java= versions
+
+If you installed a few different version's JDK, then you can switch between them by running:
+
+#+BEGIN_SRC bash
+  sudo alternatives --config java
+#+END_SRC
+
+
+**** Install LSP server
+
+Download LSP from [[https://download.eclipse.org/jdtls/milestones/?d][here]]
+
+For example, download the latest version: ~jdt-language-server-1.9.0-202203031534.tar.gz~
+
+***** Extract
+
+#+BEGIN_SRC bash
+  mkdir java-lsp-server
+  tar zxf jdt-language-server-1.9.0-202203031534.tar.gz --directory java-lsp-server 
+#+END_SRC
+
+
+***** Configure =Java= LSP
+
+Just add =java-lsp-server/bin= to your =$PATH= environment var.
+
+
+*** Configure git and restore my dot files
+
+#+BEGIN_SRC bash
+  #
+  # Generate new SSH key
+  #
+  ssh-keygen -t ed25519 -C "your_email@example.com"
+
+  #
+  # Add your SSH key to `ssh-agent` (run in bash)
+  #
+  bash
+  eval "$(ssh-agent -s)"
+  ssh-add ~/.ssh/id_ed25519
+#+END_SRC
+
+Then copy your ~~/.ssh/id_ed25519.pub~ and then it to your Github settings.
+
+
+*** Install nerd fonts
+
+**** JetBrainMono
+
+#+BEGIN_SRC bash
+  # Install the basic font without nerd font icon support
+  sudo dnf install jetbrains-mono-fonts-all
+
+  # Install nerd font version
+  cd temp
+  curl -OL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+  tar xvf JetBrainsMono.tar.xz
+  rm -rf  JetBrainsMono.tar.xz
+
+  # Update font cache
+  sudo mkdir /usr/share/fonts/jetbrains-mono-nerd-fonts
+  sudo mv ./*.ttf /usr/share/fonts/jetbrains-mono-nerd-fonts/
+  sudo fc-cache -fv
+  fc-cache -fv
+#+END_SRC
+
+
+**** SourceCodePro
+
+#+BEGIN_SRC bash
+  # Install nerd font version
+  cd temp
+  curl -OL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/SourceCodePro.tar.xz
+  tar xvf SourceCodePro.tar.xz
+  rm -rf  SourceCodePro.tar.xz
+
+  # Update font cache
+  sudo mkdir /usr/share/fonts/source-code-pro-nerd-fonts
+  sudo mv ./*.ttf /usr/share/fonts/source-code-pro-nerd-fonts/
+  sudo fc-cache -fv
+  fc-cache -fv
+#+END_SRC
+
+
+*** Wallpaper backend (=swww=) and dynamic wallper color extraction
+
+**** =swww=
+
+#+BEGIN_SRC bash
+  git clone --depth=1 https://github.com/LGFae/swww.git
+  sudo dnf install lz4 lz4-devel
+  cd swww && cargo build --release
+#+END_SRC
+
+Then copy =swww= and =swww-daemon= to your =$PATH= folder
+
+
+**** =pywal16=
+
+#+BEGIN_SRC bash
+  #
+  # Install `pip3` if you don't have yet
+  #
+  sudo dnf install python3-pip
+
+  #
+  # Install `pywal16` (forked from `pywal`)
+  #
+  pip3 install --user pywal16
+#+END_SRC
+
+
+*** Install =brave= 
+
+#+BEGIN_SRC bash
+  sudo dnf install dnf-plugins-core
+  sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+  sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+  sudo dnf install brave-browser
+#+END_SRC
+
+
+**** How to launch
+
+#+BEGIN_SRC bash
+  dbus-run-session brave-browser > ~/.launch_brave_browser.log
+
+  #
+  # If you want all fonts are bigger, change `GDK_DPI_SCALE` to your value
+  #
+  GDK_DPI_SCALE=1.2 dbus-run-session brave-browser > ~/.launch_brave_browser.log
+#+END_SRC
+
+
+**** Enable =wayland=
+
+Open =brave://flags= in URL bar, then search =zone=, you should be able to see the =Preferred Ozone platform= option, set it to ~Wayland~ and re-launch to take affects.
+
+
+*** Make your boot faster
+
+Switch to =root= user to edit ~/etc/default/grub~ and add the following settings to that file:
+
+#+BEGIN_SRC bash
+  GRUB_TIMEOUT=0
+  GRUB_TIMEOUT_STYLE=hidden
+#+END_SRC
+
+
+Then run ~grub2-mkconfig -o /boot/grub2/grub.cfg~ (as =root= user) and reboot.
+  
+
+*** Enable the traditional boot logging
+
+Switch to =root= user in =bash= shell and run the following commands:
+
+#+BEGIN_SRC bash
+  kernel="/boot/vmlinuz-$(uname -r)"
+  grubby --update-kernel ${kernel} --remove-args="rhgb quiet"
+#+END_SRC
+
+Then reboot to take effects.
+
+
+*** AI Text-to-speech
+
+Download binary voice models from [[https://github.com/rhasspy/piper][Piper repo]].
+
+Of course, you can listen the sample from [[https://rhasspy.github.io/piper-samples/][here]].
+
+Then extract by running ~tar xf piper_amd64.tar.gz~
+
+**** Voices model files
+
+Each voice model has 2 files, their filename should be the same and end with =.onnx= and =.onnx.json=, otherwise, it won't work!!!
+
+Move the downloaded voices file into the =piper/modles= folder (not necessary, just a good practice).
+
+
+**** Create =playsound.sh= with the following content and save it into =piper= folder
+
+
+#+BEGIN_SRC bash
+  #!/bin/sh
+
+  if [ "$#" -ne 1 ]; then
+      echo "Mising input text."
+      exit 1
+  fi
+
+  echo $1 | \
+      piper --model {YOUR_PIPER_FOLDER_HERE}/models/en_GB-jenny_dioco-medium.onnx \
+      --output_file ~/temp/temp.wav && \
+      mpv ~/temp/temp.wav && \
+      rm -rf ~/temp/temp.wav
+#+END_SRC
+
+
+**** Add your un-extract folder to your =$PATH=
+
+The final folder structure should look like this:
+
+#+BEGIN_SRC bash
+  piper
+      ├── models
+      │   ├── en_GB-jenny_dioco-medium.onnx
+      │   └── en_GB-jenny_dioco-medium.onnx.json
+      └── playsound.sh
+#+END_SRC
+
+
+Then you can run ~playsound.sh "TEXT_HERE"~ to play the AI voice.
+
+
+*** Enable =firewal daemon= and config default zone to =public= and remove =ssh= open service
+
+For more details, plz read from [[https://github.com/wisonye/arch-linux/blob/master/installation-tutorial-book/src/firewall.md][here]].
+
+=firewalld.service= should be enabled already by default, you can double-check by running the following command:
+
+#+BEGIN_SRC bash
+  systemctl status firewalld.service
+
+  # ● firewalld.service - firewalld - dynamic firewall daemon
+  #      Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; preset: enabled)
+  #     Drop-In: /usr/lib/systemd/system/service.d
+  #              └─10-timeout-abort.conf
+  #      Active: active (running) since Mon 2024-01-29 09:48:37 NZDT; 42min ago
+  #        Docs: man:firewalld(1)
+  #    Main PID: 650 (firewalld)
+  #       Tasks: 4 (limit: 19121)
+  #      Memory: 51.0M
+  #         CPU: 1.919s
+  #      CGroup: /system.slice/firewalld.service
+  #              └─650 /usr/bin/python3 -sP /usr/sbin/firewalld --nofork --nopid
+
+  # Jan 29 09:48:36 fedora systemd[1]: Starting firewalld.service - firewalld - dynamic firewall daemon...
+  # Jan 29 09:48:37 fedora systemd[1]: Started firewalld.service - firewalld - dynamic firewall daemon.
+  # Jan 29 10:23:43 fedora firewalld[650]: ERROR: INVALID_ZONE: network
+  # Jan 29 10:24:48 fedora firewalld[650]: ERROR: INVALID_ZONE: FedoraWorkStation
+#+END_SRC
+
+
+If not, then enable and restart it:
+
+#+BEGIN_SRC bash
+  sudo systemctl enable firewalld.service
+  sudo systemctl restart firewalld.service
+#+END_SRC
+
+
+**** Make sure =public= zone is the current active zone
+
+#+BEGIN_SRC bash
+  sudo firewall-cmd --get-default-zone
+  # public
+
+  sudo firewall-cmd --get-active-zone
+  # public (default)
+  #   interfaces: enp0s5
+#+END_SRC
+
+If NOT, then use =root= permission to edit ~/etc/firewalld/firewalld.conf~ and make sure:
+
+#+BEGIN_SRC config
+  DefaultZone=public
+#+END_SRC
+
+Then reload it by running:
+
+#+BEGIN_SRC bash
+  sudo firewall-cmd --reload
+#+END_SRC
+
+
+**** Make sure remove the =ssh= service from the open service list
+
+#+BEGIN_SRC bash
+  sudo firewall-cmd --list-service
+  # dhcpv6-client mdns
+#+END_SRC
+
+If you see =ssh= is there, then run the following command to remove it and reload:
+
+#+BEGIN_SRC bash
+  sudo firewall-cmd --remove-service ssh --permanent
+  sudo firewall-cmd --reload
+#+END_SRC
+
+
+
+**** Add/remove custom ports
+
+You can add or remove custom application ports by running the following commands:
+
+#+BEGIN_SRC bash
+  #
+  # Add/remove single port example
+  #
+  sudo firewall-cmd --add-port=8080/tcp
+  sudo firewall-cmd --remove-port=8080/tcp
+
+  sudo firewall-cmd --add-port=9801/udp
+  sudo firewall-cmd --remove-port=9801/udp
+
+  #
+  # Add a rang of ports example
+  #
+  sudo firewall-cmd --add-port=8000-8080/tcp
+  sudo firewall-cmd --remove-port=8000-8080/tcp
+
+  sudo firewall-cmd --add-port=9801-9809/udp
+  sudo firewall-cmd --remove-port=9801-9809/udp
+
+  #
+  # List ports
+  #
+  sudo firewall-cmd --list-ports
+#+END_SRC
+
+
+*** Disable unnecessary services
+
+**** Disable =ssh daemon= if you don't need it
+
+#+BEGIN_SRC bash
+    sudo systemctl stop sshd.service
+    sudo systemctl disable sshd.service
+#+END_SRC
+
+
+**** Figure out what ports are listening by default
+
+#+BEGIN_SRC bash
+  ss --numeric --processes --listening --tcp
+#+END_SRC
+
+Then disable the related service if you don't need them.
+
+
+**** Figure out what services are enabled and active at this moment
+
+#+BEGIN_SRC bash
+  systemctl --all | rg "loaded    active   active"
+#+END_SRC
+
+Then disable the related service if you don't need them.
+
+
+*** =MPV= related
+
+**** Keyboard control
+
+| Keybinding   | Description                                       |
+|--------------+---------------------------------------------------|
+| =9=  / =0=       | Volume down/up                                    |
+| =<= / =>==       | Switch to previous/next track in playlist         |
+| =m=            | Toggle mute/unmute                                |
+| =space=        | Pause/unpause                                     |
+| =left= / =right= | Seek back-forward/forward 5 seconds               |
+| =[= / =]=        | Decrease/increase current playback speed by 10%.= |
+| =backspace=    | Reset playback speed to normal                    |
+| =I=            | Toggle stats info                                 |
+| =L=            | Toggle infinite loop                              |
+| =s=            | Take a screenshot                                 |
+| =S=            | Take a screenshto without subtitles               |
+|              |                                                  |
+
+
+
+** Sega super model3 emulator: =Supermodel=
+
+There is no =supermodel= package by default, you have to compile from source:
+
+#+BEGIN_SRC bash
+  git clone --depth=1 https://github.com/trzy/Supermodel.git
+
+  #
+  # Install dev dependencies
+  #
+  # - If you see: `fatal error: GL/glu.h: No such file or directory`
+  #   then install `mesa-libGLU-devel`
+  #
+  sudo dnf install SDL2-static SDL2-devel SDL2_net SDL2_net-devel zlib zlib-devel mesa-libGLU-devel
+
+  #
+  # Compile
+  #
+  make -f Makefiles/Makefile.UNIX
+#+END_SRC
+
+
+** Steam
+
+#+BEGIN_SRC bash
+  sudo dnf upgrade --refresh
+  sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+  sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+  sudo dnf install steam
+#+END_SRC

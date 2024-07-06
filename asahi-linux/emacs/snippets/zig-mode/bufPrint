@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: bufPrint
-# key: bp
-# --
-std.fmt.bufPrint(&$1, "$2", .{$0}) catch "";

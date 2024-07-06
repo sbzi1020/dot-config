@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: arr_len
-# key: arr_len
-# --
-sizeof(${1:array_var}) / sizeof($1[0])$0

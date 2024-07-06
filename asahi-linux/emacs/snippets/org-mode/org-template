@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: code-org-template
-# key: cot
-# --
-#+title: ${1:YOUR_TITLE}
-
-Here is the default tempalate description.
-
-$0
