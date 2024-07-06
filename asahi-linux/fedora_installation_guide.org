@@ -378,7 +378,7 @@ Or quick read from here: https://docs.fedoraproject.org/en-US/quick-docs/dnf/
 *** Install everything I need
 
 #+BEGIN_SRC bash
-  sudo dnf install git bat ripgrep procs htop btop neofetch fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol mpv cava dbus dbus-daemon
+  sudo dnf install git git-delta bat ripgrep procs htop btop neofetch fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol mpv cava dbus dbus-daemon
 #+END_SRC
 
 
@@ -500,7 +500,28 @@ For example, download the latest version: ~jdt-language-server-1.9.0-20220303153
 Just add =java-lsp-server/bin= to your =$PATH= environment var.
 
 
-*** Configure git and restore my dot files
+*** Configure =git=
+
+**** Git config
+
+#+BEGIN_SRC bash
+  git config --global user.name "YOUR_PREFFERED_USER_NAME_HERE"
+  git config --global user.email "YOUR_EMAIL_HERE"
+
+  git config --global pull.rebase false
+  git config --global core.pager delta
+  git config --global interactive.diffFilter "delta --color-only"
+  git config --global delta.navigate true
+  git config --global delta.light false
+  git config --global delta.line-numbers true
+  git config --global delta.side-by-side true
+  git config --global delta.show-syntax-themes true
+  git config --global merge.conflictstyle diff3
+  git config --global diff.colorMoved default
+#+END_SRC
+
+
+**** Generate SSH keypair
 
 #+BEGIN_SRC bash
   #

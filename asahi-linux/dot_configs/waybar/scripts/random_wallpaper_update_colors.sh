@@ -7,7 +7,7 @@ set wallpaper_folder $argv[1]
 # `test` help: https://fishshell.com/docs/current/cmds/test.html
 #
 if test -z $wallpaper_folder
-   echo "Usage: change_wallpaper.sh [wallpaper_folder]"
+   echo "Usage: random_wallpaper_update_colors.sh [wallpaper_folder]"
    exit 0
 end
 
