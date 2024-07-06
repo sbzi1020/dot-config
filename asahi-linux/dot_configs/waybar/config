@@ -26,15 +26,19 @@
     // -----------------------------------------------------------------------
     // Modules in left, center and right
     // -----------------------------------------------------------------------
-    "modules-left": ["hyprland/workspaces"],
+    "modules-left": [
+        "hyprland/workspaces",
+        "custom/random-wallpaper",
+        "cpu",
+    ],
     "modules-center": ["clock"],
     "modules-right": [
-        "cpu",
-        "custom/random-wallpaper",
         "network",
         "custom/disk-usage",
+        "battery",
+        "backlight",
         "pulseaudio",
-        "tray",
+        "tray"
     ],
 
 
@@ -63,6 +67,26 @@
             "4": [],
             "5": [],
         },
+    },
+
+    // -----------------------------------------------------------------------
+    // Random wallpaper module
+    // -----------------------------------------------------------------------
+    "custom/random-wallpaper": {
+        "format": " ",
+        // "on-click": "$HOME/.config/waybar/scripts/random-wallpaper --random ~/Photos/wallpaper/my-favorite",
+        "on-click": "$HOME/.config/waybar/scripts/random_wallpaper_update_colors.sh ~/Photos/wallpaper/my-favorite/",
+    },
+
+    // -----------------------------------------------------------------------
+    // CPU module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-CPU
+    // -----------------------------------------------------------------------
+    "cpu": {
+        "interval": 2,
+        "format": " {}% | {avg_frequency} GHz",
+        "max-length": 20,
     },
 
 
@@ -128,27 +152,6 @@
     },
 
 
-    // -----------------------------------------------------------------------
-    // CPU module
-    //
-    // https://github.com/Alexays/Waybar/wiki/Module:-CPU
-    // -----------------------------------------------------------------------
-    "cpu": {
-        "interval": 2,
-        "format": " {}% | {avg_frequency} GHz",
-        "max-length": 20,
-    },
-
-
-    // -----------------------------------------------------------------------
-    // Random wallpaper module
-    // -----------------------------------------------------------------------
-    "custom/random-wallpaper": {
-        "format": " ",
-        // "on-click": "$HOME/.config/waybar/scripts/random-wallpaper --random ~/Photos/wallpaper/my-favorite",
-        "on-click": "$HOME/.config/waybar/scripts/random_wallpaper_update_colors.sh ~/Photos/wallpaper/my-favorite/",
-    },
-
 
     // -----------------------------------------------------------------------
     // Network module
@@ -157,7 +160,7 @@
     // -----------------------------------------------------------------------
     "network": {
         "interval": 5,
-        "interface": "wlp3s0",
+        "interface": "wlp1s0f0",
         "format": "{ifname}",
         "format-wifi": "  {ipaddr}/{cidr}",
         "format-ethernet": "󰈀  {ipaddr}/{cidr}",
@@ -168,7 +171,6 @@
         "tooltip-format-disconnected": "Disconnected",
         "max-length": 50
     },
-
 
     // -----------------------------------------------------------------------
     // Disk usage module
@@ -182,7 +184,6 @@
         "tooltip": false,
     },
 
-
     // -----------------------------------------------------------------------
     // Volume module
     //
@@ -192,15 +193,15 @@
         "scroll-step": 5, // %, can be a float
         "reverse-scrolling": 5,
         "format": "{volume}% {icon} {format_source}",
-        "format-bluetooth": "{volume}% {icon} {format_source}",
-        "format-bluetooth-muted": "󰝟 {icon} {format_source}",
+        "format-bluetooth": "{volume}% {icon}  {format_source}",
+        "format-bluetooth-muted": "󰝟 {icon}  {format_source}",
         "format-muted": "󰝟 {format_source}",
         "format-source": "{volume}% ",
         "format-source-muted": "",
         "format-icons": {
             "headphone": "",
             "hands-free": "",
-            "headset": "",
+            "headset": "",
             "phone": "",
             "portable": "",
             "car": "",
@@ -215,21 +216,35 @@
     },
 
 
-
+    // -----------------------------------------------------------------------
+    // Battery module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Battery
+    // -----------------------------------------------------------------------
+    "battery": {
+        "interval": 2,
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon}  {capacity}% {time}",
+        "format-time": "{H}:{m}",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt": "{icon}  {time}",
+        "format-icons": ["", "", "", "", ""],
+    },
 
     // -----------------------------------------------------------------------
-    // Backlight module
+    // Brightness display
     //
     // https://github.com/Alexays/Waybar/wiki/Module:-Backlight
-    // https://github.com/Alexays/Waybar/wiki/Module:-Backlight-Slider
     // -----------------------------------------------------------------------
-    // "backlight": {
-    //     "device": "intel_backlight",
-    //     "format": "{percent}% {icon}",
-    //     "format-icons": ["","","","", "", "", ""],
-    //     "min-length": 7,
-    // },
-
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+    },
 
     // -----------------------------------------------------------------------
     // Tray module
