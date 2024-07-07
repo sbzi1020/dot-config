@@ -875,7 +875,16 @@ Then disable the related service if you don't need them.
 Then you need to install =cptv= to get the file preview works:
 
 #+BEGIN_SRC bash
+  #
+  # Install dependencies for `libmagic` and `libcrypto`
+  #
+  sudo dnf install file-libs file-devel openssl-devel
 
+  cd ~/temp
+  git clone --depth=1 git@github.com:NikitaIvanovV/ctpv.git
+  cd ctpv
+  make
+  sudo make install
 #+END_SRC
 
 
