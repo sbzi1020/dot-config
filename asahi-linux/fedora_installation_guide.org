@@ -378,7 +378,7 @@ Or quick read from here: https://docs.fedoraproject.org/en-US/quick-docs/dnf/
 *** Install everything I need
 
 #+BEGIN_SRC bash
-  sudo dnf install git git-delta bat ripgrep procs htop btop neofetch fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol mpv cava dbus dbus-daemon
+  sudo dnf install git git-delta bat ripgrep procs htop btop neofetch fzf fish neovim emacs alacritty tmux hyprland dunst qt6-qtwayland wl-clipboard waybar pavucontrol pamixer mpv cava dbus dbus-daemon brightnessctl
 #+END_SRC
 
 
@@ -863,6 +863,20 @@ Then disable the related service if you don't need them.
 | =S=            | Take a screenshto without subtitles               |
 |              |                                                  |
 
+
+
+*** Install =lf= (Terminal File Manager)
+
+#+BEGIN_SRC bash
+  dnf copr enable pennbauman/ports
+  dnf install lf
+#+END_SRC
+
+Then you need to install =cptv= to get the file preview works:
+
+#+BEGIN_SRC bash
+
+#+END_SRC
 
 
 ** Sega super model3 emulator: =Supermodel=

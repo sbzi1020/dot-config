@@ -1,0 +1,136 @@
+# ------------------------------------------------------------------
+# How to get the settings information?
+#
+# `lf --doc | bat`
+# ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+# Before previewer script (`scope`) works, you need to install the
+# following programs to support different types of preview
+#
+# doas pacman --sync --refresh bat atool ffmpegthumbnailer chafa
+#
+# For image preview
+# - Überzug (X11 only)
+# - Chafa (X11 and Wayland)
+#
+# paru --sync --refresh ctpv-git
+# ------------------------------------------------------------------
+
+#
+# Default settings
+#
+set info size:time
+set icons
+set drawbox
+set ratios '1:2:2'
+
+#
+# File previewer
+#
+set previewer ctpv
+set cleaner ctpvclear
+&ctpv -s $id
+&ctpvquit $id
+
+#
+# Disable the original default keybindings (map to nothing!)
+#
+map c
+map d
+map y
+map p
+map w
+map sn
+map ss
+map st
+map hh
+
+#
+# Go to folders
+#
+map gc cd ~/.config
+map gh cd ~
+map g- cd -
+map gr cd ~/Rust
+map gt cd ~/temp
+map gb cd ~/my-shell/backup
+map gd cd ~/Downloads
+map gp cd ~/Photos
+
+
+#
+# Show hidden files
+#
+map sh :set hidden!
+
+
+#
+# Quit
+#
+map Q :quit
+
+
+#
+# Copy, cut, paste
+#
+map yy :copy
+map dd :cut
+map dD :delete
+map pp :paste
+map yp :yank-path
+
+#
+# Vim-like rename
+#
+map cw :rename
+map A :rename
+map I :push A<c-a>
+map ciw :push A<c-u>
+map bulk :bulk-rename
+
+
+#
+# Dish usage
+#
+map du :!clear && dust -d1
+
+
+#
+# Sorting, reverse result by default
+#
+set reverse
+map ss :set sortby size
+map st :set sortby time
+
+
+#
+# Rename for multiple items
+#
+cmd bulk-rename ${{
+    old="$(mktemp)"
+    new="$(mktemp)"
+    [ -n "$fs" ] && fs="$(ls)"
+    printf '%s\n' "$fs" >"$old"
+    printf '%s\n' "$fs" >"$new"
+    $EDITOR "$new"
+    [ "$(wc -l "$new")" -ne "$(wc -l "$old")" ] && exit
+    paste "$old" "$new" | while IFS= read -r names; do
+        src="$(printf '%s' "$names" | cut -f1)"
+        dst="$(printf '%s' "$names" | cut -f2)"
+        if [ "$src" = "$dst" ] || [ -e "$dst" ]; then
+            continue
+        fi
+        mv -- "$src" "$dst"
+    done
+    rm -- "$old" "$new"
+    lf -remote "send $id unselect"
+}}
+
+
+#
+# Copy current path
+#
+# cmd yank-path $printf '%s' "$fx" | xclip -i -selection clipboard
+cmd yank-path $printf '%s' "$fx" | wl-copy
+
