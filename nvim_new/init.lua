@@ -36,6 +36,7 @@ end
 Reload_package('my_settings')
 Reload_package('my_keybindings')
 Reload_package('my_plugins')
+Reload_package 'my_auto_groups'
 -- Reload_package 'my_statusline'
 -- --Reload_package 'my_nvim_tree'
 -- Reload_package 'my_tmuxline'
@@ -74,7 +75,6 @@ Reload_package('my_plugins')
 -- Reload_package 'my_macros'
 -- 
 -- -- Load auto groups
--- Reload_package 'my_auto_groups'
 -- 
 -- -- Load hare setup
 -- Reload_package 'my_hare_setup'
