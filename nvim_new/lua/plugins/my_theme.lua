@@ -22,8 +22,10 @@ return {
         -- vim.cmd('let g:gruvbox_baby_function_style = "NONE"')
         -- vim.cmd('let g:gruvbox_baby_keyword_style = "italic"')
 
-        -- Enable telescope theme
-        vim.cmd('let g:gruvbox_baby_telescope_theme = 1')
+        --
+        -- DO NOT enable this, it mess the picker top prompt!!!
+        --
+        -- vim.cmd('let g:gruvbox_baby_telescope_theme = 1')
 
         -- Enable transparent mode
         vim.cmd('let g:gruvbox_baby_transparent_mode = 1')
