@@ -46,7 +46,6 @@ require("lazy").setup({
     -- Automatically check for plugin updates
     checker = {
         enabled = true,
-        concurrency = nil, ---@type number? set to 1 to check for updates very slowly
         notify = false, -- get a notification when new updates are found
     },
     -- automatically check for config file changes and reload the ui
