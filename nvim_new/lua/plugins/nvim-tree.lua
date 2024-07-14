@@ -119,16 +119,16 @@ return {
             },
         })
 
+--        vim.keymap.set('n',
+--            '<leader>ee',
+--            '<cmd>NvimTreeToggle<CR>',
+--            {
+--                silent = true,
+--                desc = "NvimTree toggle",
+--            })
+--
         vim.keymap.set('n',
             '<leader>ee',
-            '<cmd>NvimTreeToggle<CR>',
-            {
-                silent = true,
-                desc = "NvimTree toggle",
-            })
-
-        vim.keymap.set('n',
-            '<leader>ef',
             '<cmd>NvimTreeFindFileToggle<CR>',
             {
                 silent = true,
