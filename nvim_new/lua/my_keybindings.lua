@@ -223,3 +223,33 @@ keymap.set('n', 'mm', 'mM', { desc = "Mark current position" })
 
 -- `gb`: Go back to the global mark
 keymap.set('n', 'gb', '`Mzz', { desc = "Go back to last marked position" })
+
+
+-------------------------------------------------------------------------------
+-- Tab related
+-------------------------------------------------------------------------------
+keymap.set('n',
+    '<leader>to',
+    '<cmd>tabnew<CR>',
+    { desc = "Tab: open new tab" }
+)
+keymap.set('n',
+    '<leader>tc',
+    '<cmd>tabclose<CR>',
+    { desc = "Tab: close current tab" }
+)
+keymap.set('n',
+    '<leader>tn',
+    '<cmd>tabn<CR>',
+    { desc = "Tab: go to next tab" }
+)
+keymap.set('n',
+    '<leader>tp',
+    '<cmd>tabp<CR>',
+    { desc = "Tab: go to prev tab" }
+)
+keymap.set('n',
+    '<leader>tf',
+    '<cmd>tabnew %<CR>',
+    { desc = "Tab: open current buffer in new tab" }
+)
