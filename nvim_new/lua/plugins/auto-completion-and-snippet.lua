@@ -16,8 +16,8 @@ return {
     -- A completion engine plugin for neovim written in Lua.
     'hrsh7th/nvim-cmp',
     dependencies = {
-        -- nvim-cmp source for neovim's built-in language server client.
-        'hrsh7th/cmp-nvim-lsp',
+        --vscode-like pictograms
+        "onsails/lspkind.nvim",
         -- nvim-cmp source for neovim Lua API.
         'hrsh7th/cmp-nvim-lua',
         -- nvim-cmp source for buffer words.
@@ -34,6 +34,7 @@ return {
     config = function()
         vim.cmd('let g:vsnip_snippet_dir = expand(\'~/.config/nvim/snippets\')')
 
+        local lspkind = require('lspkind')
 
         ---
         --- 'nvim-cmp' setup
@@ -126,7 +127,6 @@ return {
                 { name = 'nvim_lua' },
                 { name = 'path' },
                 { name = 'vsnip' },
-                { name = 'nvim_lsp', keyword_length = 2  },
 
                 --
                 -- For `buffer` source, I only want to see it after I type over 5
@@ -136,33 +136,55 @@ return {
                 { name = 'buffer', keyword_length = 5 },
             }),
 
-            -- -- Customize the item formatting
-            -- formatting = {
-            --     format = function(entry, vim_item)
-            --         -- Item rendering: icon, kind name
-            --         -- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind)
-
-            --         -- Clear style: Do not display the icon and kind name!!!
-            --         vim_item.kind = ""
-
-            --         -- Source name mapping
-            --         vim_item.menu = ({
-            --             nvim_lua = "[Lua]",
-            --             path = "[Path]",
-            --             nvim_lsp = "[LSP]",
-            --             vsnip = "[Snippets]",
-            --             buffer = "[Buffer]",
-            --             latex_symbols = "[LaTeX]",
-            --         })[entry.source.name]
-            --         return vim_item
-            --     end
-            -- },
-
             -- Floating document window use rounded border
             window = {
                 completion = cmp.config.window.bordered(),
                 documentation = cmp.config.window.bordered(),
             },
+
+            -- Popup formatting
+            formatting = {
+                format = lspkind.cmp_format({
+                    --
+                    -- show only symbol annotations
+                    --
+                    mode = 'symbol',
+
+                    --
+                    -- prevent the popup from showing more than provided
+                    -- characters (e.g 50 will not show more than 50 characters)
+                    -- can also be a function to dynamically calculate max width
+                    -- such as:
+                    --
+                    -- maxwidth = function()
+                    --      return math.floor(0.45 * vim.o.columns)
+                    -- end
+                    --
+                    maxwidth = 50,
+
+                    --
+                    -- when popup menu exceed maxwidth, the truncated part would
+                    -- show ellipsis_char instead (must define maxwidth first)
+                    --
+                    ellipsis_char = '...',
+
+                    --
+                    -- show labelDetails in menu. Disabled by default
+                    --
+                    show_labelDetails = true,
+
+                    --
+                    -- The function below will be called before any actual
+                    -- modifications from lspkind so that you can provide more
+                    -- controls on popup customization.
+                    -- (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
+                    --
+                    before = function (entry, vim_item)
+                        ...
+                        return vim_item
+                    end
+                })
+            }
         })
 
         cmp.setup.cmdline({ '/', '?' }, {

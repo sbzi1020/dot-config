@@ -33,6 +33,7 @@ require("lazy").setup({
     spec = {
         -- import your plugins
         { import = "plugins" },
+        { import = "plugins.lsp" },
     },
     install = {
         -- Install missing plugins on startup. This doesn't increase startup
