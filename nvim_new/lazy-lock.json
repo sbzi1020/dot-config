@@ -23,6 +23,7 @@
   "telescope-cmdline.nvim": { "branch": "main", "commit": "1c6a169d84a5e8f0c796f8275bdbb8019bd3ca14" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "cf48d4dfce44e0b9a2e19a008d6ec6ea6f01a83b" },
   "telescope.nvim": { "branch": "0.1.x", "commit": "a0bbec21143c7bc5f8bb02e0005fa0b982edc026" },
+  "todo-comments.nvim": { "branch": "main", "commit": "d61567557e2ff5c548c74e96b2d9f8d33e5fcb34" },
   "vim-vsnip": { "branch": "master", "commit": "02a8e79295c9733434aab4e0e2b8c4b7cea9f3a9" },
   "which-key.nvim": { "branch": "main", "commit": "f0e99d48f33193526fe66e699174670d5856b6b8" }
 }
