@@ -12,6 +12,10 @@ return {
             }
         })
 
+        --
+        -- Work with `nvim-cmp`: add autopair when you choose a function in
+        -- completion list
+        --
         local cmp_autopairs = require('nvim-autopairs.completion.cmp')
         local cmp = require('cmp')
         cmp.event:on(
