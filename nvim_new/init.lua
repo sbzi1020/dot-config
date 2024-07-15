@@ -36,26 +36,13 @@ end
 Reload_package('my_settings')
 Reload_package('my_keybindings')
 Reload_package('my_plugins')
-Reload_package 'my_auto_groups'
--- Reload_package 'my_statusline'
--- --Reload_package 'my_nvim_tree'
--- Reload_package 'my_tmuxline'
--- -- Reload_package 'my_indent_blankline'
+Reload_package('my_auto_groups')
 -- Reload_package 'my_goyo'
 -- Reload_package 'my_firenvim'
--- Reload_package 'my_markdown_preview'
 -- 
--- -- Make sure `my_treesitter` loads BEFORE `my_telescope`.
--- -- Otherise, treesitter highlight will stop working!!!
--- Reload_package 'my_treesitter'
--- Reload_package 'my_telescope'
 -- -- Reload_package 'my_colorizer'
 -- Reload_package 'my_nvim_comment'
 -- 
--- 
--- -- LSP(Language Server Protocol) modules
--- Reload_package 'lsp/my_lsp'
--- -- Reload_package 'lsp/coc'
 -- 
 -- -- -- Themes modules
 -- Reload_package 'my_themes'

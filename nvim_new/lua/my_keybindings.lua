@@ -158,7 +158,7 @@ keymap.set('i', '<c-k>', '<c-p>')
 keymap.set('n', '<leader>oq', ':copen<CR>', { desc = "Open quick list" })
 keymap.set('n', '<leader>cq', ':cclose<CR>', { desc = "Close quick list" })
 
-keymap.set('n', '<leader>ol', ':lopen<CR>', { desc = "Close location list" })
+keymap.set('n', '<leader>ol', ':lopen<CR>', { desc = "Open location list" })
 keymap.set('n', '<leader>cl', ':lclose<CR>', { desc = "Close location list" })
 
 -- Cycle through the quick fix list and center the current result line
@@ -252,4 +252,20 @@ keymap.set('n',
     '<leader>tf',
     '<cmd>tabnew %<CR>',
     { desc = "Tab: open current buffer in new tab" }
+)
+
+
+-------------------------------------------------------------------------------
+-- Terminal related
+-------------------------------------------------------------------------------
+keymap.set('n',
+    '<leader>ot',
+    ':vsplit<CR>:terminal<CR>',
+    { desc = "Terminal: open terminal" }
+)
+
+keymap.set('t',
+    '<ESC>',
+    '<C-\\><C-n>',
+    { desc = "Terminal: Press `<ESC>` to back to normal mode" }
 )

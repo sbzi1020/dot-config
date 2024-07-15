@@ -171,5 +171,14 @@ return {
                 }
             })
         })
+
+
+        vim.keymap.set('n',
+            '<leader>os',
+            '<cmd>vs ~/.config/nvim/snippets<CR>',
+            {
+                silent = true,
+                desc = "Open snippets folder",
+            })
     end
 }
