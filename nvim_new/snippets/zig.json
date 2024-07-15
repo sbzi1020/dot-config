@@ -1,0 +1,115 @@
+{
+    "print": {
+        "prefix": "pl",
+        "body": [
+            "print(\"\\n>>> $1\", .{$0});"
+        ]
+    },
+    "declareBuffer": {
+        "prefix": "buffer",
+        "body": [
+            "var $1: [$0]u8 = undefined;"
+        ]
+    },
+    "declareBufferAndInit": {
+        "prefix": "buffer2",
+        "body": [
+            "var $1 = [_]u8 {0x00} ** $0;"
+        ]
+    },
+    "bufPrint": {
+        "prefix": "bufPrint",
+        "body": [
+            "std.fmt.bufPrint(&$1, \"$2\", .{$0}) catch \"\";"
+        ]
+    },
+    "pageAllocator": {
+        "prefix": "pageAllocator",
+        "body": [
+            "const allocator = std.heap.page_allocator;"
+        ]
+    },
+    "FixedBufferAllocator": {
+        "prefix": "fixedBufferAllocator",
+        "body": [
+            "var stack_buffer: [1024]u8 = undefined;",
+            "var fba = std.heap.FixedBufferAllocator.init(&stack_buffer);",
+            "const allocator = fba.allocator();"
+        ]
+    },
+    "stackFallback": {
+        "prefix": "stackFallback",
+        "body": [
+            "var gpa = std.heap.GeneralPurposeAllocator(.{}){};",
+            "const gpa_allocator = gpa.allocator();",
+            "defer {",
+            "    const deinit_status = gpa.deinit();",
+            "    //fail test; can't try in defer as defer is executed after we return",
+            "    if (deinit_status == .leak) std.testing.expect(false) catch @panic(\"\\nGPA detected a memory leak!!!\\n\");",
+            "}",
+            "",
+            "// var sfa = std.heap.stackFallback(10, std.heap.page_allocator);",
+            "var sfa = std.heap.stackFallback(10, gpa_allocator);",
+            "const allocator = sfa.get();"
+        ]
+    },
+    "areanAllocator": {
+        "prefix": "arenaAllocator",
+        "body": [
+            "var gpa = std.heap.GeneralPurposeAllocator(.{}){};",
+            "const gpa_allocator = gpa.allocator();",
+            "defer {",
+            "    const deinit_status = gpa.deinit();",
+            "    //fail test; can't try in defer as defer is executed after we return",
+            "    if (deinit_status == .leak) std.testing.expect(false) catch @panic(\"\\nGPA detected a memory leak!!!\\n\");",
+            "}",
+            "",
+            "// var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);",
+            "var arena = std.heap.ArenaAllocator.init(gpa_allocator);",
+            "defer arena.deinit();",
+            "const allocator = arena.allocator();"
+        ]
+    },
+    "GPA": {
+        "prefix": "globalPurposeAllocator",
+        "body": [
+            "var gpa = std.heap.GeneralPurposeAllocator(.{}){};",
+            "const allocator = gpa.allocator();",
+            "defer {",
+            "    const deinit_status = gpa.deinit();",
+            "    //fail test; can't try in defer as defer is executed after we return",
+            "    if (deinit_status == .leak) std.testing.expect(false) catch @panic(\"\\nGPA detected a memory leak!!!\\n\");",
+            "}"
+        ]
+    },
+    "testAllocator": {
+        "prefix": "testAllocator",
+        "body": [
+            "const test_allocator = std.testing.allocator;"
+        ]
+    },
+    "closure": {
+        "prefix": "closure",
+        "body": [
+            "struct {",
+            "    fn $1(who: []const u8) void {",
+            "        $0",
+            "    }",
+            "}.$1"
+        ]
+    },
+    "ArrayList": {
+        "prefix": "al",
+        "body": [
+            "var $1 = try std.ArrayList($2).initCapacity(allocator, $0);",
+            "defer $1.deinit();"
+        ]
+    },
+    "Hashmap": {
+        "prefix": "hm",
+        "body": [
+            "var $1 = std.StringHashMap($0).init(allocator);",
+            "defer $1.deinit();"
+        ]
+    }
+}
