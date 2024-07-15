@@ -16,6 +16,7 @@ https://github.com/nvim-telescope/telescope.nvim/blob/bfcc7d5c6f12209139f175e612
 -----------------------------------------------------------------------
 --]]
 
+
 local callback = function()
     local telescope = Reload_package('telescope')
     local actions = Reload_package('telescope.actions')
@@ -120,11 +121,11 @@ local callback = function()
                         height = 30,
                     }
                 },
-                -- mappings    = {
-                --     complete      = '<Tab>',
-                --     run_selection = '<C-CR>',
-                --     run_input     = '<CR>',
-                -- },
+                mappings    = {
+                    complete      = '<Tab>',
+                    run_selection = '<CR>',
+                    run_input     = '<CR>',
+                },
                 overseer = {
                     enabled = false,
                 },
@@ -238,6 +239,9 @@ return {
             'nvim-telescope/telescope-fzf-native.nvim',
             build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release'
         },
+
+        -- Telescope extension to use command line in a floating window,
+        -- rather than in bottom-left corner.
         'jonarrien/telescope-cmdline.nvim',
     },
     config = callback,
