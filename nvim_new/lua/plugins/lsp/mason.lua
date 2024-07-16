@@ -31,8 +31,9 @@ return {
         require("mason-lspconfig").setup {
             --
             -- Pre-install the following language servers, fully support list:
-            -- https://github.com/williamboman/mason-lspconfig.nvim
             --
+            -- https://github.com/williamboman/mason-lspconfig.nvim
+            -- https://github.com/neovim/nvim-lspconfig/wiki/Language-specific-plugins
             --
             -- LSP server installed location: ~/.local/share/nvim/mason/bin
             --

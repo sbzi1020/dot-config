@@ -17,7 +17,7 @@ return {
     'hrsh7th/nvim-cmp',
     dependencies = {
         -- nvim-cmp source for neovim Lua API.
-        'hrsh7th/cmp-nvim-lua',
+        -- 'hrsh7th/cmp-nvim-lua',
         -- nvim-cmp source for buffer words.
         'hrsh7th/cmp-buffer',
         -- nvim-cmp source for filesystem paths.
@@ -125,7 +125,8 @@ return {
 
             -- Completion source (the order decides the priority!!!)
             sources = cmp.config.sources({
-                { name = 'nvim_lua' },
+                { name = 'nvim_lsp' },
+                -- { name = 'nvim_lua' },
                 { name = 'path' },
                 { name = 'vsnip' },
 
