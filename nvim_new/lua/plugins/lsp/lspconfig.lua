@@ -142,7 +142,9 @@ return {
 
 
         ---------------------------------------------------------------
-        -- Customize diagnostic symbol column icons
+        -- Customize diagnostic symbol column icons (the left sign
+        -- column before the relative column!!!)
+        --
         -- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
         --
         -- For more highlight group, plz search help
@@ -161,11 +163,81 @@ return {
         --- lspconfig UI customization
         --- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
         ---------------------------------------------------------------
-        -- lspconfig.
+
+
+        -----------------------------------------------------------------------
+        -- Customize diagnostic virtual text
+        --
+        -- :h vim.diagnostic.config()
+        -----------------------------------------------------------------------
+        local config = {
+            -- Virtual text
+            underline = true,
+            virtual_text = {
+                -- prefix = "•",
+                prefix = "",
+                -- prefix = "",
+                -- prefix = "",
+                -- prefix = "■ ",
+                spacing = 4,
+            },
+
+            -- show signs
+            signs = {
+                active = signs,
+            },
+
+            update_in_insert = true,
+            severity_sort = true,
+            float = {
+                style = "minimal",
+
+                --
+                -- • "none": No border (default).
+                -- • "single": A single line box.
+                -- • "double": A double line box.
+                -- • "rounded": Like "single", but with rounded corners
+                --   ("╭" etc.).
+                -- • "solid": Adds padding by a single whitespace cell.
+                -- • "shadow": A drop shadow effect by blending with the
+                --   background.
+                -- • If it is an array, it should have a length of eight or
+                --   any divisor of eight. The array will specify the eight
+                --   chars building up the border in a clockwise fashion
+                --   starting with the top-left corner. As an example, the
+                --   double box style could be specified as: >
+                --   [ "╔", "═" ,"╗", "║", "╝", "═", "╚", "║" ].
+                border = "rounded",
+
+                source = "always",
+                header = "",
+                prefix = "",
+            },
+        }
+
+        vim.diagnostic.config(config)
+
+
+        -----------------------------------------------------------------------
+        -- rounded board for LSP documentation window
+        -----------------------------------------------------------------------
+        vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+            vim.lsp.handlers.hover,
+            {border = 'rounded'}
+        )
+
+        vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+            vim.lsp.handlers.signature_help,
+            {border = 'rounded'}
+        )
 
 
         ---------------------------------------------------------------
+        ---
         --- :h mason-lspconfig.setup_handlers
+        ---
+        --- :h lspconfig-setup
+        ---
         ---------------------------------------------------------------
 
         -- Get the default LSP's capabilities to advertise it to LSP servers.
@@ -194,6 +266,39 @@ return {
             --
             -- https://github.com/neovim/nvim-lspconfig/wiki/Understanding-setup-{}
             --
+            ["tsserver"] = function ()
+                --
+                -- :h lspconfig-setup
+                -- :h vim.lsp.ClientConfig
+                --
+                lspconfig["tsserver"].setup({
+                    capabilities = capabilities,
+                    root_dir = lspconfig.util.root_pattern("package.json"),
+                    init_options = {
+                        lint = true,
+                    },
+                    -- cmd = {'tsserver', 'param1', 'param2'}
+
+                    --
+                    -- The `settings` table is sent after initialization via a
+                    -- `workspace/didChangeConfiguration` notification from the
+                    -- Nvim client to the language server.
+                    -- These settings allow a user to change optional runtime
+                    -- settings of the language server. 
+                    --
+                    -- settings = {}
+                })
+            end,
+
+            ["denols"] = function ()
+                lspconfig["denols"].setup({
+                    capabilities = capabilities,
+                    root_dir = lspconfig.util.root_pattern("deno.json"),
+                    init_options = {
+                        lint = true,
+                    },
+                })
+            end,
             ["rust_analyzer"] = function ()
                 lspconfig["rust-analyzer"].setup({
                     capabilities = capabilities,
@@ -212,25 +317,6 @@ return {
                 })
             end,
 
-            ["tsserver"] = function ()
-                lspconfig["tsserver"].setup({
-                    capabilities = capabilities,
-                    root_dir = lspconfig.util.root_pattern("package.json"),
-                    init_options = {
-                        lint = true,
-                    },
-                })
-            end,
-
-            ["denols"] = function ()
-                lspconfig["denols"].setup({
-                    capabilities = capabilities,
-                    root_dir = lspconfig.util.root_pattern("deno.json"),
-                    init_options = {
-                        lint = true,
-                    },
-                })
-            end,
 
             ["lua_ls"] = function ()
                 lspconfig["lua_ls"].setup {

@@ -37,6 +37,22 @@ return {
             --
             -- LSP server installed location: ~/.local/share/nvim/mason/bin
             --
+            -- But use the system-installed LSP server binary has higher priority!!!
+            --
+            -- For example, I've already install `~/my-shell/zig-nightly/zls` and
+            -- mason installs `~/.local/share/nvim/mason/bin/zls`.
+            --
+            -- Tnen `vim.lsp.start_client()` searchs my `zls` from `$PATH` and starts
+            -- it, you can use `:LspInfo` to confirm:
+            --
+            --   1 client(s) attached to this buffer: 
+            --   
+            --   Client: zls (id: 1, bufnr: [1])
+            --   	filetypes:       zig, zir
+            --   	autostart:       true
+            --   	root directory:  /home/wison/zig/temp
+            --   	cmd:             /home/wison/my-shell/zig-nightly/zls
+            --
             ensure_installed = {
                 "lua_ls",
                 "bashls",
