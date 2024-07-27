@@ -1,6 +1,6 @@
 return {
     'luisiacc/gruvbox-baby',
-
+    enabled = true,
     lazy = false,
 
     --[[
@@ -31,18 +31,8 @@ return {
         vim.cmd('let g:gruvbox_baby_transparent_mode = 1')
 
         -- Load colorscheme
-        local current_theme = "gruvbox-baby"
-        local status_ok, loaded_colorscheme = pcall(
-            vim.cmd,
-            "colorscheme " .. current_theme
-        )
-
+        vim.cmd("colorscheme gruvbox-baby")
         vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
         vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-
-        if not status_ok then
-            print("Fail to load colorscheme: " .. current_theme)
-            return
-        end
     end
 }
