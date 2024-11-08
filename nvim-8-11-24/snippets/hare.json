@@ -1,0 +1,110 @@
+{
+    "void_pointer": {
+        "prefix": ["void_pointer"],
+        "body": [
+            "nullable *opaque"
+        ]
+    },
+    "struct": {
+        "prefix": ["struct"],
+        "body": [
+            "type ${1: struct name} = struct {",
+            "\t$0",
+            "};"
+        ]
+    },
+    "pl": {
+        "prefix": "pl",
+        "body": [
+            "fmt::printfln(\">>> $0\")!;"
+        ]
+    },
+    "pll": {
+        "prefix": "pll",
+        "body": [
+            "fmt::printfln(\">>> $1\", $0)!;"
+        ]
+    },
+    "u8_array": {
+        "prefix": "ua",
+        "body": [
+            "[]u8$0"
+        ]
+    },
+    "for": {
+        "prefix": "for",
+        "body": [
+            "for( let ${1:index_var}=0z; index < ${2:len}; index +=1) {",
+            "\t$0",
+            "};"
+        ]
+    },
+    "match": {
+        "prefix": "match",
+        "body": [
+            "match ($1) {",
+            "\tcase $0 =>;",
+            "\tcase let err: errors::error => fmt::printfln(\">>> error: {}\", errors::strerror(err))!;",
+            "};"
+        ]
+    },
+    "switch": {
+        "prefix": "switch",
+        "body": [
+            "switch ($1) {",
+            "\tcase $0 =>;",
+            "};"
+        ]
+    },
+    "buf_print_stack_allocated": {
+        "prefix": "bpsl",
+        "body": [
+            "let ${1:buffer}: [${2:buffer_size}]u8 = [0x00...];",
+            "const ${3:return_string} = fmt::bsprintf(&${1:buffer}, \"$4\", $0);"
+        ]
+    },
+    "buf_print_stack_allocated_2": {
+        "prefix": "bpsl2",
+        "body": [
+            "let ${1:buffer}: [${2:buffer_size}]u8 = [0x00...];",
+            "let ${3:fix_buffer} = memio::fixed(&${1:buffer});",
+            "fmt::fprintf(&${3:fix_buffer}, \"$4\", $0)!;",
+            "fmt::printfln(\"{}\", memio::string(&${3:fix_buffer})!)!;"
+        ]
+    },
+    "buf_print_heap_allocated": {
+        "prefix": "bphl",
+        "body": [
+            "let ${1:heap_buffer}: memio::stream = memio::dynamic();",
+            "defer io::close(&${1:heap_buffer})!;",
+            "fmt::fprintf(&${1:heap_buffer}, \"$2\", $0)!;",
+            "fmt::printfln(\"{}\", memio::string(&${1:heap_buffer})!)!;"
+        ]
+    },
+    "print_slice": {
+        "prefix": "ps",
+        "body": [
+            "fn print_slice(slice: []u8) void = {",
+            "\tfmt::printfln(\">>> [ print_slice ] - len: {}, value:\", len(slice))!;",
+            "\tfor (let index = 0z; index < len(slice); index += 1) {",
+            " \t\t//",
+            " \t\t// Hex",
+            " \t\t//",
+            " \t\t// fmt::printfln(\">>>\tslice[{}]: 0x{:X.2}\", index, slice[index])!;",
+            "",
+            "\t\t//",
+            "\t\t// Character",
+            "\t\t//",
+            "\t\t// fmt::printfln(\">>>\tslice[{}]: {}\", index, slice[index]: rune)!;",
+            "",
+            "\t\t//",
+            "\t\t// Integer",
+            "\t\t//",
+            "\t\tfmt::printfln(\">>>\tslice[{}]: {}\", index, slice[index])!;",
+            "\t};",
+            "};",
+            "",
+            "$0"
+        ]
+    }
+}
