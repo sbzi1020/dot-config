@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: thread_result_type
+# key: thread_result_type
+# --
+pub type ThreadResult<T>= Result<std::thread::JoinHandle<T>, Box<dyn std::error::Error + 'static>>;

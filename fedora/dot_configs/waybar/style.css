@@ -1,0 +1,128 @@
+/* @import url("/home/fion/.cache/wal/colors-waybar.css"); */
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: SauceCodePro Nerd Font;
+    min-height: 20px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+window#waybar {
+    background: transparent;
+    /* background: #23211b; */
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+#workspaces {
+    margin-left: 10px;
+    border-radius: 10px;
+    transition: none;
+    background: @background;
+    opacity: 0.9;
+}
+
+#workspaces button {
+    border-radius: 10px;
+    font-size: 25px;
+    color: @color1;
+    background: transparent;
+    padding: 5px 20px;
+}
+
+#workspaces button.active {
+    color: @color0;
+    background: @color1;
+    border-radius: inherit;
+
+    margin: 5px 5px;
+    font-size: 30px;
+}
+
+#clock {
+    margin: 0px;
+    padding: 10px 30px 10px 30px;
+    border-radius: 10px;
+    transition: none;
+    color: @color2;
+    background: @background;
+    opacity: 0.9;
+}
+
+#cpu {
+    margin-right: 8px;
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    transition: none;
+    color: @color3;
+    background: @background;
+    opacity: 0.9;
+}
+
+#custom-random-wallpaper {
+    margin-right: 8px;
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    transition: none;
+    color: @color4;
+    background: @background;
+    opacity: 0.9;
+}
+
+#network {
+    margin-right: 8px;
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    transition: none;
+    color: @color5;
+    background: @background;
+    opacity: 0.9;
+}
+
+#custom-disk-usage {
+    margin-right: 8px;
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    transition: none;
+    color: @color6;
+    background: @background;
+    opacity: 0.9;
+}
+
+#pulseaudio {
+    margin-right: 8px;
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    transition: none;
+    color: @color7;
+    background: @background;
+    opacity: 0.9;
+}
+
+#pulseaudio.muted {
+    color: @color8;
+    background: @background;
+    /* color: #ff9f1c; */
+
+}
+
+#tray {
+    margin-right: 0;
+    padding: 10px 15px 10px 15px;
+    border-radius: 10px;
+    transition: none;
+    color: @color9;
+    background: @background;
+    opacity: 0.9;
+}
+
+@keyframes blink {
+    to {
+        background-color: #9DE2DD;
+        color: #000000;
+    }
+}

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: string
+# key: ss
+# --
+[]const u8$0

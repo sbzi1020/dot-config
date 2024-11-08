@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: closure
+# key: closure
+# --
+struct {
+    fn $1(who: []const u8) void {
+        $0
+    }
+}.$1()

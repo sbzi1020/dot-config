@@ -1,0 +1,16 @@
+{
+    "Code block": {
+        "prefix": "cb",
+        "body": [
+            "@code ${1: language}",
+            "$0",
+            "@end"
+        ]
+    },
+    "Todo": {
+        "prefix": "td",
+        "body": [
+            "- ( ) $0"
+        ]
+    }
+}

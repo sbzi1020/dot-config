@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ArrayList
+# key: al
+# --
+var $1 = try std.ArrayList($2).initCapacity(allocator, $0);
+defer $1.deinit();

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: allow_warnings
+# key: allow_warnings
+# --
+#![allow(warnings)]
