@@ -129,7 +129,7 @@ set -U fish_color_user ff5f5f
 #       command.
 #--------------------------------------------------------
 set -g fish_key_bindings fish_vi_key_bindings
-bind -M insert -m default hh backward-char force-repaint
+bind -M insert -m default jj backward-char force-repaint
 bind -M insert \f accept-autosuggestion
 bind -M default k history-search-backward
 bind -M default j history-search-forward
@@ -145,20 +145,16 @@ abbr c "clear"
 # History
 abbr h "history -n40"
 
-# Abbreviation for `exa` and map `ll` and
-abbr exal "exa --long --git --time-style=long-iso --sort=newest"
-# abbr ll "exa --long --git --time-style=long-iso --sort=newest"
-abbr exalr "exa --long --git --time-style=long-iso --sort=newest -r"
-# abbr llr "exa --long --git --time-style=long-iso --sort=newest -r"
 abbr ll "ls -lht"
-abbr llt "exa --long --git --time-style=long-iso --sort=newest -r --tree"
 
 # Abbreviation for `dust` and map it to `du`
 # Make sure you already install it by running: cargo install du-dust
 abbr du "dust -d1"
 abbr ps "procs"
 
-# Abbreviation for `Docker
+#--------------------------------------------------------
+# Docker
+#--------------------------------------------------------
 abbr d "docker"
 abbr di "docker images"
 abbr dii "docker image inspect --format '{{.Os}}/{{.Architecture}}' "
@@ -170,7 +166,9 @@ abbr dns "docker network ls"
 abbr dc "docker-compose"
 abbr dm "docker-machine"
 
-# Vi config related and vifm
+#--------------------------------------------------------
+# Open configuration in vim
+#--------------------------------------------------------
 # abbr vim "lvim"
 abbr vim "nvim"
 # abbr fc "nvim ~/.config/fish/config.fish"
@@ -184,45 +182,50 @@ abbr wison_fc "nvim -u ~/.config/nvim_backup/init_wison.lua ~/.config/fish/confi
 abbr wison_ac "nvim -u ~/.config/nvim_backup/init_wison.lua ~/.alacritty.yml"
 abbr vifm "vifm -c 'colorscheme zenburn_1' -c view"
 
+#--------------------------------------------------------
 # Git related
+#--------------------------------------------------------
 abbr gs "git status"
 abbr gb "git branch"
 abbr gl "git log -n10 --oneline --decorate --all --graph"
 abbr ga "git add"
 abbr gf "git diff HEAD"
 abbr gc "git commit -nm"
-abbr gp "git push -u origin"
 abbr gck "git checkout"
+abbr gcl "git clone --depth=1"
+abbr gp "git push -u origin"
+abbr grc "gh repo create REPO_NAME_HERE --private --source . --push"
+abbr grd "gh repo delete --yes OWNER_NAME/REPO_NAME"
+abbr grl "gh repo list --language all"
 
-# Code-insider
-abbr ci "code-insiders ."
-
+#--------------------------------------------------------
 # Rust related
-# abbr cn "cargo new"
-# abbr cc "cargo check"
-# abbr cr "cargo run"
-# abbr ct "cargo test"
-# abbr cw "cargo watch"
-# abbr cwr "cargo watch -c --exec run"
-# abbr cwt "cargo watch -c --exec 'test -- --nocapture'"
+#--------------------------------------------------------
+abbr cn "cargo new"
+abbr cc "cargo check"
+abbr cr "cargo run"
+abbr ct "cargo test"
+abbr cw "cargo watch"
+abbr cwr "cargo watch -c --exec run"
+abbr cwt "cargo watch -c --exec 'test -- --nocapture'"
 
 # Alacritty
 abbr al "/Applications/Alacritty.app/Contents/MacOS/alacritty --working-directory ./ &"
 abbr ac "nvim ~/.alacritty.toml"
 
-# Tmux
+#--------------------------------------------------------
+# Tmux related
+#--------------------------------------------------------
 abbr tr "tmux source-file ~/.tmux.conf"
 abbr tn "tmux new -s dev"
 abbr tc "nvim ~/.tmux.conf"
 abbr tl "tmux ls"
-abbr ta "tmux attach-session -t 0"
 abbr ta "tmux attach-session -t dev"
-abbr tam "tmux attach-session -t 'minimal'"
-abbr tap "tmux attach-session -t 'minimal frontend paid'"
-
 abbr tk "tmux kill-server"
 
-# iproute2 related
+#--------------------------------------------------------
+# Iproute2 related
+#--------------------------------------------------------
 abbr ip "ip"
 abbr ipj "ip --json"
 
@@ -231,12 +234,14 @@ abbr ipj "ip --json"
 # nsu - net status udp all
 # nstl - net status tcp listening
 # abbr ns "ss"
-abbr nst "lsof -nP -iTCP"
-abbr nstl "lsof -nP -iTCP | grep LISTEN"
-abbr nsu "lsof -nP -iUDP"
+abbr nst "ss --numeric --processes --all --tcp"
+abbr nstl "ss --numeric --processes --listening --tcp"
+abbr nsu "ss --numeric --processes --all --udp"
+abbr ns "ip route show"
 
-
+#--------------------------------------------------------
 # Kubernetes
+#--------------------------------------------------------
 abbr kb "kubectl"
 
 abbr kcd "kubectl create deployment"
@@ -251,42 +256,26 @@ abbr kgs "kubectl get service --output=wide"
 abbr kga "kubectl get all --output=wide"
 abbr kgns "kubectl get namespace"
 
+#--------------------------------------------------------
 # Firebase
+#--------------------------------------------------------
 abbr fb "firebase"
 abbr fbe "firebase emulators:start"
 
-# Neofetch
+#--------------------------------------------------------
+# Show system information
+#--------------------------------------------------------
 abbr nf "neofetch"
-
-# Python 2 -> 3
-abbr python "python3"
+abbr ff "fastfetch"
 
 
+#--------------------------------------------------------
 # Google Cloud SDK
+#--------------------------------------------------------
 abbr g "gcloud"
 abbr gi "gcloud info"
 abbr gal "gcloud auth list"
 abbr gcl "gcloud config list"
-
-
-#--------------------------------------------------------
-# EMacs server
-#--------------------------------------------------------
-abbr es "emacs --daemon --debug-init"
-abbr kes "emacsclient -e \(\"kill-emacs\"\)"
-
-#--------------------------------------------------------
-# EMacs client
-#--------------------------------------------------------
-abbr ect "emacsclient -t"
-abbr ec "emacsclient -c &"
-
-#--------------------------------------------------------
-# EMacs standalone
-#--------------------------------------------------------
-abbr et "emacs --no-window-system"
-abbr eg "emacs &"
-
 
 #--------------------------------------------------------
 # Node LTS
@@ -299,37 +288,12 @@ set PATH /opt/homebrew/opt/node@18/bin $PATH
 set -gx LDFLAGS "-L/opt/homebrew/opt/node@18/lib"
 set -gx CPPFLAGS "-I/opt/homebrew/opt/node@18/include"/
 
-
-#--------------------------------------------------------
-# GO LANG
-#--------------------------------------------------------
-# set GOPATH $HOME/go
-# set PATH $PATH $GOPATH/bin
-
 #--------------------------------------------------------
 # Rust - Cargo
 #--------------------------------------------------------
 # set PATH $HOME/.cargo/bin $PATH
 # set LD_LIBRARY_PATH (rustc --print sysroot)"/lib"
 # set RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/library"
-
-
-#--------------------------------------------------------
-# Fuzzy file searching pluging for `vim`
-#--------------------------------------------------------
-set PATH ~/.vim/plugged/fzf/bin $PATH
-set --export FZF_DEFAULT_COMMAND 'fd --type f'
-set --export FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
-
-#--------------------------------------------------------
-# Python 3.7
-#--------------------------------------------------------
-# set PATH /usr/local/opt/python@3.7/bin $PATH
-
-#--------------------------------------------------------
-# Open JDK 11
-#--------------------------------------------------------
-# set PATH /usr/local/opt/openjdk@11/bin $PATH
 
 
 #--------------------------------------------------------
@@ -516,3 +480,41 @@ abbr mpvh "mpv --ytdl --script-opts=try_ytdl_first=yes --ytdl-format=ytdl"   # B
 abbr mpv  "mpv --ytdl --script-opts=try_ytdl_first=yes --ytdl-format=best"   # Middle video and audio quality
 abbr mpvl "mpv --ytdl --script-opts=try_ytdl_first=yes --ytdl-format=worst"  # Low video and audio quality
 
+#--------------------------------------------------------
+# Python
+#--------------------------------------------------------
+abbr python "python3"
+
+#--------------------------------------------------------
+# Iptables
+#--------------------------------------------------------
+abbr iptreload "doas ~/.config/iptables/basic.fish"
+abbr iptrestore "doas ~/.config/iptables/temp-restore-iptables.fish"
+abbr iptl "doas iptables -t filter --list -v"
+abbr iptlr "doas iptables -t filter --list-rules"
+abbr iptlog "journalctl -k --grep=\"IN=.*OUT=.*\""
+
+
+#--------------------------------------------------------
+# emacs
+#--------------------------------------------------------
+abbr es "emacs --daemon --debug-init"
+abbr kes "emacsclient -e \(\"kill-emacs\"\)"
+abbr et "emacs --no-window-system"
+abbr eg "emacs &"
+
+
+#--------------------------------------------------------
+# Package manager
+#--------------------------------------------------------
+abbr pinstall "sudo dnf install"
+abbr pginstall "sudo dnf group install"
+abbr psearch "dnf search"
+abbr pgsearch "dnf group list | rg"
+abbr pinfo "dnf info"
+abbr pginfo "dnf group info"
+abbr premove "sudo dnf remove"
+abbr pgremove "sudo dnf group remove"
+abbr pquery "dnf repoquery --installed" # Query only installed packages
+# abbr pqueryfile "dnf repoquery --installed --list"
+abbr pqueryfile "dnf repoquery --latest 1 --list" # When querying package files, query from repo latest version
