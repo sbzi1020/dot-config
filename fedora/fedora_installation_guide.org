@@ -165,6 +165,21 @@ Change default shell to =fish=:
 #+END_SRC
 
 
+*** Install =lf=
+
+
+
+#+BEGIN_SRC bash
+  dnf copr enable pennbauman/ports
+  dnf install lf
+#+END_SRC
+
+
+Or you can direct download the pre-built binary from here:
+
+https://github.com/gokcehan/lf/releases
+
+
 *** Install =Xorg= if inside VM
 
 If you're running =Fedora= inside a VM, then =hyprland= runs a bit slower and might have the following issues:
