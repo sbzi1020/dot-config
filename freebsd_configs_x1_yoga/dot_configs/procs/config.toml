@@ -1,0 +1,104 @@
+# For more detail setting information, plz visit https://github.com/dalance/procs
+
+[[columns]]
+# The column kind to show
+kind = "Pid"
+# Use which color to show
+style = "BrightYellow|Yellow"
+# This column can be search for as numeric parameter passed
+# to `procs` command?
+numeric_search = true
+# This column can be search for as non-numeric parameter passed
+# to `procs` command?
+nonnumeric_search = false
+# Alignment, "Left, Center, Right". "Left" by default.j
+# align = "Right"
+
+[[columns]]
+kind = "User"
+style = "BrightMagenta|Magenta"
+numeric_search = false
+nonnumeric_search = true
+align = "Right"
+
+[[columns]]
+kind = "Separator"
+style = "BrightWhite|White"
+color_075 = "BrightWhitee"
+numeric_search = false
+nonnumeric_search = false
+align = "Center"
+
+[[columns]]
+kind = "Tty"
+style = "BrightWhite|White"
+numeric_search = false
+nonnumeric_search = false
+align = "Center"
+
+[[columns]]
+kind = "Threads"
+style = "BrightWhite|White"
+numeric_search = false
+nonnumeric_search = false
+align = "Center"
+
+[[columns]]
+kind = "VmRss"
+style = "BrightGreen|Green"
+numeric_search = false
+nonnumeric_search = false
+align = "Right"
+
+# [[columns]]
+# kind = "UsageCpu"
+# style = "BrightGreen|Green"
+# numeric_search = false
+# nonnumeric_search = false
+# align = "Center"
+# 
+# [[columns]]
+# kind = "UsageMem"
+# style = "BrightGreen|Green"
+# numeric_search = false
+# nonnumeric_search = false
+# align = "Center"
+
+[[columns]]
+kind = "Separator"
+style = "BrightWhite|White"
+numeric_search = false
+nonnumeric_search = false
+align = "Center"
+
+[[columns]]
+kind = "Command"
+style = "BrightWhite|White"
+numeric_search = false
+nonnumeric_search = true
+align = "Left"
+
+[search]
+numeric_search = "Exact"
+nonnumeric_search = "Partial"
+logic = "And"
+
+[display]
+show_self = false
+show_thread = false
+show_thread_in_tree = true
+cut_to_terminal = true
+cut_to_pager = false
+cut_to_pipe = false
+color_mode = "Always"
+
+[sort]
+column = 0
+order = "Ascending"
+# order = "Descending"
+
+[docker]
+path = "unix:///var/run/docker.sock"
+
+[pager]
+mode = "Auto"
