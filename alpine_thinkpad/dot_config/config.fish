@@ -395,6 +395,7 @@ abbr premove "doas apk del"
 #--------------------------------------------------------
 abbr rc "nvim ~/.config/river/init"
 abbr exitr "riverctl exit"
+abbr shutdown "doas poweroff"
 
 #--------------------------------------------------------
 # MPV realted: play audio or video
