@@ -1,0 +1,192 @@
+{
+    "println!()": {
+        "prefix": "pl",
+        "body": [
+            "println!(\"$0\");"
+        ]
+    },
+    "println!(\"{}\",)": {
+        "prefix": "pll",
+        "body": [
+            "println!(\"$1 {}\", $0);"
+        ]
+    },
+    "format!(\"{}\",)": {
+        "prefix": "form",
+        "body": [
+            "format!(\"$1 {}\", $0);"
+        ]
+    },
+    "if statement": {
+        "prefix": "if",
+        "body": [
+            "if ${1:condition} {",
+            "    $0",
+            "}"
+        ]
+    },
+    "if else statement": {
+        "prefix": "ifelse",
+        "body": [
+            "if ${1:condition} {",
+            "    $2",
+            "} else {",
+            "    $0",
+            "}"
+        ]
+    },
+    "for statement": {
+        "prefix": "for",
+        "body": [
+            "for ${1:index_var} in ${2:var_or_range} {",
+            "    $0",
+            "}"
+        ]
+    },
+    "pattern matching statement": {
+        "prefix": "match",
+        "body": [
+            "match ${1:target} {",
+            "    ${2:value} => $0",
+            "}"
+        ]
+    },
+    "struct statement": {
+        "prefix": "struct",
+        "body": [
+            "struct ${1:struct_name} {",
+            "   $0",
+            "}"
+        ]
+    },
+    "impl struct statement": {
+        "prefix": "impl",
+        "body": [
+            "impl ${1:struct_name} {",
+            "    $0",
+            "}"
+        ]
+    },
+    "impl struct for trait statement": {
+        "prefix": "impl_for",
+        "body": [
+            "impl ${1:trait_name} for ${2:struct_name} {",
+            "    $0",
+            "}"
+        ]
+    },
+    "Implement std::fmt::Display trait": {
+        "prefix": "impl_display_for_struct",
+        "body": [
+            "impl std::fmt::Display for ${1:struct_name} {",
+            "    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {",
+            "        // write!(f, \"{}\", self.xxx)",
+            "        $0",
+            "    }",
+            "}"
+        ]
+    },
+    "Implement std::fmt::Debug trait": {
+        "prefix": "impl_debug_for_struct",
+        "body": [
+            "impl std::fmt::Debug for ${1:struct_name} {",
+            "    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {",
+            "        // write!(f, \"{}\", self.xxx)",
+            "        // f.debug_struct(\"My Test Struct\")",
+            "        // .field(\"name\", &self.name)",
+            "        // .finish()",
+            "        $0",
+            "    }",
+            "}"
+        ]
+    },
+    "enum statement": {
+        "prefix": "enum",
+        "body": [
+            "enum ${1:enum_name} {",
+            "    $0",
+            "}"
+        ]
+    },
+    "#[derive()] statement": {
+        "prefix": "derive",
+        "body": [
+            "#[derive(${1:trait_to_derive})]"
+        ]
+    },
+    "#![allow(warnings)]": {
+        "prefix": "allow_warnings",
+        "body": [
+            "#![allow(warnings)]"
+        ]
+    },
+    "Unit test block": {
+        "prefix": "test_for_unit",
+        "body": [
+            "#[cfg(test)]",
+            "mod tests {",
+            "    use super::*;",
+            "",
+            "    #[test]",
+            "    fn ${1:test_fn_name}() {",
+            "        $0",
+            "    }",
+            "}"
+        ]
+    },
+    "'fn new' in struct impl statement": {
+        "prefix": "new",
+        "body": [
+            "fn new(${1:parameter}) -> Self {",
+            "    $0",
+            "}"
+        ]
+    },
+    "Spwan new thread": {
+        "prefix": "spwan_new_thread",
+        "body": [
+            "thread::spawn(move || {",
+            "    $0",
+            "});"
+        ]
+    },
+    "type BufferReference<'a>": {
+        "prefix": "buffer_type",
+        "body": [
+            "pub type BufferReference<'a> = &'a [u8];"
+        ]
+    },
+    "type FutureResult<T>": {
+        "prefix": "future_result_type",
+        "body": [
+            "pub type FutureResult<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;"
+        ]
+    },
+    "type ThreadResult<T>": {
+        "prefix": "thread_result_type",
+        "body": [
+            "pub type ThreadResult<T>= Result<std::thread::JoinHandle<T>, Box<dyn std::error::Error + 'static>>;"
+        ]
+    },
+    "Rust Embedded Main content": {
+        "prefix": "embedded_main",
+        "body": [
+            "#![no_std]",
+            "#![no_main]",
+            "",
+            "use cortex_m_rt::entry;",
+            "use panic_semihosting as _;",
+            "",
+            "#[cfg(feature = \"enable-debug\")]",
+            "use cortex_m_semihosting::hprintln;",
+            "",
+            "#[entry]",
+            "fn main() -> ! {",
+            "    #[cfg(feature = \"enable-debug\")]",
+            "    let _ = hprintln!(\"Demo is running\");",
+            "    $0",
+            "    loop {}",
+            "}"
+        ]
+    }
+}
