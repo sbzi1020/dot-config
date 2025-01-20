@@ -1,0 +1,78 @@
+{
+    "include_guard": {
+        "prefix": ["include_guard"],
+        "body": [
+            "#ifndef __${1: macro name}_H__",
+            "#define __${1: macro name}_H__",
+            "",
+            "$0",
+            "",
+            "#endif"
+        ]
+    },
+    "struct": {
+        "prefix": ["struct"],
+        "body": [
+            "typedef struct ${1: struct name} {",
+            "    $0",
+            "} ${1: struct name};"
+        ]
+    },
+    "printf()": {
+        "prefix": "pl",
+        "body": [
+            "printf(\"$0\");"
+        ]
+    },
+    "if statement": {
+        "prefix": "if",
+        "body": [
+            "if ${1:condition} {",
+            "    $0",
+            "}"
+        ]
+    },
+    "if else statement": {
+        "prefix": "ifelse",
+        "body": [
+            "if ${1:condition} {",
+            "    $2",
+            "} else {",
+            "    $0",
+            "}"
+        ]
+    },
+    "enum_with_hex": {
+        "prefix": "enum_hex",
+        "body": [
+            "typedef enum ${1: enum name} {",
+            "    $0 = 0x01",
+            "} ${1: enum name};"
+        ]
+    },
+    "enum": {
+        "prefix": "enum",
+        "body": [
+            "typedef enum ${1: enum name} {",
+            "    $0",
+            "} ${1: enum name};"
+        ]
+    },
+    "array_len": {
+        "prefix": "arr_len",
+        "body": [
+            "sizeof($0) / sizeof($0[0]);"
+        ]
+    },
+    "switch": {
+        "prefix": "switch",
+        "body": [
+            "switch (${1: condition}) {",
+            "    case $0:",
+            "        // code block",
+            "        break;",
+            "    default:",
+            "}"
+        ]
+    }
+}

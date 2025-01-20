@@ -1,0 +1,310 @@
+{
+    // -----------------------------------------------------------------------
+    // Decide if the bar is displayed in front (top) of the windows or behind
+    // (bottom) them. Also, it affects tooltip layer!!!
+    // -----------------------------------------------------------------------
+    "layer": "bottom",
+
+    // -----------------------------------------------------------------------
+    // Bar position, can be `top,bottom,left,right`.
+    // -----------------------------------------------------------------------
+    "position": "top",
+
+    // -----------------------------------------------------------------------
+    // Height and width to be used by the bar if possible, leave blank for a
+    // dynamic value.
+    // -----------------------------------------------------------------------
+    // "height": 30,
+    // "width": 1280,
+
+    // -----------------------------------------------------------------------
+    // Margins value using the css format without units (top/right/bottom/left).
+    // -----------------------------------------------------------------------
+    "margin": "10 0 0 0",
+
+
+    // -----------------------------------------------------------------------
+    // Modules in left, center and right
+    // -----------------------------------------------------------------------
+    // "modules-left": ["hyprland/workspaces"],
+    "modules-left": ["river/tags", "river/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["backlight", "battery", "custom/wifi", "pulseaudio", "custom/notification", "tray"],
+
+
+    // // -----------------------------------------------------------------------
+    // // 'hyprland/workspaces' module
+    // //
+    // // https://github.com/Alexays/Waybar/wiki/Module:-Hyprland#persistent-workspaces
+    // // -----------------------------------------------------------------------
+    // "hyprland/workspaces": {
+    //     "disable-scroll": true,
+    //     // "format": "{name}: {icon}",
+    //     "format": "{icon}",
+    //     "format-icons": {
+    //         "1": "1",
+    //         "2": "",
+    //         "3": "",
+    //         "4": "",
+    //         "5": "5",
+    //         // "active": "",
+    //         // "default": ""
+    //     },
+    //     "persistent_workspaces": {
+    //         "1": [],
+    //         "2": [],
+    //         "3": [],
+    //         "4": [],
+    //         "5": [],
+    //     },
+    // },
+
+    // -----------------------------------------------------------------------
+    // 'river' module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-River#tags
+    // https://github.com/Alexays/Waybar/wiki/Module:-River#window
+    // -----------------------------------------------------------------------
+    "river/tags": {
+        "num-tags": 5,
+        "tag-labels": ["1", "", "", "", "5"],
+    },
+    "river/window": {
+        "format": "{}",
+        "max-length": 60,
+    },
+
+
+    // -----------------------------------------------------------------------
+    // Clock module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Clock
+    //
+    // Supported format - https://fmt.dev/latest/syntax.html#chrono-specs
+    //
+    // If you see `"oops: bad dow name: il"` in `~/.waybar.log`, that's why `clock` module
+    // fails to load, here is the temporary fix:
+    //
+    // If you are running jobs via agents or daemons as root on your downloads folder is
+    // located at `/var/root/Downloads`. Otherwise, it's in your `~/Downloads` folder.
+    //
+    // Edit `~/Downloads/tzdata/northamerica` (around line 2634) change `April` to `Apr`.
+    // re-login to take affect
+    // -----------------------------------------------------------------------
+    "clock": {
+        "interval": 2,
+        "timezone": "Pacific/Auckland",
+        // "tooltip-format": "<tt><big>{calendar}</big></tt>",
+        "tooltip-format": "<span size='15pt'>{calendar}</span>",
+        "format": "{:%a %d %b %I:%M:%S %p}",
+        "calendar": {
+            // -----------------------------------------------------------------------
+            // Calendar view mode. Possible values: `year|month`
+            // -----------------------------------------------------------------------
+            "mode": "month",
+
+            // -----------------------------------------------------------------------
+            // When `mode=year`, how many months per row
+            // -----------------------------------------------------------------------
+            "mode-mon-col": 2,
+
+            // -----------------------------------------------------------------------
+            // The position where week numbers should be displayed. Disabled when is
+            // empty. Possible values: `left|right`
+            // -----------------------------------------------------------------------
+            // "weeks-pos": "right",
+
+            // -----------------------------------------------------------------------
+            // Value to scroll months/years forward/backward. Can be negative. Is
+            // configured under on-scroll option
+            // -----------------------------------------------------------------------
+            "on-scroll": 1,
+
+            // -----------------------------------------------------------------------
+            // Toggle `month` or `year` mode.
+            // -----------------------------------------------------------------------
+            "on-click-right": "mode",
+
+            // -----------------------------------------------------------------------
+            // Calendar view mode. Possible values: year|month
+            // -----------------------------------------------------------------------
+            "format": {
+                "months":     "<span color='#FF9F1C'><b>{}</b></span>",
+                "days":       "<span color='#ACE6FE'><b>{}</b></span>",
+                "weeks":      "<span color='#6FC3DF'><b>W{}</b></span>",
+                "weekdays":   "<span color='#6FC3DF'><b>{}</b></span>",
+                "today":      "<span color='#F44747'><b>{}</b></span>"
+            }
+        },
+        "actions":  {
+            // Switch between `months` and `years` mode
+            "on-click-right": "mode",
+            // Scroll next/prev month
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        },
+    },
+
+
+    // -----------------------------------------------------------------------
+    // CPU module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-CPU
+    // -----------------------------------------------------------------------
+    "cpu": {
+        "interval": 2,
+        "format": " {}% | {avg_frequency} GHz",
+        "max-length": 20,
+    },
+
+
+    // -----------------------------------------------------------------------
+    // Random wallpaper module
+    // -----------------------------------------------------------------------
+    "custom/random-wallpaper": {
+        "format": " ",
+        // "on-click": "$HOME/.config/waybar/scripts/wallpaper-util --random ~/Photos/wallpaper/my-favorite/",
+        "on-click": "$HOME/.config/waybar/scripts/random_wallpaper_update_colors.sh ~/Photos/wallpaper/my-favorite/ &",
+    },
+
+
+    // -----------------------------------------------------------------------
+    // Wifi module, you cannot use 'network' module, as that's only available
+    // on linux.
+    // -----------------------------------------------------------------------
+    "custom/wifi": {
+        "format": "{}",
+        "exec": "$HOME/.config/waybar/scripts/wifi.sh",
+        "interval": 2,
+        "tooltip": false,
+    },
+    "custom/ethernet": {
+        "format": "{}",
+        "exec": "$HOME/.config/waybar/scripts/ethernet.sh",
+        "interval": 2,
+        "tooltip": false,
+    },
+
+
+    // -----------------------------------------------------------------------
+    // Volume module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio
+    // -----------------------------------------------------------------------
+    "pulseaudio": {
+        "scroll-step": 5, // %, can be a float
+        "reverse-scrolling": 5,
+        "format": "{volume}% {icon} {format_source}",
+        "format-bluetooth": "{volume}% {icon}  {format_source}",
+        "format-bluetooth-muted": "󰝟 {icon}  {format_source}",
+        "format-muted": "󰝟 {format_source}",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            // "hdmi":"󰡁",
+            "default": [""]
+        },
+        "on-click": "$HOME/.config/waybar/scripts/toggle-mute.sh",
+        "on-click-middle": "$HOME/.config/waybar/scripts/toggle-mic-mute.sh",
+        "on-click-right": "pavucontrol",
+        // Minimal width
+        "min-length": 10,
+    },
+
+
+    // -----------------------------------------------------------------------
+    // Disk usage module
+    // -----------------------------------------------------------------------
+    "custom/disk-usage": {
+        // "format": "{} ",
+        // "format": "{} ",
+        "format": "  {}",
+        "exec": "$HOME/.config/waybar/scripts/disk-usage.sh",
+        "interval": 10,
+        "tooltip": false,
+    },
+
+
+    // -----------------------------------------------------------------------
+    // Backlight module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Backlight
+    // https://github.com/Alexays/Waybar/wiki/Module:-Backlight-Slider
+    // -----------------------------------------------------------------------
+    // "backlight": {
+    //     "device": "intel_backlight",
+    //     "format": "{icon} {percent}%",
+    //     "format-icons": ["󰃞", "󰃟", "󰃠"],
+    // },
+
+
+    // -----------------------------------------------------------------------
+    // Battery module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Battery
+    // -----------------------------------------------------------------------
+    "battery": {
+        "interval": 2,
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon}  {capacity}% {time}",
+        "format-time": "{H}:{m}",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt": "{icon}  {time}",
+        "format-icons": ["", "", "", "", ""],
+    },
+
+    // -----------------------------------------------------------------------
+    // Brightness display
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Backlight
+    // -----------------------------------------------------------------------
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+    },
+
+    // -----------------------------------------------------------------------
+    // Tray module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Tray
+    // -----------------------------------------------------------------------
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10,
+    },
+
+    // -----------------------------------------------------------------------
+    // Swaync (notification)
+    // -----------------------------------------------------------------------
+    "custom/notification": {
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "<span foreground='red'><sup></sup></span>",
+            "none": "",
+            "dnd-notification": "<span foreground='red'><sup></sup></span>",
+            "dnd-none": "",
+            "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+            "inhibited-none": "",
+            "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+            "dnd-inhibited-none": ""
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    },
+}

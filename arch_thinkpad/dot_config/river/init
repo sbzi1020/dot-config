@@ -1,0 +1,202 @@
+#!/bin/sh
+
+# This is the example configuration file for river.
+#
+# If you wish to edit this, you will probably want to copy it to
+# $XDG_CONFIG_HOME/river/init or $HOME/.config/river/init first.
+#
+# See the river(1), riverctl(1), and rivertile(1) man pages for complete
+# documentation.
+
+# Note: the "Alt" modifier is also known as Logo, GUI, Windows, Mod4, etc.
+
+
+#------------------------------------------------------------------------------
+# Monitors resolution
+#------------------------------------------------------------------------------
+
+# Virtual
+#--Dul LG
+wlr-randr --output Virtual-1 --mode 2560x1600 --scale 1.0 &
+#--LG
+wlr-randr --output DP-1 --mode 2560x1440 --scale 1.0 &
+
+
+#------------------------------------------------------------------------------
+# Wallpaper
+#------------------------------------------------------------------------------
+wbg ~/Photos/wallpaper/cartoon.jpg &
+
+
+#------------------------------------------------------------------------------
+# Launch apps
+#------------------------------------------------------------------------------
+# Pipewipe media server
+/usr/libexec/pipewire-launcher &
+
+# waybar
+rm -rf ~/.waybar.* && waybar 2> ~/.waybar.err > ~/.waybar.log &
+
+# Swaync (notification daemon )
+rm -rf ~/.swaync.* && swaync 2> ~/.swaync.err > ~/.swaync.log &
+
+
+#------------------------------------------------------------------------------
+# Load pywal color
+#------------------------------------------------------------------------------
+source ~/.cache/wal/colors-river
+
+
+#------------------------------------------------------------------------------
+# Close and exit
+#------------------------------------------------------------------------------
+# Close the focused view
+riverctl map normal Alt Q close
+
+# Exit river
+riverctl map normal Alt+Shift E exit
+
+
+#------------------------------------------------------------------------------
+# Float anf fullscreen
+#------------------------------------------------------------------------------
+# Toggle float
+riverctl map normal Alt+Control F toggle-float
+
+# Toggle fullscreen
+riverctl map normal Alt F toggle-fullscreen
+
+
+#------------------------------------------------------------------------------
+# Move foucs and swap next
+#------------------------------------------------------------------------------
+# Move focus to the next/previous view in the layout stack
+riverctl map normal Alt+Shift H focus-view next
+riverctl map normal Alt+Shift L focus-view previous
+
+# Swap the focused view with the next/previous view in the layout stack
+riverctl map normal Alt M swap next
+# riverctl map normal Alt+Shift L swap previous
+
+
+#------------------------------------------------------------------------------
+# Mouse to move and resize
+#------------------------------------------------------------------------------
+# Alt + Left Mouse Button to move views
+riverctl map-pointer normal Alt BTN_LEFT move-view
+
+# Alt + Right Mouse Button to resize views
+riverctl map-pointer normal Alt BTN_RIGHT resize-view
+
+# # Alt + Middle Mouse Button to toggle float
+# riverctl map-pointer normal Alt BTN_MIDDLE toggle-float
+
+
+#------------------------------------------------------------------------------
+# Open apps
+#------------------------------------------------------------------------------
+# Open alacritty
+riverctl map normal Alt Return spawn alacritty
+
+# Open qutebrowser
+riverctl map normal Alt B spawn "rm -rf ~/.qute_browser.* && qutebrowser 2> ~/.qute_browser.err > ~/.qute_browser.log"
+
+
+#------------------------------------------------------------------------------
+# Setup tags (workspaces)
+#------------------------------------------------------------------------------
+for i in $(seq 1 9)
+do
+    tags=$((1 << ($i - 1)))
+
+    # Alt+[1-9] to focus tag [0-8]
+    riverctl map normal Alt $i set-focused-tags $tags
+
+    # Alt+Shift+[1-9] to tag focused view with tag [0-8]
+    riverctl map normal Alt+Shift $i set-view-tags $tags
+
+    # Alt+Control+[1-9] to toggle focus of tag [0-8]
+    riverctl map normal Alt+Control $i toggle-focused-tags $tags
+
+    # Alt+Shift+Control+[1-9] to toggle tag [0-8] of focused view
+    riverctl map normal Alt+Shift+Control $i toggle-view-tags $tags
+done
+
+# Alt+0 to focus all tags
+# Alt+Shift+0 to tag focused view with all tags
+all_tags=$(((1 << 32) - 1))
+riverctl map normal Alt 0 set-focused-tags $all_tags
+riverctl map normal Alt+Shift 0 set-view-tags $all_tags
+
+
+# Various media key mapping examples for both normal and locked mode which do
+# not have a modifier
+for mode in normal locked
+do
+    # Eject the optical drive (well if you still have one that is)
+    riverctl map $mode None XF86Eject spawn 'eject -T'
+
+    # Control pulse audio volume with pamixer (https://github.com/cdemoulins/pamixer)
+    riverctl map $mode None XF86AudioRaiseVolume  spawn 'pamixer -i 5'
+    riverctl map $mode None XF86AudioLowerVolume  spawn 'pamixer -d 5'
+    riverctl map $mode None XF86AudioMute         spawn 'pamixer --toggle-mute'
+
+    # Control MPRIS aware media players with playerctl (https://github.com/altdesktop/playerctl)
+    riverctl map $mode None XF86AudioMedia spawn 'playerctl play-pause'
+    riverctl map $mode None XF86AudioPlay  spawn 'playerctl play-pause'
+    riverctl map $mode None XF86AudioPrev  spawn 'playerctl previous'
+    riverctl map $mode None XF86AudioNext  spawn 'playerctl next'
+
+    # Control screen backlight brightness with brightnessctl (https://github.com/Hummer12007/brightnessctl)
+    riverctl map $mode None XF86MonBrightnessUp   spawn 'brightnessctl set +5%'
+    riverctl map $mode None XF86MonBrightnessDown spawn 'brightnessctl set 5%-'
+done
+
+
+#------------------------------------------------------------------------------
+# Output/monitor related
+#------------------------------------------------------------------------------
+
+# Switch to next output/monitor
+riverctl map normal Alt N focus-output next
+
+
+#------------------------------------------------------------------------------
+# Background and border
+#------------------------------------------------------------------------------
+# Set background and border color
+riverctl background-color $river_background
+riverctl border-color-focused $river_color1
+riverctl border-color-unfocused 0x595959aa
+# riverctl border-width 4
+
+
+#------------------------------------------------------------------------------
+# Keyboard related
+#------------------------------------------------------------------------------
+# Set keyboard repeat rate
+riverctl set-repeat 50 250
+
+#
+# Make `Capslock` as an additional Escape, to search alll supported options:
+#
+# 1. doas apk --no-cache add xkeyboard-config-doc
+# 2. man xkeyboard-config
+# 3. Search options/keyname in the man page
+#
+riverctl keyboard-layout -options "caps:escape" us
+
+
+#------------------------------------------------------------------------------
+# Rules
+#------------------------------------------------------------------------------
+
+# Make all views with an app-id that starts with "float" and title "foo" start floating
+riverctl rule-add -app-id 'float*' -title 'foo' float
+
+
+#------------------------------------------------------------------------------
+# Layout and gaps
+#------------------------------------------------------------------------------
+riverctl default-layout rivertile
+rivertile -view-padding 10 -outer-padding 10 &
