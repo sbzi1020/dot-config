@@ -4,7 +4,7 @@ local keymap = vim.keymap
 
 --[[
 -------------------------------------------------------------------------------
-vim.keymap.set({mode}, {lhs}, {rhs}, {opts})
+vim.keymap.set({@mode}, {@lhs}, {@rhs}, {@opts})
 -------------------------------------------------------------------------------
 
 @mode - string, avaialbe value:
@@ -23,7 +23,7 @@ vim.keymap.set({mode}, {lhs}, {rhs}, {opts})
 
     - string[], for multiple modes, e.g. '{'n', 'v'}
 
-@lhs - LeftHandSide, the keys you want to map
+@lhs - LeftHandSide, the keys you want to map (custom key)
 @rhs - RightHandeSide, map to command string or lua function
 @opts - {
         • {buffer}? (`integer|boolean`) Creates buffer-local mapping,
@@ -97,11 +97,10 @@ keymap.set('n', '<leader>th', ':%TOhtml<CR>', { desc = "Save as HTML" })
 
 -------------------------------------------------------------------------------
 -- ctrl+s: replace all words under cursor.
--- <c-r><c-w> to grab the word under cursor
 -------------------------------------------------------------------------------
 keymap.set('n',
     '<c-s>',
-    ':%s/<C-r><C-w>//g<left><left>',
+    ':%s/<C-r><C-w>//g<left><left>', -- <c-r><c-w> to grab the word under cursor
     { desc = "Replace all words under the cursor" })
 
 
@@ -113,11 +112,12 @@ keymap.set('n',
 keymap.set('n', '<leader>vs', ':vsplit<CR>', { desc = "Vertical split" })
 
 -- Move between windows
-keymap.set('n', '<leader>h', ':wincmd h<CR>', {silent=true, desc = "Move to left window" })
-keymap.set('n', '<leader>j', ':wincmd j<CR>', {silent=true, desc = "Move to down window" })
-keymap.set('n', '<leader>k', ':wincmd k<CR>', {silent=true, desc = "Move to up window" })
-keymap.set('n', '<leader>l', ':wincmd l<CR>', {silent=true, desc = "Move to right window" })
-keymap.set('n', '<leader>q', ':wincmd q<CR>', {silent=true, desc = "Quit current window" })
+--keymap.set('n', '<leader>h', ':wincmd h<CR>', {silent=true, desc = "Move to left window" })
+--keymap.set('n', '<leader>j', ':wincmd j<CR>', {silent=true, desc = "Move to down window" })
+--keymap.set('n', '<leader>k', ':wincmd k<CR>', {silent=true, desc = "Move to up window" })
+--keymap.set('n', '<leader>l', ':wincmd l<CR>', {silent=true, desc = "Move to right window" })
+--keymap.set('n', '<leader>q', ':wincmd q<CR>', {silent=true, desc = "Quit current window" })
+--::
 keymap.set('n', '<C-h>', ':wincmd h<CR>', {silent=true, desc = "Move to left window" })
 keymap.set('n', '<C-l>', ':wincmd l<CR>', {silent=true, desc = "Move to right window" })
 
@@ -136,8 +136,8 @@ shift+k: move selection up
 <: left indent
 >: right indent
 --]]
-keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 keymap.set('v', '<', '<gv', { desc = "Left indent selections" })
 keymap.set('v', '>', '>gv', { desc = "Right indent selections" })
 
@@ -155,11 +155,11 @@ keymap.set('n', 'N', 'Nzz', { desc = "Jump to prev matching and center" })
 keymap.set('i', '<c-j>', '<c-n>')
 keymap.set('i', '<c-k>', '<c-p>')
 
-keymap.set('n', '<leader>oq', ':copen<CR>', { desc = "Open quick list" })
-keymap.set('n', '<leader>cq', ':cclose<CR>', { desc = "Close quick list" })
+-- keymap.set('n', '<leader>oq', ':copen<CR>', { desc = "Open quick list" })
+-- keymap.set('n', '<leader>cq', ':cclose<CR>', { desc = "Close quick list" })
 
-keymap.set('n', '<leader>ol', ':lopen<CR>', { desc = "Open location list" })
-keymap.set('n', '<leader>cl', ':lclose<CR>', { desc = "Close location list" })
+-- keymap.set('n', '<leader>ol', ':lopen<CR>', { desc = "Open location list" })
+-- keymap.set('n', '<leader>cl', ':lclose<CR>', { desc = "Close location list" })
 
 -- Cycle through the quick fix list and center the current result line
 keymap.set('n', '<c-j>', ':cnext<CR>zz')
@@ -167,35 +167,35 @@ keymap.set('n', '<c-k>', ':cNext<CR>zz')
 
 
 
-
 -------------------------------------------------------------------------------
 -- Rust related
 -------------------------------------------------------------------------------
-keymap.set('n',
-    '<leader>cc',
-    ':vsplit<CR>:terminal cargo check<CR>',
-    { desc = "Rust: cargo check" })
-keymap.set('n',
-    '<leader>cb',
-    ':vsplit<CR>:terminal cargo build --release<CR>',
-    { desc = "Rust: cargo build --release" })
-keymap.set('n',
-    '<leader>cr',
-    ':vsplit<CR>:terminal cargo run <CR>',
-    { desc = "Rust: cargo run" })
-keymap.set('n',
-    '<leader>ct',
-    ':vsplit<CR>:terminal cargo test<CR>',
-    { desc = "Rust: cargo test" })
+
+-- keymap.set('n',
+--     '<leader>cc',
+--     ':vsplit<CR>:terminal cargo check<CR>',
+--     { desc = "Rust: cargo check" })
+-- keymap.set('n',
+--     '<leader>cb',
+--     ':vsplit<CR>:terminal cargo build --release<CR>',
+--     { desc = "Rust: cargo build --release" })
+-- keymap.set('n',
+--     '<leader>cr',
+--     ':vsplit<CR>:terminal cargo run <CR>',
+--     { desc = "Rust: cargo run" })
+-- keymap.set('n',
+--     '<leader>ct',
+--     ':vsplit<CR>:terminal cargo test<CR>',
+--     { desc = "Rust: cargo test" })
 
 
 -------------------------------------------------------------------------------
 -- Zig related
 -------------------------------------------------------------------------------
-keymap.set('n',
-    '<leader>zr',
-    ':vsplit<CR>:terminal zig build run<CR>',
-    { desc = "Zig: zig build run" })
+-- keymap.set('n',
+--     '<leader>zr',
+--     ':vsplit<CR>:terminal zig build run<CR>',
+--     { desc = "Zig: zig build run" })
 
 
 -------------------------------------------------------------------------------

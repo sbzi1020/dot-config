@@ -144,6 +144,18 @@ set_options('w', 'cursorline', true)
 -- `CursorLine` highlight group affect cursor position's line number and text
 set_options('w', 'cursorlineopt', 'both')
 
+-- Set cursor appearance for different modes
+vim.opt.guicursor = {
+    "n-v:block-Cursor1",  -- Normal, Visual: Block cursor
+    "i:ver30-Cursor2",  -- insert: vertical line cursor
+    "r-cr:hor20",                     -- Replace mode: Horizontal cursor with height 20
+    "o:hor50"                         -- Operator-pending mode: Horizontal cursor with height 50%
+}
+
+-- Define the cursor highlight groups
+vim.cmd('highlight Cursor1 guifg=white guibg=darkgreen')  -- Normal mode: Block cursor (magenta background)
+vim.cmd('highlight Cursor2 guifg=white guibg=green')  -- Normal mode: Block cursor (magenta background)
+
 --[[
 1. `n-v-c:block-Cursor/lCursor`
 
@@ -157,7 +169,7 @@ set_options('w', 'cursorlineopt', 'both')
     bar shape cusor (bar width is 25% of the character width ), 
 
 --]]
-set_options('o', 'guicursor', 'n-v-c:block-Cursor1/lCursor1,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50')
+--set_options('o', 'guicursor', 'n-v-c:block-Cursor1/lCursor1,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50')
 
 
 -- --[[
@@ -193,5 +205,3 @@ https://github.com/BurntSushi/ripgrep#installation
 By default, `ripgrep` will respect your .gitignore and automatically skip
 hidden files/directories and binary files. So the search will be very fast!!!
 --]]
-vim.cmd 'set grepprg=rg\\ --no-heading\\ --vimgrep'
-vim.cmd 'set grepformat=%f:%l:%c:%m'

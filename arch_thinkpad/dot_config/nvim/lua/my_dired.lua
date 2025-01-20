@@ -801,7 +801,7 @@ end
 -------------------------------------------------------------------------------
 vim.keymap.set(
     "n",
-    "<C-c>j",
+    "<C-e>e",
     "<cmd>lua require('my_dired').open()<CR>",
     {
         silent = true,
