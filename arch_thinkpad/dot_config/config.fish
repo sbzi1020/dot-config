@@ -130,7 +130,7 @@ set -U fish_color_user ff5f5f
 #       command.
 #--------------------------------------------------------
 set -g fish_key_bindings fish_vi_key_bindings
-bind -M insert -m default hh backward-char force-repaint
+bind -M insert -m default jj backward-char force-repaint
 bind -M insert \f accept-autosuggestion
 bind -M default k history-search-backward
 bind -M default j history-search-forward
@@ -196,9 +196,9 @@ abbr eg "emacs &"
 #--------------------------------------------------------
 # Rust - Cargo
 #--------------------------------------------------------
-#set PATH $HOME/.cargo/bin $PATH
-#set LD_LIBRARY_PATH (rustc --print sysroot)"/lib"
-#set RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/library"
+set PATH $HOME/.cargo/bin $PATH
+set LD_LIBRARY_PATH (rustc --print sysroot)"/lib"
+set RUST_SRC_PATH (rustc --print sysroot)"/lib/rustlib/src/rust/library"
 
 
 #--------------------------------------------------------
@@ -443,7 +443,6 @@ abbr tk "tmux kill-server"
 #-----------------------------------------------------------
 # Alacritty
 #-----------------------------------------------------------
-abbr ac "nvim ~/.alacritty.toml"
 abbr ac "nvim ~/.alacritty.toml"
 
 

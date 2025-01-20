@@ -25,53 +25,69 @@
 
     // -----------------------------------------------------------------------
     // Modules in left, center and right
+    // "backlight/slider"
     // -----------------------------------------------------------------------
-    // "modules-left": ["hyprland/workspaces"],
-    "modules-left": ["river/tags", "river/window"],
+    "modules-left": [
+        "hyprland/workspaces",
+        "custom/random-wallpaper",
+        "cpu",
+    ],
     "modules-center": ["clock"],
-    "modules-right": ["backlight", "battery", "custom/wifi", "pulseaudio", "custom/notification", "tray"],
+    "modules-right": [
+        "network",
+        "custom/disk-usage",
+        "battery",
+        "backlight",
+        "pulseaudio",
+        "tray"
+    ],
 
-
-    // // -----------------------------------------------------------------------
-    // // 'hyprland/workspaces' module
-    // //
-    // // https://github.com/Alexays/Waybar/wiki/Module:-Hyprland#persistent-workspaces
-    // // -----------------------------------------------------------------------
-    // "hyprland/workspaces": {
-    //     "disable-scroll": true,
-    //     // "format": "{name}: {icon}",
-    //     "format": "{icon}",
-    //     "format-icons": {
-    //         "1": "1",
-    //         "2": "",
-    //         "3": "",
-    //         "4": "",
-    //         "5": "5",
-    //         // "active": "",
-    //         // "default": ""
-    //     },
-    //     "persistent_workspaces": {
-    //         "1": [],
-    //         "2": [],
-    //         "3": [],
-    //         "4": [],
-    //         "5": [],
-    //     },
-    // },
 
     // -----------------------------------------------------------------------
-    // 'river' module
+    // 'hyprland/workspaces' module
     //
-    // https://github.com/Alexays/Waybar/wiki/Module:-River#tags
-    // https://github.com/Alexays/Waybar/wiki/Module:-River#window
+    // https://github.com/Alexays/Waybar/wiki/Module:-Hyprland#persistent-workspaces
     // -----------------------------------------------------------------------
-    "river/tags": {
-        "num-tags": 5,
-        "tag-labels": ["1", "", "", "", "5"],
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        // "format": "{name}: {icon}",
+        "format": "{icon}",
+        "format-icons": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            // "active": "",
+            // "default": ""
+        },
+        "persistent_workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+        },
     },
-    "river/window": {
-        "format": "{}",
-        "max-length": 60,
+
+    // -----------------------------------------------------------------------
+    // Random wallpaper module
+    // -----------------------------------------------------------------------
+    "custom/random-wallpaper": {
+        "format": " ",
+        // "on-click": "$HOME/.config/waybar/scripts/random-wallpaper --random ~/Photos/wallpaper/my-favorite",
+        "on-click": "$HOME/.config/waybar/scripts/random_wallpaper_update_colors.sh ~/Photos/wallpaper/my-favorite/",
+    },
+
+    // -----------------------------------------------------------------------
+    // CPU module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-CPU
+    // -----------------------------------------------------------------------
+    "cpu": {
+        "interval": 2,
+        "format": " {}% | {avg_frequency} GHz",
+        "max-length": 20,
     },
 
 
@@ -81,15 +97,6 @@
     // https://github.com/Alexays/Waybar/wiki/Module:-Clock
     //
     // Supported format - https://fmt.dev/latest/syntax.html#chrono-specs
-    //
-    // If you see `"oops: bad dow name: il"` in `~/.waybar.log`, that's why `clock` module
-    // fails to load, here is the temporary fix:
-    //
-    // If you are running jobs via agents or daemons as root on your downloads folder is
-    // located at `/var/root/Downloads`. Otherwise, it's in your `~/Downloads` folder.
-    //
-    // Edit `~/Downloads/tzdata/northamerica` (around line 2634) change `April` to `Apr`.
-    // re-login to take affect
     // -----------------------------------------------------------------------
     "clock": {
         "interval": 2,
@@ -142,49 +149,41 @@
             // Scroll next/prev month
             "on-scroll-up": "shift_up",
             "on-scroll-down": "shift_down"
-        },
+        }
     },
 
 
+
     // -----------------------------------------------------------------------
-    // CPU module
+    // Network module
     //
-    // https://github.com/Alexays/Waybar/wiki/Module:-CPU
+    // https://github.com/Alexays/Waybar/wiki/Module:-Network
     // -----------------------------------------------------------------------
-    "cpu": {
-        "interval": 2,
-        "format": " {}% | {avg_frequency} GHz",
-        "max-length": 20,
+    "network": {
+        "interval": 5,
+        "interface": "wlp2s0",
+        "format": "{ifname}",
+        "format-wifi": "  {ipaddr}/{cidr}",
+        "format-ethernet": "󰈀  {ipaddr}/{cidr}",
+        "format-disconnected": "", //An empty format will hide the module.
+        "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+        "tooltip-format-wifi": " {essid} ({signalStrength}%)",
+        "tooltip-format-ethernet": "󰈀 {ifname}",
+        "tooltip-format-disconnected": "Disconnected",
+        "max-length": 50
     },
 
-
     // -----------------------------------------------------------------------
-    // Random wallpaper module
+    // Disk usage module
     // -----------------------------------------------------------------------
-    "custom/random-wallpaper": {
-        "format": " ",
-        // "on-click": "$HOME/.config/waybar/scripts/wallpaper-util --random ~/Photos/wallpaper/my-favorite/",
-        "on-click": "$HOME/.config/waybar/scripts/random_wallpaper_update_colors.sh ~/Photos/wallpaper/my-favorite/ &",
-    },
-
-
-    // -----------------------------------------------------------------------
-    // Wifi module, you cannot use 'network' module, as that's only available
-    // on linux.
-    // -----------------------------------------------------------------------
-    "custom/wifi": {
-        "format": "{}",
-        "exec": "$HOME/.config/waybar/scripts/wifi.sh",
-        "interval": 2,
+    "custom/disk-usage": {
+        // "format": "{} ",
+        // "format": "{} ",
+        "format": "  {}",
+        "exec": "$HOME/.config/waybar/scripts/disk-usage.sh",
+        "interval": 120,
         "tooltip": false,
     },
-    "custom/ethernet": {
-        "format": "{}",
-        "exec": "$HOME/.config/waybar/scripts/ethernet.sh",
-        "interval": 2,
-        "tooltip": false,
-    },
-
 
     // -----------------------------------------------------------------------
     // Volume module
@@ -203,7 +202,7 @@
         "format-icons": {
             "headphone": "",
             "hands-free": "",
-            "headset": "",
+            "headset": "",
             "phone": "",
             "portable": "",
             "car": "",
@@ -216,32 +215,6 @@
         // Minimal width
         "min-length": 10,
     },
-
-
-    // -----------------------------------------------------------------------
-    // Disk usage module
-    // -----------------------------------------------------------------------
-    "custom/disk-usage": {
-        // "format": "{} ",
-        // "format": "{} ",
-        "format": "  {}",
-        "exec": "$HOME/.config/waybar/scripts/disk-usage.sh",
-        "interval": 10,
-        "tooltip": false,
-    },
-
-
-    // -----------------------------------------------------------------------
-    // Backlight module
-    //
-    // https://github.com/Alexays/Waybar/wiki/Module:-Backlight
-    // https://github.com/Alexays/Waybar/wiki/Module:-Backlight-Slider
-    // -----------------------------------------------------------------------
-    // "backlight": {
-    //     "device": "intel_backlight",
-    //     "format": "{icon} {percent}%",
-    //     "format-icons": ["󰃞", "󰃟", "󰃠"],
-    // },
 
 
     // -----------------------------------------------------------------------
@@ -285,26 +258,30 @@
     },
 
     // -----------------------------------------------------------------------
-    // Swaync (notification)
+    // Cava module
+    //
+    // https://github.com/Alexays/Waybar/wiki/Module:-Cava
     // -----------------------------------------------------------------------
-    "custom/notification": {
-        "tooltip": false,
-        "format": "{icon}",
-        "format-icons": {
-            "notification": "<span foreground='red'><sup></sup></span>",
-            "none": "",
-            "dnd-notification": "<span foreground='red'><sup></sup></span>",
-            "dnd-none": "",
-            "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-            "inhibited-none": "",
-            "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-            "dnd-inhibited-none": ""
-        },
-        "return-type": "json",
-        "exec-if": "which swaync-client",
-        "exec": "swaync-client -swb",
-        "on-click": "swaync-client -t -sw",
-        "on-click-right": "swaync-client -d -sw",
-        "escape": true
-    },
+    // "cava": {
+    //     "cava_config": "~/.config/cava/config",
+    //     "framerate": 30,
+    //     "autosens": 1,
+    //     "sensitivity": 100,
+    //     "bars": 14,
+    //     "lower_cutoff_freq": 50,
+    //     "higher_cutoff_freq": 10000,
+    //     "method": "pulse",
+    //     "source": "auto",
+    //     "stereo": true,
+    //     "reverse": false,
+    //     "bar_delimiter": 0,
+    //     "monstercat": false,
+    //     "waves": false,
+    //     "noise_reduction": 0.77,
+    //     "input_delay": 2,
+    //     "format-icons" : ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█" ],
+    //     "actions": {
+    //         "on-click-right": "mode"
+    //     }
+    // },
 }
