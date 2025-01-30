@@ -1,0 +1,120 @@
+#
+# Varmilo keyboard, replace all `Super` to `Alt`
+# DygmaRise keyboard, replace all `Alt` to `Super`
+#
+
+general.import = ["/home/fion/.cache/wal/colors-alacritty.toml"]
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+# [colors.primary]
+# foreground = "#9DE2DD"
+
+[cursor.style]
+blinking = "Off"
+shape = "Block"
+
+[font]
+size = 15.0
+
+[font.bold]
+family = "SauceCodePro Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "SauceCodePro Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "SauceCodePro Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "SauceCodePro Nerd Font"
+style = "Medium"
+
+
+#------------------
+[[keyboard.bindings]]
+key = "T"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["new-window"]
+program = "/usr/bin/tmux"
+
+#------------------
+[[keyboard.bindings]]
+key = "W"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["kill-window"]
+program = "/usr/bin/tmux"
+
+#------------------
+[[keyboard.bindings]]
+key = "H"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["prev"]
+program = "/usr/bin/tmux"
+
+#------------------
+[[keyboard.bindings]]
+key = "L"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["next"]
+program = "/usr/bin/tmux"
+
+#------------------
+
+[[keyboard.bindings]]
+key = "ArrowRight"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux swap-window -t +1 && /usr/bin/tmux next-window"]
+program = "/usr/bin/fish"
+
+#------------------
+
+[[keyboard.bindings]]
+key = "ArrowLeft"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux swap-window -t -1 && /usr/bin/tmux previous-window"]
+program = "/usr/bin/fish"
+
+#------------------
+
+[[keyboard.bindings]]
+key = "J"
+mods = "Control|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/bin/tmux switch-client -n"]
+program = "/usr/bin/fish"
+
+# [[keyboard.bindings]]
+# key = "K"
+# mods = "Control|Shift"
+# 
+# [keyboard.bindings.command]
+# args = ["-C", "/usr/bin/tmux switch-client -p"]
+# program = "/usr/bin/fish"
+
+[window]
+# decorations = "none"
+decorations = "full"
+# opacity = 0.95
+startup_mode = "Maximized"
+
+[window.padding]
+x = 10
+y = 10

@@ -1,0 +1,176 @@
+#
+# Varmilo keyboard, replace all `Super` to `Alt`
+# DygmaRise keyboard, replace all `Alt` to `Super`
+#
+
+import = ["/home/wison/.cache/wal/colors-alacritty.toml"]
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[colors.primary]
+foreground = "#9DE2DD"
+
+[cursor.style]
+blinking = "Off"
+shape = "Block"
+
+[font]
+size = 16.0
+
+[font.bold]
+family = "SauceCodePro Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "SauceCodePro Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "SauceCodePro Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "SauceCodePro Nerd Font"
+style = "Medium"
+
+[[keyboard.bindings]]
+key = "Key1"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 1"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key2"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 2"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key3"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 3"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key4"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 4"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key5"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 5"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key6"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 6"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key7"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 7"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key8"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 8"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "Key9"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["select-window", "-t 9"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+chars = """
+clear
+"""
+key = "K"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "tmux rename-window "
+key = "I"
+mods = "Alt"
+
+[[keyboard.bindings]]
+key = "T"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["new-window"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "W"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["kill-window"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "H"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["prev"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Alt"
+
+[keyboard.bindings.command]
+args = ["next"]
+program = "/usr/local/bin/tmux"
+
+[[keyboard.bindings]]
+key = "J"
+mods = "Control|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/local/bin/tmux switch-client -n"]
+program = "/usr/local/bin/fish"
+
+[[keyboard.bindings]]
+key = "K"
+mods = "Control|Shift"
+
+[keyboard.bindings.command]
+args = ["-C", "/usr/local/bin/tmux switch-client -p"]
+program = "/usr/local/bin/fish"
+
+[window]
+decorations = "none"
+opacity = 0.95
+startup_mode = "Maximized"
+
+[window.padding]
+x = 10
+y = 10

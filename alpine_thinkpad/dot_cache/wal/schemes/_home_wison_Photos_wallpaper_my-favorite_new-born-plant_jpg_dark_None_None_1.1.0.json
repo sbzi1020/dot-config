@@ -1,0 +1,27 @@
+{
+    "wallpaper": "/home/wison/Photos/wallpaper/my-favorite/new-born-plant.jpg",
+    "alpha": "100",
+    "special": {
+        "background": "#0E0E0F",
+        "foreground": "#ded4cc",
+        "cursor": "#ded4cc"
+    },
+    "colors": {
+        "color0": "#0E0E0F",
+        "color1": "#AE6450",
+        "color2": "#C67451",
+        "color3": "#B68576",
+        "color4": "#D4926C",
+        "color5": "#46708F",
+        "color6": "#6195B2",
+        "color7": "#ded4cc",
+        "color8": "#9b948e",
+        "color9": "#AE6450",
+        "color10": "#C67451",
+        "color11": "#B68576",
+        "color12": "#D4926C",
+        "color13": "#46708F",
+        "color14": "#6195B2",
+        "color15": "#ded4cc"
+    }
+}
