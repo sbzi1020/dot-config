@@ -20,8 +20,8 @@
 ;;
 (defun my-set-font()
    (set-face-attribute 'default nil
-       ;;:family "SauceCodePro Nerd Font"
-       :family "JetBrainsMono Nerd Font"
+       :family "SauceCodePro Nerd Font"
+       ;;:family "JetBrainsMono Nerd Font"
        :weight 'semi-bold
        :height 140
        ;; :italic t

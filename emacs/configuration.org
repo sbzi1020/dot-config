@@ -2077,7 +2077,6 @@ If you can't find the language gammar in =https://github.com/tree-sitter/tree-si
   (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
   (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 
@@ -2484,22 +2483,6 @@ Before you can active =eglot=, you have to install your language server separate
 #+END_SRC
 
 
-**** =typescript language server=
-
-By default, it supports the filetypes below:
-
-- javascript
-- javascriptreact
-- javascript.jsx
-- typescript
-- typescriptreact
-- typescript.tsx
-
-#+BEGIN_SRC bash
-    npm install -g typescript typescript-language-server
-#+END_SRC
-
-
 *** Setup langauge server list (optional)
 
 ~eglot-server-programs~ is the variable that use to list all relationships between =mode= and =language server.
@@ -2684,22 +2667,6 @@ Here is the way to set the default style via the hook:
       (setq tab-width 4)
       (message ">>> my-emacs-lisp-style-settings [done]")
   )
-  ;;
-  ;; 
-  ;;
-  (defun my-js-ts-style-settings()
-      ;;
-      ;; Very important to reset!!!
-      ;;
-      (setq tab-width my-tab-width)                
-
-      ;;
-      ;; Back to normal TAB behavior rather than 'indent-for-tab-command' 
-      ;;
-      (define-key evil-insert-state-local-map (kbd "TAB") 'tab-to-tab-stop)
-
-      (message ">>> my-js-ts-style-settings [done]")
-  )
 
   (add-hook 'c-mode-hook #'my-c-style-settings)
   (add-hook 'c-ts-mode-hook #'my-c-style-settings)
@@ -2709,8 +2676,7 @@ Here is the way to set the default style via the hook:
   (add-hook 'python-ts-mode-hook #'my-c-style-settings)
   (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
   (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
-  (add-hook 'typescript-ts-mode-hook #'my-js-ts-style-settings)
-  (add-hook 'js-ts-mode-hook #'my-js-ts-style-settings)
+  (add-hook 'typescript-ts-mode-hook #'my-c-style-settings)
   (add-hook 'java-ts-mode-hook #'my-c-style-settings)
 #+END_SRC
 
@@ -2733,7 +2699,7 @@ Here is the way to start =eglot= automatically:
                   zig-mode-hook
                   python-ts-mode-hook 
                   cmake-ts-mode-hook
-                  js-ts-mode-hook
+                  javascript-ts-mode-hook
                   typescript-ts-mode-hook
                   java-ts-mode-hook
                   ))
@@ -3749,6 +3715,40 @@ By default, evil bind ~C-z~ to toggle between =evil-state= and =emacs-state=, bu
       (progn
           (which-key-add-key-based-replacements "SPC q q" "Save and exit")
           (which-key-add-key-based-replacements "C-c q q" "Save and exit")
+      ))
+#+END_SRC
+
+
+** Delete other windows by by ~<leader>1~
+
+#+BEGIN_SRC emacs-lisp
+  (dolist (map (list
+                evil-motion-state-map
+                evil-normal-state-map
+                ))
+      (define-key map (kbd "SPC 1") 'delete-other-windows)
+      (define-key map (kbd "C-c 1") 'delete-other-windows)
+  )
+
+
+  ;;
+  ;; Bind to the local buffer keymap against the following delay modes
+  ;;
+  (defun my-bind-1-delete-other-windows-local()
+    (define-key evil-normal-state-local-map (kbd "SPC 1") 'delete-other-windows)
+  )
+
+  (dolist (hook '(
+                 dired-mode-hook
+                 xref--xref-buffer-mode-hook
+                 ))
+    (add-hook hook #'my-bind-1-delete-other-windows-local)
+  )
+
+  (if my-enable-which-key-customized-description
+      (progn
+          (which-key-add-key-based-replacements "SPC 1" "Delete other windows")
+          (which-key-add-key-based-replacements "C-c 1" "Delete other windows")
       ))
 #+END_SRC
 
@@ -4955,7 +4955,6 @@ After going into the =wdired-change-to-wdired-mode=, here are the default keybin
                   rust-mode-hook
                   rust-ts-mode-hook
                   typescript-ts-mode-hook
-                  js-ts-mode-hook
                   python-ts-mode-hook
                   java-ts-mode-hook
                   ))

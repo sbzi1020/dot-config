@@ -565,7 +565,6 @@ targets."
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . bash-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-ts-mode))
 (add-to-list 'auto-mode-alist '("\\.java\\'" . java-ts-mode))
 
@@ -708,22 +707,6 @@ targets."
     (setq tab-width 4)
     (message ">>> my-emacs-lisp-style-settings [done]")
 )
-;;
-;; 
-;;
-(defun my-js-ts-style-settings()
-    ;;
-    ;; Very important to reset!!!
-    ;;
-    (setq tab-width my-tab-width)                
-
-    ;;
-    ;; Back to normal TAB behavior rather than 'indent-for-tab-command' 
-    ;;
-    (define-key evil-insert-state-local-map (kbd "TAB") 'tab-to-tab-stop)
-
-    (message ">>> my-js-ts-style-settings [done]")
-)
 
 (add-hook 'c-mode-hook #'my-c-style-settings)
 (add-hook 'c-ts-mode-hook #'my-c-style-settings)
@@ -733,8 +716,7 @@ targets."
 (add-hook 'python-ts-mode-hook #'my-c-style-settings)
 (add-hook 'emacs-lisp-mode-hook #'my-emacs-lisp-style-settings)
 (add-hook 'cmake-ts-mode-hook #'my-c-style-settings)
-(add-hook 'typescript-ts-mode-hook #'my-js-ts-style-settings)
-(add-hook 'js-ts-mode-hook #'my-js-ts-style-settings)
+(add-hook 'typescript-ts-mode-hook #'my-c-style-settings)
 (add-hook 'java-ts-mode-hook #'my-c-style-settings)
 
 (defun start-eglot()
@@ -750,7 +732,7 @@ targets."
                 zig-mode-hook
                 python-ts-mode-hook 
                 cmake-ts-mode-hook
-                js-ts-mode-hook
+                javascript-ts-mode-hook
                 typescript-ts-mode-hook
                 java-ts-mode-hook
                 ))
@@ -1175,6 +1157,35 @@ Specific to the current window's mode line.")
     (progn
         (which-key-add-key-based-replacements "SPC q q" "Save and exit")
         (which-key-add-key-based-replacements "C-c q q" "Save and exit")
+    ))
+
+(dolist (map (list
+              evil-motion-state-map
+              evil-normal-state-map
+              ))
+    (define-key map (kbd "SPC 1") 'delete-other-windows)
+    (define-key map (kbd "C-c 1") 'delete-other-windows)
+)
+
+
+;;
+;; Bind to the local buffer keymap against the following delay modes
+;;
+(defun my-bind-1-delete-other-windows-local()
+  (define-key evil-normal-state-local-map (kbd "SPC 1") 'delete-other-windows)
+)
+
+(dolist (hook '(
+               dired-mode-hook
+               xref--xref-buffer-mode-hook
+               ))
+  (add-hook hook #'my-bind-1-delete-other-windows-local)
+)
+
+(if my-enable-which-key-customized-description
+    (progn
+        (which-key-add-key-based-replacements "SPC 1" "Delete other windows")
+        (which-key-add-key-based-replacements "C-c 1" "Delete other windows")
     ))
 
 (dolist (map (list
@@ -2091,7 +2102,6 @@ Specific to the current window's mode line.")
                 rust-mode-hook
                 rust-ts-mode-hook
                 typescript-ts-mode-hook
-                js-ts-mode-hook
                 python-ts-mode-hook
                 java-ts-mode-hook
                 ))
