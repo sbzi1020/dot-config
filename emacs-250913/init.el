@@ -1022,6 +1022,7 @@ targets."
 (add-hook 'typescript-ts-mode-hook #'my-js-ts-style-settings)
 (add-hook 'js-ts-mode-hook #'my-js-ts-style-settings)
 (add-hook 'java-ts-mode-hook #'my-js-ts-style-settings)
+(add-hook 'python-ts-mode-hook #'my-c-style-settings)
 
 (defun start-eglot()
    (eglot-ensure)
@@ -1039,6 +1040,7 @@ targets."
                 typescript-ts-mode-hook
                 java-ts-mode-hook
                 odin-ts-mode-hook
+                python-ts-mode-hook 
                 ))
    (add-hook hook #'start-eglot)
 )
@@ -1422,7 +1424,7 @@ Specific to the current window's mode line.")
 	;; 'after-init-hook
 	(lambda ()
 		(let (
-				;; (theme 'ef-cyprus)
+				(theme 'ef-cyprus)
 				;; (theme 'ef-melissa-light)
 				;; (theme 'ef-melissa-dark)
 				;; (theme 'ef-elea-dark)
@@ -1433,7 +1435,7 @@ Specific to the current window's mode line.")
 				;; (theme 'doom-plain-dark)
 				;; (theme 'doom-plain)
 				;; (theme 'doom-nord)
-				(theme 'doom-nord-aurora)
+				;; (theme 'doom-nord-aurora)
 				;; (theme 'doom-lantern)
 				;; (theme 'doom-pine)
 				;; (theme 'doom-horizon)
@@ -3530,6 +3532,7 @@ press 'C-a' to increase all number from top to bottom (starts from the first num
 		emacs-lisp-compilation-mode-hook
 		snippet-mode-hook
 		prog-mode-hook
+		text-mode-hook
 		;; c-mode-hook
 		;; c-ts-mode-hook
 		;; c++-mode-hook
@@ -3732,6 +3735,7 @@ press 'C-a' to increase all number from top to bottom (starts from the first num
                 typescript-ts-mode-hook
                 js-ts-mode-hook
                 java-ts-mode-hook
+                python-ts-mode-hook
                 ))
 	(add-hook hook #'my-lsp-bindings)
 )
@@ -3889,15 +3893,10 @@ press 'C-a' to increase all number from top to bottom (starts from the first num
 ;; (defun my-dired-sort-by-directory ()	(interactive) (dired-sort-other "-l --group-directories-first"))
 
 (defun my-goto-home-directory()			(interactive) (dired "~/"))
-(defun my-goto-shell-backup-directory()	(interactive) (dired "~/my-shell/backup"))
-(defun my-goto-c-directory()			(interactive) (dired "~/c"))
+(defun my-goto-desktop-directory()		(interactive) (dired "~/Desktop"))
+(defun my-goto-sbzi-directory()			(interactive) (dired "~/sbzi"))
 (defun my-goto-emacs-directory()		(interactive) (dired "~/.config/emacs"))
 (defun my-goto-downloads-directory()	(interactive) (dired "~/Downloads"))
-(defun my-goto-rust-directory()			(interactive) (dired "~/rust"))
-(defun my-goto-zig-directory()			(interactive) (dired "~/zig"))
-(defun my-goto-odin-directory()			(interactive) (dired "~/odin"))
-(defun my-goto-temp-directory()			(interactive) (dired "~/temp"))
-(defun my-goto-photo-directory()		(interactive) (dired "~/Photos"))
 
 (defun my-dired-add-file-or-directory ()
 
@@ -4029,26 +4028,14 @@ If the filename end with '/' that means create diretory, otherwise, create an em
 	;; Quickly go to particular directories by 'gX'
 	;;
 	;; - 'gh': Go home       '~/'
-	;; - 'gb': Go backup     '~/my-shell/backup'
-	;; - 'gc': Go c          '~/c'
-	;; - 'gd': Go downloads  '~/Downloads'
+	;; - 'gd': Go Desktop    '~/Desktop'
+	;; - 'gs': Go sbzi       '~/sbzi'
 	;; - 'ge': Go Emacs      '~/.config/emacs'
-	;; - 'gp': Go Photos     '~/Photos'
-	;; - 'gr': Go Rust       '~/rust'
-	;; - 'gt': Go temp       '~/temp'
-	;; - 'gz': Go zig        '~/zig'
-	;; - 'go': Go zig        '~/odin'
 	;;
 	(keymap-set map "g h" 'my-goto-home-directory)
-	(keymap-set map "g b" 'my-goto-shell-backup-directory)
-	(keymap-set map "g d" 'my-goto-downloads-directory)
-	(keymap-set map "g c" 'my-goto-c-directory)
+	(keymap-set map "g d" 'my-goto-desktop-directory)
+	(keymap-set map "g s" 'my-goto-sbzi-directory)
 	(keymap-set map "g e" 'my-goto-emacs-directory)
-	(keymap-set map "g p" 'my-goto-photo-directory)
-	(keymap-set map "g r" 'my-goto-rust-directory)
-	(keymap-set map "g t" 'my-goto-temp-directory)
-	(keymap-set map "g z" 'my-goto-zig-directory)
-	(keymap-set map "g z" 'my-goto-odin-directory)
 
 	;;
 	;; Modify the READ-ONLY buffer by '<leader>m'
