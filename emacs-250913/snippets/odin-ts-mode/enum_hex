@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: enum_hex
+# key: enum_hex
+# --
+${1:enum name} :: enum {
+    $0 = 0x01
+}

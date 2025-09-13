@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: import-small-array
+# key: isa
+# --
+import sa "core:container/small_array"

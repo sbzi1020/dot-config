@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print2
+# key: pl
+# --
+fmt::printfln(">>> $0\")!;

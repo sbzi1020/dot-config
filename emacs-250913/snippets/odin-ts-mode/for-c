@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: for-c
+# key: for-c
+# --
+for ${1: index} := 0; ${1} < ${2: len}; ${1} +=1 {
+    $0
+}

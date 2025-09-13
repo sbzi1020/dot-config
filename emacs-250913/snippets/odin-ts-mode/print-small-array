@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: print_small_array
+# key: psa
+# --
+print_small_arr :: proc(arr_ptr: ^sa.Small_Array(${1: size}, ${0: type}), var_name_and_prefix: string) {
+    if (arr_ptr == nil) { return }
+    fmt.printf(
+        "\n>>> %s type: %v, capacity: %v, len: %v, value: %#v\n",
+        var_name_and_prefix,
+        typeid_of(type_of(arr_ptr)),
+        sa.cap(arr_ptr^),
+        sa.len(arr_ptr^),
+        arr_ptr^
+    )
+}

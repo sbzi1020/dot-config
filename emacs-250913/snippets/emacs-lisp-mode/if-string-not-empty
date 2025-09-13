@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: if-string-not-empty
+# key: if-string-not-empty
+# --
+(if (not (string-empty-p $0))
+)

@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: my-xxx-mode-local-bindings
+# key: mlb
+# --
+;;
+;; Call 'my-MODE_NAME-mode-bindings' with 'evil-normal-state-local-map'
+;;
+(defun my-MODE_NAME-mode-local-bindings ()
+	(my-MODE_NAME-mode-bindings evil-normal-state-local-map)
+)
+
+
+;;
+;; Then, add it to the 'MODE_NAME-mode-hook'
+;;
+(add-hook 'MODE_NAME-mode-hook #'my-MODE_NAME-mode-local-bindings)

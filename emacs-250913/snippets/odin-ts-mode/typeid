@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: typeid
+# key: typeid
+# --
+typeid_of(type_of($0))

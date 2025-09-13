@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: conditional-compilation-freebsd
+# key: conditional-compilation-freebsd
+# --
+when ODIN_OS == .FreeBSD {
+    $0
+}

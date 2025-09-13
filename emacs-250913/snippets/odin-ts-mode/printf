@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: printf
+# key: pl
+# --
+fmt.printf("\n>>> $0")

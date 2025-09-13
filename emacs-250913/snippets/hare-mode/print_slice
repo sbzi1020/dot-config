@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: print_slice
+# key: ps
+# --
+fn print_slice(slice: []u8) void = {
+	fmt::printfln(">>> [ print_slice ] - len: {}, value:", len(slice))!;
+	for (let index = 0z; index < len(slice); index += 1) {
+		fmt::printfln(">>>\tslice[{}]: {}", index, slice[index])!;
+
+	};
+};
+
+$0

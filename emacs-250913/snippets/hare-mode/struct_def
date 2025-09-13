@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: struct_def
+# key: struct_def
+# --
+type $1 = struct {
+     $0
+};

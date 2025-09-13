@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: impl_for
+# key: impl_for
+# --
+impl ${1:trait_name} for ${2:struct_name} {
+    $0
+}

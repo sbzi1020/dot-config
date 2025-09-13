@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: string-not-match
+# key: string-not-match
+# --
+(not (string-match-p ${1:STRING-TO-CHECK} $0))

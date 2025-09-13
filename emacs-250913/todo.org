@@ -1,0 +1,153 @@
+* My Todo List
+
+** DONE Emacs workflow environment
+
+*** DONE Continue working on =Project Command=
+
+Fix the hashmap bug: Every time I update the entry, then all entries have been update, why?
+
+
+*** DONE Add the ~SPC s k~ to run ~'my-show-key(major-mode)~ to (mini) buffer
+
+I should a ~'my-show-key(major-mode)~ function and bind to ~SPC s k~ (show keys) to popup  a (mini) buffer/window to show the special key in the current major, then I don't need to run ~describ-bindings~ and search the key by the function.
+
+The key table should an alist like this:
+
+#+BEGIN_SRC emacs-lisp
+  '(
+  	('all-mode . '(
+  		("C-x 1"	. "Delete other windows")
+  		("C-x C-c"	. "Close/Exit emacs")
+  		("C-x C-f"	. "Find files")
+  		("C-x b"	. "Switch buffer")
+  		("SPC b"	. "Buffers (bookmarks)")
+  		("SPC k d"	. "Kill EL-Doc windows and buffers")
+  		("SPC k e"	. "Kill Embark windows and buffers")
+  		("SPC k h"	. "Kill Help windows and buffers")
+  		("SPC k i"	. "Kill Info windows and buffers")
+  		("SPC k m"	. "Kill Manpage windows and buffers")
+  		("SPC o a"	. "Open agenda")
+  		("SPC o c"	. "Open emacs config")
+  		("SPC o t"	. "Open todo")
+  		("SPC p b"	. "Project switch buffer")
+  		("SPC p c"	. "Project command")
+  		("SPC p f"	. "Project find files")
+  		("SPC p r"	. "Project RG")
+  		("SPC v s"	. "Vertical split")
+  		("SPC x"	. "M-x")
+  		)
+  	)
+  	 ('dired-mode . '(
+  		("C-c j"	. "Jump to dired")
+  		("% m"		. "Mark by regex")
+  		("C"		. "Copy")
+  		("D"		. "Delete")
+  		("R"		. "Rename/move")
+  		("o"		. "Open file in other window")
+  		("Z"		. "Compress/uncompress")
+  		("m"		. "Mark")
+  		("u"		. "Unmark")
+  		("t"		. "Toggle mark/umask all")
+  		("g b"		. "Go Backup")
+  		("g c"		. "Go C")
+  		("g d"		. "Go Downloads")
+  		("g e"		. "Go emacs config")
+  		("g h"		. "Go Home")
+  		("g o"		. "Go Odin")
+  		("g p"		. "Go Photos")
+  		("g r"		. "Go Rust")
+  		("g t"		. "Go Temp")
+  		("g z"		. "Go Zig")
+  		("s h"		. "(Toggle) show hidden")
+  		("s n"		. "Sort by name")
+  		("s s"		. "Sort by size")
+  		("s t"		. "Sort by time")
+  		("y p"		. "Yank path")
+  		)
+  	)
+  	('org-mode . '(
+  		("SPC i m"	. "Embark collect")
+  		("SPC i l"	. "Insert link")
+  		("SPC o l"	. "Open link")
+  		("SPC n i"	. "Narrow in")
+  		("SPC n o"	. "Narrow out")
+  		("C-<left>"	. "Jump up to parent heading")
+  		("C-<right>"	. "Cycle through TODO state")
+  		)
+  	)
+  	('eww-mode . '(
+  		("o"		. "Open URL")
+  		("O"		. "Open URL in new buffer")
+  		("r"		. "Reload")
+  		("R"		. "Readable mode")
+  		("u"		. "Scroll up")
+  		("d"		. "Scroll down")
+  		("m"		. "Bookmark")
+  		("SPC i m"	. "Embark collect")
+  		)
+  	)
+  )
+#+END_SRC
+
+
+*** DONE Fix the transparent issue
+
+After using ~my-consult-theme~ and apply =transparent backgroun=, if I open another =org= file, the heading number (=***=) part will mess up!!!!
+
+But it works if I reload the theme.
+
+
+*** DONE Fix the mode line error
+
+When I open emacs I saw this:
+
+#+BEGIN_SRC fish
+  Error during redisplay: (eval (when (mode-line-window-selected-p) (when-let (vc vc-mode) (propertize (my-get-git-branch-name) 'face 'my-modeline-yellow-font))) t) signaled (void-variable vc) [5 times]
+#+END_SRC
+
+
+*** DONE Replicate the same coding expreince in =Neovim=
+
+**** DONE Implement what ~gA~ and ~gX~ do in =Vim=
+
+Go into the visual block mode and select the number column, then press ~gA~ to auto increase all numbers, or press ~gX~ to decrease all numbers.
+
+
+**** DONE =Odin= coding related
+
+***** DONE In =Compilation Mode=, press ~RET~ on the error line, jump to the source
+
+This doesn't at this moment, I think should be the Odin =Error Format= doesn't support by Emacs Yet.
+
+
+***** DONE Let =Odin Search= include ~odin-utils~ in rg searching path
+
+***** DONE Snippets or abbreviations
+
+
+**** DONE Optional, implement the following LSP functionalities with out =Eglot=
+
+Emacs is single thread, the way how LSP works doesn't suit for Emacs I think, it will be very slow in a big project. And I just the basic LSP features:
+
+- ~K~: show the signature
+- ~gd~: go to the definition source code
+
+So, I think =Riggrep= and =Fzf= can work together to make that happen in an easy way. I think I'm able to build it by myself and just for fun, Why not?
+
+
+** TODO Back to =Odin= project
+
+*** TODO Event-loop
+
+As =GameLoop-liked= pattern terminal TUI is based on my =EventLoop= implementation, that's this is MUST to go.
+
+
+*** TODO Termianl utils
+
+**** TODO TUI components
+
+- Dropdown menu: Done
+- TextArea
+- ScrollContainer
+- FlexBox layout
+- Keybindings system

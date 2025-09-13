@@ -1,0 +1,2455 @@
+#+title: Emacs LISP Quick Tutorial
+
+*  First thing you need to know
+
+** Use ~;;~ to comment
+
+** About the ~quote~ function
+
+~(quote ARG)~ returns the argument, without evaluating it.
+
+~'xxx~ just a syntax sugar for ~(quote xxx)~!!!
+
+   #+BEGIN_SRC emacs-lisp
+     ;;
+     ;; Here, I declare a global var with a string value
+     ;;
+     (setq-local my-name "Wison Ye")
+
+     ;;
+     ;; But when I 'quote' on it, it returns the 'my-name' as a value without evaluating it!!!
+     ;;
+     (quote my-name)
+     ;; Output: my-name
+
+
+     ;;
+     ;; `'xxx` just a syntax sugar for '(quote xxx)'
+     ;;
+     'my-name
+     ;; Output: my-name
+   #+END_SRC
+
+
+** =Symbol= in Emacs
+
+A symbol name starts with a ~'~ (quote), which means tell emacs lisp that you don't need to evaulate it at all, it is what it is!!!
+
+When you declare a ~my-global-var~ variable, actually, you're binding a value to the symbol named ~'my-global-var~!!!
+
+Also, in Emacs Lisp, if ~foo~ is a symbol, then ~'foo~ and ~#'foo~ are completely equivalent. The latter form (with ~#'~) is preferred when =foo= is a function, as it documents the fact that it is intended to be funcalled.
+
+Your two forms are therefore completely equivalent, and the one with ~#'~ is preferred:
+
+#+BEGIN_SRC emacs-lisp
+  ;; This return 't'
+  (eq 'my-add #'my-add)
+#+END_SRC
+
+Edit: as pointed out by =Malabarba=, this is not quite true: ~#'~ on symbols will cause the byte-compiler to emit a warning if the function is not defined.
+
+
+*  How to declare variables
+
+You've got a few ways to declare variables for different situations:
+
+** =set=
+
+The ~set~ function sets the symbol's value to the given value, and return value.
+
+This is the fundamental behaviour when you want to delare a variable and assign a value to it.
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; A symbol name starts with a `'` (quote), which means tell emacs lisp that
+  ;; you don't need to evaulate it at all, it is what it is!!!
+  ;;
+  ;; When you declare a 'my-global-var' variable, actually, you're binding a value
+  ;; to the symbol named `'my-global-var`!!!
+  ;;
+  (set 'my-global-var "This is my global var.")
+  (message ">>> my-global-var: %s" my-global-var)
+#+END_SRC
+
+The variables you created are available for all buffers. Also, they will show in the ~helpful-variable~ list.
+
+
+** =setq=
+
+~set~ read as =set quote=. Basically, it's just a convenient way to call the ~set~ function, as you don't need to type the ~'~ part.
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-global-version "1.0")
+  (setq my-temp-var 999)
+
+  ;; You can declare multiple variables at once.
+  (setq
+  	my-global-version "1.1"
+  	my-temp-var 888
+  )
+  (message ">>> my-global-version: %s, my-temp-var: %d" my-global-version my-temp-var)
+#+END_SRC
+
+
+** =setq-local=
+Use ~setq-local~ to declare buffer scope variables, they~re ONLY available for the current buffer.
+
+And the variable you created won't show in the ~helpful-variable~ list.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local my-local-version "2.0")
+
+  ;; You can declare multiple variables at once.
+  (setq-local
+  	my-local-version "1.1"
+  	my-local-var 888
+  	)
+  (message ">>> my-local-version: %s, my-local-var: %d" my-local-version my-local-var)
+#+END_SRC
+
+
+** =defvar= and =defvar-local=
+
+~defvar~ function works like the same with ~setq~ except the following:
+
+- It allows you to add the documentation to a variable.
+- It only assign the init value IF the var doesn't has been set before.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar
+  	;; The var (symbol) name
+  	my-global-version
+  	;; The init value IF it doesn't exists or be set yet
+  	"3.0"
+  	;; The var docs
+  	"Doc here"
+  )
+
+  (defvar
+  	;; The var (symbol) name
+  	my-another-var
+  	;; The init value IF it doesn't exists or be set yet
+  	"888"
+  	;; The var docs
+  	"Another var's doc"
+  )
+  (message ">>> my-local-version: %s, my-another-var: %s" my-local-version my-another-var)
+#+END_SRC
+
+~defvar-local~ targets to ~setq-local~ with the same exceptions mentioned above.
+
+Usually, using ~setq~ and ~setq-local~ is enough except you're building your package, then DOC is important.
+
+
+** =let= and =let*=
+
+*** =let=
+
+~let~ function creates a local variable that only exists in the ~let~ scope (inside the ~()~ pair range). But why do it in this way?
+
+Here is the case:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; This is a buffer scope var
+  ;;
+  (setq-local count 0)
+
+  ;;
+  ;; A function print 'count' in a while loop
+  ;;
+  (defun run-the-loop()
+  	(while (< count 5)
+  		(message ">>> count: %d" count)
+  		(cl-incf count)
+  	)
+  )
+
+  ;;
+  ;; If you run it, it outputs the following at the first call
+  ;;
+  ;; >>> count: 0
+  ;; >>> count: 1
+  ;; >>> count: 2
+  ;; >>> count: 3
+  ;; >>> count: 4
+  ;;
+  (run-the-loop)
+
+  ;;
+  ;; If you run it again, it outps 'nil', as 'count' is 5!!!
+  ;;
+  (run-the-loop)
+#+END_SRC
+
+
+So, the simple way to solve the above issue is to move the ~(setq-local count 0)~ into the ~run-the-loop~ function to reset the value before the loop.
+
+But if you want to declare the temporary value that only exists in the ~{}~ (like what the ~let~ keyword does in other languages), then you can use ~let~ function to make it happen:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; A function print 'temp_count' in a while loop
+  ;;
+  (defun run-the-loop()
+  	(let
+  		;;
+  		;; This is the temp vars list, they ONLY exists inside this 'let' scope!!!
+  		;;
+  		(
+  			(temp_count 0)
+  		)
+  		;;
+  		;; This is the body code inside the 'let' scope
+  		;;
+  		(while (< temp_count 5)
+  			(message ">>> temp_count: %d" temp_count)
+  			(cl-incf temp_count)
+  		)
+  	) ;; The 'let' scope ends here
+
+  	;;
+  	;; Outside the above 'let' scope, 'temp_count' doesn't exists!!!
+      ;; If you uncomment this, it will fail with `(void-variable temp_count)`
+  	;; error!!!!
+  	;;
+  	;; (message ">>> outside let scope, temp_count: %d" temp_count)
+  )
+
+  ;;
+  ;; Now, it works as expected no matter how many times you run
+  ;;
+  (run-the-loop)
+#+END_SRC
+
+
+You don't have to provide the temporary var list:
+
+#+BEGIN_SRC emacs-lisp
+  (let () (message ">>>> empty var list still works find."))
+#+END_SRC
+ 
+
+*** =let= function shadows the outside variable
+
+=let= will shadow the outside-scoped variable if they have the same name. When this happens, you can use =setq= to change the =let= (inner-scoped) variables' value.
+
+Example:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; This is the global var
+  ;;
+  (setq my-version "1.0")
+  (message ">>> global 'my-version' should be '1.0' : %s" my-version)
+
+  (let ((my-version "0.8"))
+  	;;
+  	;; Inside this 'let' scope, 'my-version' will shadow the outside global var 'my-version'.
+  	;; It looks like the outside 'my-version' doesn't exist.
+  	;;
+  	(message ">>> my-version in 'let' scope should be '0.8': %s" my-version)
+
+  	;;
+  	;; Also, inside the current 'let' scope, you can use 'setq' to change var's value.
+  	;; In this case, 'setq' DOES NOT mean declaring a global variable!!!
+  	;;
+  	(setq my-version "0.999")
+  	(message ">>> my-version in 'let' scope should be '0.999': %s" my-version)
+  )
+
+  (message ">>> global 'my-version' (after the 'let' scope) should be still '1.0' : %s" my-version)
+
+  ;; >>> global ’my-version’ should be ’1.0’ : 1.0
+  ;; >>> my-version in ’let’ scope should be ’0.8’: 0.8
+  ;; >>> my-version in ’let’ scope should be ’0.999’: 0.999
+  ;; >>> global ’my-version’ (after the ’let’ scope) should be still ’1.0’ : 1.0
+#+END_SRC
+
+
+*** =let*=
+
+This won't work, as ~let~ doesn't evaluate variable name inside the =varialbe list=:
+
+#+BEGIN_SRC emacs-lisp
+  (let
+  	(
+  		(temp_x 8)
+  		(temp_y (+ temp_x 1)) ;; error: (void-variable temp_x)
+  	)
+  	(message ">>> temp_x: %d, temp_y: %d" temp_x temp_y)
+  )
+#+END_SRC
+
+If you want to make that happen, use ~let*~ instead:
+
+#+BEGIN_SRC emacs-lisp
+  (let*
+  	(
+  		(temp_x 8)
+  		(temp_y (+ temp_x 1)) ;; This works:)
+  	)
+  	(message ">>> temp_x: %d, temp_y: %d" temp_x temp_y)
+  )
+#+END_SRC
+
+
+** =defcustom=
+
+~defcustom~ function declares the given symbol as customizable variable. The primary difference is that: All ~defcustom~ variables are show up in the customization UI, then user is able to change their values without writing LISP code:)
+
+
+*  Data type
+
+**  Variable doesn't have a fixed data type
+
+In =LISP=, a variable doesn't have a fixed data type, it's data type changes based on its value, here is the exampe:
+
+#+BEGIN_SRC emacs-lisp
+  (setq value "123")
+  (type-of value)       ; string
+  (setq value 111.222)
+  (type-of value)       ; float
+  (setq value 123)
+  (type-of value)       ; integer
+
+  (setq value 'helloworld)
+  (type-of value)       ; symbol
+  (setq value t)
+  (type-of value)       ; symbol
+  (setq value nil)
+  (type-of value)       ; symbol
+
+  (setq value '(1 2 3 ))
+  (type-of value)       ; (1 2 3), it's a List
+#+END_SRC
+
+
+**  Evaluate the value or not
+
+If you put a ~'~ in front of a value or a variable, that said DO NOT try tp evaluate to get back the value, just use it as a symbol as value!!!
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-name "Wison Ye")
+  (message "my-name: %s" my-name)   ; "my-name: Wison Ye"
+  (message "my-name: %s" 'my-name)  ; "my-name: my-name"
+#+END_SRC
+
+
+**  Boolean
+
+There is no ~true~ and ~false~ in =LISP=. You should say: Except the ~nil~ and empty list (~'()~ or ~(list)~) represent the ~false~, everything else reprepsents the ~true~!!!
+
+Value represents true: ~t~
+Value represents false: ~nil~, ~'()~, ~(list)~
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; The expressions below are output 'No'
+  ;;
+  (if nil "Yes" "No")
+  (if '() "Yes" "No")     ;; Empty list represents 'false'
+  (if (list) "Yes" "No")  ;; Empty list represents 'false'
+
+
+#+END_SRC
+
+
+**  Primitive data type
+
+Basic primitive data type in =LISP= is ~List~:
+
+| Expression                  | Data type          |
+|-----------------------------+--------------------|
+| ~(type-of 789)~               | integer            |
+| ~(type-of 789.123)~           | float              |
+| ~(type-of "789")~             | string             |
+| ~(type-of 'This-is-a-symbol)~ | symbol             |
+| ~(type-of '(123 789))~        | cons               |
+|                             | vector             |
+|                             | has-table          |
+|                             | subr               |
+|                             | byte-code function |
+|                             | record             |
+|                             |                    |
+
+Also, =LISP= has programming types as well.
+
+
+**  How to check whether the given values are equal or not
+
+| Function | Description                                                              |
+|----------+--------------------------------------------------------------------------|
+| ~eq~       | Return t if the two args are the same Lisp object (like same reference). |
+| ~eql~      | Return t if number values are the same.                                  |
+| ~equal~    | Return t if two Lisp objects have similar structure and contents         |
+| ~string=~  | Return t if the two string contents are the same                         |
+|          |                                                                          |
+
+
+So, usually, you will use ~equal~ to check variables or values are equal or not.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local num-1 9.9)
+  (setq-local num-2 9.9)
+  (eql num-1 num-2)
+
+  (setq-local str-1 "Hellow World")
+  (setq-local str-2 "Hellow World")
+  (setq-local str-3 "hellow world")
+
+  (eql str-1 str-2)     ;; nil, you shouldn't use this to check string content
+  (string= str-1 str-2) ;; t
+  (equal str-1 str-2)   ;; t
+  (string= str-1 str-3) ;; nil
+#+END_SRC
+
+
+*  Control flow
+
+**  ~if~
+
+~t~ is true, ~nil~ is false
+
+#+BEGIN_SRC emacs-lisp
+  (setq condition t)
+  (setq condition nil)
+  (if condition
+      (message "true")  ;; If true do this
+      (message "false") ;; Else if falae do this, this branch is optional
+  )
+#+END_SRC
+
+The =false= branch is optional:
+
+#+BEGIN_SRC emacs-lisp
+  (setq condition t)
+  (if condition
+      (message "true")  ;; If true do this
+  )
+#+END_SRC
+
+As you can see, the =true/false= branch statement only accept one function. If you want to run more than one function, then you have to use ~(progn)~ function:
+
+#+BEGIN_SRC emacs-lisp
+  (setq condition t)
+  (setq condition nil)
+  (if condition
+      (progn
+          (message ">>> true-1")
+          (message ">>> true-2")
+          (message ">>> true")
+      )
+      (progn
+          (message ">>> false-1")
+          (message ">>> false-2")
+          (message ">>> false")
+      )
+  )
+#+END_SRC
+
+You can use ~(not)~ function in ~if~ like this:
+
+#+BEGIN_SRC emacs-lisp
+  (if (not condition)
+      (progn
+          (message ">>> true-1")
+          (message ">>> true-2")
+          (message ">>> true")
+      )
+      (progn
+          (message ">>> false-1")
+          (message ">>> false-2")
+          (message ">>> false")
+      )
+  )
+#+END_SRC
+
+Or combine ~(and)~ ~(or)~ etc.
+
+
+**  ~when~ and ~unless~
+
+~when~ is only care about the ~t~ case: Run the body if ~t~, otherwise, return ~nil~.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local download-successfully t)
+  (when download-successfully
+       (message "when hits t")
+       (message "Download successfully.")
+  )
+#+END_SRC
+
+
+~unless~ is only care about the ~nil~ case: Run the body if ~nil~, otherwise, return ~nil~.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local download-successfully nil)
+  (unless download-successfully
+       (message "unless hits nil")
+       (message "Download failed.")
+  )
+#+END_SRC
+
+
+**  ~cond~ works like ~if else if else~ 
+
+There is no ~if else~ in =LISP=, but ~cond~ works like that: if match condition, then return its value
+
+#+BEGIN_SRC emacs-lisp
+  ;; (setq-local temp-str "aaa")
+  ;; (setq-local temp-str "bbb")
+  ;; (setq-local temp-str "cc")
+  ;; (setq-local a 80)
+  ;; (setq-local b 70)
+
+  (setq-local result (cond ((string= temp-str "aaa") "Yes, that's aaa")  ;; if
+                           ((string= temp-str "bbb") "Yes, that's bbb")  ;; else if
+                           ((string= temp-str "ccc") "Yes, that's ccc")  ;; else if
+                           ((> a b) "Yes, a > b")                        ;; else if
+                           (t "Yes, This works like 'else' branch")      ;; else
+  ))
+#+END_SRC
+
+
+**  ~while~ loop
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local counter 5)
+
+  (while (> counter 0)
+       (message ">>> counter: %d" counter)
+       ;; (setq-local counter (- counter 1))
+       (setq-local counter (1- counter))
+  )
+#+END_SRC
+
+
+**  ~dolist~ lopp
+
+Loop elements from a list and then do something in the body
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Evaluate elements inside the list and print out
+  ;; 'list' is a function to create a list
+  ;; 'temp-value' is a temporary variable to hold each element in the list
+  ;;
+  (setq value-1 "AAA")
+  (setq value-2 "BBB")
+  (setq value-3 "CCC")
+
+  (dolist (temp-value (list value-1 value-2 value-3))
+       (message "temp-value: %s" temp-value)
+  )
+
+  ;;
+  ;; The same purpose with above
+  ;;
+  (setq temp-list (list "AAA" "BBB" "CCC"))
+  (dolist (temp-value temp-list)
+       (message "temp-value: %s" temp-value)
+  )
+#+END_SRC
+
+
+*  Function
+
+**  Function parameter has no type and =function returns the last expression value=
+
+In LISP, function parameter has no type (dynamic type: can be any types);
+
+#+BEGIN_SRC emacs-lisp
+  (defun test()
+  	(setq-local xxx 888)
+
+  	;;
+  	;; This is the last expression, also the return value of this function!!!
+  	;;
+  	xxx
+  )
+
+  ;;
+  ;; Then call the function and it's Return value is '888'
+  ;;
+  (test)
+
+
+
+  (defun show-type-and-value (x y)
+      (message "x type: %s, value: %s" (type-of x) x)
+
+  	;;
+  	;; Becasue this is the last expression, that's why this function returns
+  	;; the 'message' function result (the formatted string ) as the function's
+  	;; return value!!!
+  	;;
+      (message "y type: %s, value: %s" (type-of y) y)
+  )
+
+
+  ;;
+  ;; Call the function and it's return value is a formatted string
+  ;;
+  (show-type-and-value 1 123.11)
+  (show-type-and-value "hey" ?A)
+#+END_SRC
+
+
+Function doesn't have ~return~ keyword, it returns the =last expression value=:
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local function-result (show-type-and-value 88 99.999))   ; "y type: float, value: 99.999"
+  (type-of function-result)                                      ; string
+#+END_SRC
+
+
+**  ~&optional~ parameter
+
+#+BEGIN_SRC emacs-lisp
+  (defun show-type-and-value (x y &optional should-show-y)
+      (message "x type: %s, value: %s" (type-of x) x)
+      (if should-show-y
+          (message "y type: %s, value: %s" (type-of y) y)
+      )
+  )
+
+  ;; Return nil, as last expression is the if, and it returns nil!!!
+  (show-type-and-value 1 123.11)
+
+  ;; Return string, as the if statement is t and run the '(message)' function to product a string
+  (show-type-and-value 1 123.11 t)
+#+END_SRC
+
+
+**  ~&optional~ parameter with default value
+
+#+BEGIN_SRC emacs-lisp
+  (defun show-type-and-value (x &optional y z)
+      (setq-local y-value (or y 10)) ; If 'y' has no value, then default is 10
+      (setq-local z-value (or z 20))
+      (message "y type: %s, value: %s" (type-of y-value) y-value)
+      (message "z type: %s, value: %s" (type-of z-value) z-value)
+  )
+
+  (show-type-and-value 1)
+  (show-type-and-value 1 2)
+  (show-type-and-value 1 2 3)
+#+END_SRC
+
+
+**  ~&rest~ parameter
+
+~&rest~ parameter use a single temporary variable to hold all the parameters (as a list) which handles by the function.
+
+For example the ~(++)~ function definition:
+
+#+BEGIN_SRC emacs-lisp
+  (+ &rest NUMBERS-OR-MARKERS)
+#+END_SRC
+
+That's why you can call it like this:
+
+#+BEGIN_SRC emacs-lisp
+  (+ 2 1)          ; 3
+  (+ 2 10 20 10)   ; 42
+#+END_SRC
+
+
+Let's self implement the ~(+)~ function ues ~&rest~:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-plus (&rest numbers)
+      (setq-local sum 0)
+      (dolist (temp-number numbers)
+           (setq-local sum (+ sum temp-number))
+      )
+      sum
+  )
+
+  (my-plus 2 3 5)    ; 10
+  (my-plus 10 20 30) ; 60
+#+END_SRC
+
+
+**  Function doc
+
+Function documentation shows in ~describe-function~ can be multiple lines, but it keep all spaces which you THINK that's correct indents:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-plus (&rest numbers)
+      " My own plus function implementation
+
+        Example:
+  
+            (my-plus 2 3 5)    ; 10
+            (my-plus 10 20 30) ; 60
+      "
+      (setq-local sum 0)
+      (dolist (temp-number numbers)
+           (setq-local sum (+ sum temp-number))
+      )
+      sum
+  )
+
+  (my-plus 2 3 5)    ; 10
+  (my-plus 10 20 30) ; 60
+#+END_SRC
+
+If you run ~describe-funciton my-plus~, the doc looks like this (which doesn't what you want):
+
+#+BEGIN_SRC emacs-lisp
+  Documentation
+  My own plus function implementation
+
+          Example:
+  
+              (my-plus 2 3 5)    ; 10
+              (my-plus 10 20 30) ; 60
+#+END_SRC
+
+
+You should never indent from line 2:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-plus (&rest numbers)
+      " My own plus function implementation
+
+Example:
+
+    (my-plus 2 3 5)    ; 10
+    (my-plus 10 20 30) ; 60
+      "
+      (setq-local sum 0)
+      (dolist (temp-number numbers)
+           (setq-local sum (+ sum temp-number))
+      )
+      sum
+  )
+
+  (my-plus 2 3 5)    ; 10
+  (my-plus 10 20 30) ; 60
+#+END_SRC
+
+
+If you run ~describe-funciton my-plus~, the doc looks correctly:
+
+#+BEGIN_SRC emacs-lisp
+  Documentation
+  My own plus function implementation
+
+  Example:
+
+      (my-plus 2 3 5)    ; 10
+      (my-plus 10 20 30) ; 60
+
+#+END_SRC
+
+
+**  Lambda function is anonymous function
+
+If you want pass a temporary (only use once) function to another function as parameter and you don't want to declare a real function, then ~lambda~ function is what you want:
+
+#+BEGIN_SRC emacs-lisp
+  (lambda ()
+      (message ">>> This is the anonymous function.")
+  )
+
+  ;;
+  ;; Or you can call the lambda function directly like this:
+  ;;
+  ;; The outside '()' call the lambda function
+  ;; The inside '()' declare the lambda function
+  ;;
+  ((lambda (x y)
+    (message ">>> Run the lambda function directly, x: %s, y: %s" x y)
+   )
+   10 20)
+#+END_SRC
+
+
+**  You can call a given function by the ~(funcall)~ function or ~(apply)~ function
+
+#+BEGIN_SRC emacs-lisp
+  (defun call-me (x) (message "You just call me with x: %s" x))
+
+  ;;
+  ;; Call any function, the first parameter is the function name symbol
+  ;;
+  (funcall 'call-me 88)
+#+END_SRC
+
+
+~(apply)~ works like ~(funcall)~, but you pass a list to combine all parameters as the second parameter:
+
+#+BEGIN_SRC emacs-lisp
+  (apply 'call-me '(88))
+#+END_SRC
+
+
+*  Command
+
+~Command~ is just the interactive function, the differences are:
+
+- You can call command by ~M-x~
+- You can bind command to key
+
+
+**  Simple command
+
+A command is the function that start with ~(interactive)~ call:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-first-command()
+  	;;
+  	;; - This makes this function becomes a `command`.
+  	;; - '(interactive)' MUST be in the first line!!!
+  	;;
+      (interactive) 
+
+      (message ">>> my-first-command")
+  )
+#+END_SRC
+
+
+**  How to limit the command ONLY available for the given =mode=
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 1. You need to set 'read-extended-command-predicate' to 'command-completion-default-include-p'
+  ;;    This is very important, otherwise, it won't work!!!
+  ;;
+  (setq read-extended-command-predicate 'command-completion-default-include-p)
+
+  ;;
+  ;; 2. Inside your command, you need to call 'interactive' with the given mode/modes
+  ;;
+  (defun my-command-only-exists-in-org-mode()
+      (interactive "" org-mode) ;; Only show if you're in 'org-mode'
+  	(message ">>> my-command-only-exists-in-org-mode")
+  )
+
+  (defun my-command-only-exists-in-org-mode-and-list-interaction-mode()
+      (interactive "" (list org-mode lisp-interaction-mode)) ;; Exists in multiple modes
+  	(message ">>> my-command-only-exists-in-org-mode-and-list-interaction-mode")
+  )
+#+END_SRC
+
+
+**  How ~interactive~ works?
+
+Signature: ~(interactive &optional ARG-DESCRIPTOR &rest MODES)~
+
+That ~ARG-DESCRIPTOR~ is a string that starts with the =prefix code/code letter=, then follow by your prompt content.
+If you need multiple prompts, separate them with ~'\n'~!!!
+
+The =prefix code/code letter= controls the popup completion candidates:
+
+| Prefix code                            | Description                                                  |
+|----------------------------------------+--------------------------------------------------------------|
+| [ General arguments ]                  |                                                              |
+| ~N~                                      | Prompt for numbers or use a numeric prefix argument          |
+| ~p~                                      | Use numeric prefix without prompting (only prefix arguments) |
+| ~M~                                      | Prompt for a string                                          |
+| ~i~                                      | Skip an “irrelevant” argument                                |
+|                                        |                                                              |
+| [ Files, directories, and buffers ]    |                                                              |
+| ~f~                                      | Prompt for a file, must exists                               |
+| ~F~                                      | Prompt for a file, ok if non-exists                          |
+| ~D~                                      | Prompt for a directory, must exists                          |
+| ~b~                                      | Prompt for a buffer, must exists                             |
+| ~B~                                      | Prompt for a buffer, ok if non-exists                        |
+|                                        |                                                              |
+| [ Functions, commands, and variables ] |                                                              |
+| ~C~                                      | Prompt for a command name                                    |
+| ~a~                                      | Prompt for a function name                                   |
+| ~v~                                      | Prompt for a custom variable name                            |
+|                                        |                                                              |
+
+For more prefix code, run ~(helpful-callable 'interactive)~ and scroll down a bit to see all of them. 
+
+
+
+Here are some examples:
+
+#+BEGIN_SRC emacs-lisp
+  ;; Ask for a number
+  (interactive "NWhat's your lucky number: ")
+
+  ;; Ask for a string
+  (interactive "MWhat's your name: ")
+
+  ;; Always return nil, used to skip an “irrelevant” argument
+  (interactive "i")
+
+  ;; Ask for an existing file
+  (interactive "fYour configuration file: ")
+
+  ;; Ask for an existing or non-exists file
+  (interactive "FYour configuration file (ok with non-exists): ")
+
+  ;; Ask for a directory
+  (interactive "DYour configuration folder: ")
+
+  ;; Ask for an existing buffer
+  (interactive "bYour opened buffer: ")
+
+  ;; Ask for an existing or non-exists buffer
+  (interactive "BYour opened or new buffer: ")
+
+  ;; Ask for a command name
+  (interactive "CYour command: ")
+
+  ;; Ask for a function name
+  (interactive "aYour function: ")
+
+  ;; Ask for a variable name
+  (interactive "vYour variable: ")
+
+  ;; Ask for a few things in oneshot, prompts separated by `\n`
+  (interactive "MYour name: \nNYour age: \nDYour home folder: ")
+#+END_SRC
+
+
+**  Use ~interactive~ work with command arguments
+
+The total number of interactive prompts MUST  match the number of your command arguments; otherwise, your function won't call correctly!!!
+
+*** A command that prompts for a file and a folder by ~F~ and ~D~ prefix codes
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; A command that prompt the for a file and a folder
+  ;;
+  (defun my-prompt-user-file-and-folder (your-file your-folder)
+      (interactive "FPlease select your file: \nDPlease select your folder: ")
+      (message ">>> your-file: %s" your-file)
+      (message ">>> your-folder: %s" your-folder)
+  )
+#+END_SRC
+
+
+*** A command that prompts for 2 numbers by ~N~ prefix code
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-prompt-user-numbers (number-1 number-2)
+      (interactive "NPlease type your first number: \nNPlease select your second number: ")
+      (message ">>> your-first-number: %d" number-1)
+      (message ">>> your-second-number: %d" number-2)
+      (setq-local result (+ number-1 number-2))
+      (message ">>> result: %d" result)
+      result ; Last expression returns the value
+  )
+#+END_SRC
+
+
+*** A command that prompts for 2 strings by ~M~ prefix code
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-prompt-user-string-and-concat (first-name last-name)
+      (interactive "MPlease type your first name: \nMPlease select your last name: ")
+      (message ">>> your-first-name: %s" first-name)
+      (message ">>> your-last-name: %s" last-name)
+      (setq-local full-name (concat first-name last-name))
+      (message ">>> Your full name is: %s" full-name)
+      full-name ; Last expression returns the value
+  )
+#+END_SRC
+
+
+*** A command that need to skip a few parameters
+
+Use ~"i"~ prefix code to skip a paramemter:
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-prompt-skips-parameters (first-param
+  								reverse-option ;; Use fixed value at this moment
+  								third-param
+  								another-reverse-option ;; Use fixed value at this moment
+  								fifth-param)
+  	(interactive "MFirst param: \ni\nMThird param: \ni\nMFifth param: \n")
+
+  	(setq-local parameters_debug_output
+  		(concat
+  			(format "first-param: %s" first-param)
+  			(format ", reverse-option: %s" (or reverse-option "FIXED_OPTION"))
+  			(format ", third-param: %s" third-param)
+  			(format ", another-reverse-option: %s" (or another-reverse-option "FIXED_OPTINO_2"))
+  			(format ", fifth-param: %s" fifth-param)
+  		)
+  	)
+
+  	;; (message ">>> first-param: %s" first-param)
+  	;; (message ">>> reverse-option: %s" (or reverse-option "FIXED_OPTION"))
+  	;; (message ">>> third-param: %s" third-param)
+  	;; (message ">>> another-reverse-option: %s" (or another-reverse-option "FIXED_OPTINO_2"))
+  	;; (message ">>> fifth-param: %s" fifth-param)
+
+  	(message ">>> parameters_debug_output: %s" parameters_debug_output)
+  )
+
+  ;; Outpt:
+  ;; >>> parameters_debug_output: first-param: 111, reverse-option: FIXED_OPTION, third-param: 333, another-reverse-option: FIXED_OPTINO_2, fifth-param: 555
+#+END_SRC
+
+
+*  Custom popup minibuffer with completion support
+
+** The basic one: ~completing-read~
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; (completing-read PROMPT COLLECTION &optional PREDICATE REQUIRE-MATCH INITIAL-INPUT HIST DEF INHERIT-INPUT-METHOD)
+  ;;
+
+  (setq cmd-list (list "./configure.sh" "./run.sh" "./run-test.sh"))
+
+  (completing-read
+  	;;
+  	;; The prompt
+  	;;
+  	"Project commands: "								
+
+  	;;
+  	;; List: can be either
+  	;;
+  	;; - A 'list' instance, e.g: (list "./configure.sh" "./run.sh" "./run-test.sh")
+  	;; - A 'list' variable name, e.g: cmd-list
+  	;; - A 'function': the function is solely responsible for performing completion; 'completion-read' returns
+  	;;					whatever this function returns. The function is called with three arguments:
+  	;;					'string predicate nil'
+  	;;
+  	;;					You can read more from 'Programmed completion':
+  	;;					https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.html
+  	;; 
+  	cmd-list
+
+  	;;
+  	;; 'PREDICATE' function (not provided)
+  	;;
+  	nil
+
+  	;;
+  	;; 'REQUIRE-MATCH': input must match in the 'List'
+  	;;
+  	t
+
+  	;;
+  	;; 'INIT-INPUT': simulate you type in the input area
+  	;;
+  	nil
+
+  	;;
+  	;; 'HIST': History list (not provided)
+  	;;
+  	nil
+
+  	;;
+  	;; 'DEF': Default value, put it to the top position!!!
+  	;;
+  	"./run.sh"
+  )
+#+END_SRC
+
+
+** The advanced one: ~consult--read~
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local my-choose
+  	(consult--read
+  		;;
+  		;; List: can be either
+  		;;
+  		;; - A 'list' instance, e.g: (list "./configure.sh" "./run.sh" "./run-test.sh")
+  		;; - A 'list' variable name, e.g: cmd-list
+  		;; - A 'function': the function is solely responsible for performing completion; 'completion-read' returns
+  		;;					whatever this function returns. The function is called with three arguments:
+  		;;					'string predicate nil'
+  		;;
+  		;;					You can read more from 'Programmed completion':
+  		;;					https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.html
+  		;; 
+  		(list "AAA" "BBBB" "CCCC")
+
+  		;;
+  		;; The prompt
+  		;;
+  		:prompt "Which one you want: "
+
+  		;;
+  		;; 'INIT-INPUT': simulate you type in the input area
+  		;;
+  		;; :initial "Hey"
+
+  		;;
+  		;; 'REQUIRE-MATCH': input must match in the 'List'
+  		;;
+  		:require-match t
+
+  		;; :category 'theme
+
+  		;;
+  		;; The state function takes two arguments, an action argument and the
+  		;; selected candidate.  The candidate argument can be nil if no candidate is
+  		;; selected or if the selection was aborted.  The function is called in
+  		;; sequence with the following arguments:
+  		;; 
+  		;;   1. 'setup nil         After entering the mb (minibuffer-setup-hook).
+  		;; ⎧ 2. 'preview CAND/nil  Preview candidate CAND or reset if CAND is nil.
+  		;; ⎪    'preview CAND/nil
+  		;; ⎪    'preview CAND/nil
+  		;; ⎪    ...
+  		;; ⎩ 3. 'preview nil       Reset preview.
+  		;;   4. 'exit nil          Before exiting the mb (minibuffer-exit-hook).
+  		;;   5. 'return CAND/nil   After leaving the mb, CAND has been selected.
+  		;; 
+  		;; Real run example output:
+  		;; 
+  		;; >>> action: setup, your-choose: nil
+  		;; >>> action: preview, your-choose: BBBB
+  		;; >>> action: preview, your-choose: b     ;; I keep typing 'b'
+  		;; >>> action: preview, your-choose: bb
+  		;; >>> action: preview, your-choose: bbb   ;; I keep deleting 'b'
+  		;; >>> action: preview, your-choose: bb
+  		;; >>> action: preview, your-choose: b
+  		;; >>> action: preview, your-choose: BBBB  ;; I choose "BBBB"
+  		;; >>> action: preview, your-choose: AAA   ;; I choose "AAA"
+  		;; >>> action: preview, your-choose: CCCC  ;; I choose "CCCC" and press 'RET'
+  		;; >>> action: preview, your-choose: nil
+  		;; >>> action: exit, your-choose: nil
+  		;; >>> action: return, your-choose: CCCC
+  		;;
+  		:state (lambda (action your-choose)
+  			;;
+  			;; Now you can do something when 'action' == 'preview' on the fly
+  			;; Or you can do something when 'action' == 'return' (means you pressed 'RET')
+  			;;
+
+  			;;
+  			;; You SHOULD NOT print out inside this function, as it will mess up the prompt!!!
+  			;;
+  			;; (message ">>> action: %s, your-choose: %s" action your-choose)
+  		)
+
+  		;;
+  		;; Default value, put it to the top position!!!
+  		;;
+  		:default "BBBB"
+  	)
+  )
+  (message ">>> my-choose: %s" my-choose)
+#+END_SRC
+
+
+*  Common functions/commands that you need to know
+
+**  Manipulate numbers
+
+***  Number operation
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; +/-/*//
+  ;;
+  (+ 1 1)
+  (- 2 1)
+  (* 2 3)
+  (/ 6 2)
+
+
+  ;;
+  ;; Reminder for integer
+  ;;
+  (% 10 3)
+
+  ;;
+  ;; Reminder for float
+  ;;
+  (mod 10.1 3)
+#+END_SRC
+
+
+***  Number rounding
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; truncate: Rounds float to integer
+  ;; round: Rounds to the nearest integer
+  ;; floor: Rounds float to integer by subtracting
+  ;; ceiling: Rounds up to next integer
+  ;;
+  (truncate 1.6)    ; 1
+  (round 1.6)       ; 2
+  (floor 1.6)       ; 1
+  (ceiling 1.6)     ; 2
+#+END_SRC
+
+
+***  Is it number or no?
+
+#+BEGIN_SRC emacs-lisp
+  (numberp 1)         ; t
+  (numberp 1.1)       ; t
+  (numberp "asdf")    ; nil
+
+  (integerp 1)        ; t
+  (integerp 1.1)      ; nil
+  (integerp "asdf")   ; nil
+
+  (floatp 1)          ; nil
+  (floatp 1.1)        ; t
+  (floatp "asdf")     ; nil
+
+  (zerop 0)           ; t
+  (zerop 0.0)         ; t
+  (zerop 1)           ; nil
+  (zerop 1.1)         ; nil
+#+END_SRC
+
+
+***  Number comparison
+
+#+BEGIN_SRC emacs-lisp
+  (= 1 1)
+  (< 2 1)
+  (> 2 1)
+  (>= 2 1)
+  (<= 2 1)
+
+  (max 2 1 10 99)
+  (min 2 1 10 99)
+#+END_SRC
+
+
+**  Manipuldate strings
+
+*** Get back the length
+
+#+BEGIN_SRC emacs-lisp
+  (let ((temp-str "888")) (length temp-str))
+  (let ((temp-str "999")) (message ">>> length of 'temp-str': %s" (length temp-str)))
+#+END_SRC
+
+
+***  Comparison
+
+#+BEGIN_SRC emacs-lisp
+  (string= "aaa" "aaa")   ; t
+  (string= "aaa" "bbb")   ; nil
+
+  (string< "aaa" "aaa")   ; nil
+  (string< "aaa" "bbb")   ; t
+
+  (string> "aaa" "aaa")   ; nil
+  (string> "aaa" "bbb")   ; nil
+#+END_SRC
+
+
+***  Substirng, concat, replace, split-string, trim
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Substring
+  ;;
+  (substring "1234567890" 0 4)    ; "1234"
+
+  ;;
+  ;; Concat
+  ;;
+  (concat "Hello" " World")       ; "Hello World"
+
+  ;;
+  ;; Trim
+  ;;
+  (string-trim "   AAA BBB ")     ; "AAA BBB"
+
+  ;;
+  ;; Replace
+  ;;
+  (string-replace
+  	", "
+  	",\n"
+  	"AAA, BBB, CCC, DDD")
+  ;; "AAA,
+  ;; BBB,
+  ;; CCC,
+  ;; DDD"
+
+
+  ;;
+  ;; Split string by the separator (default is " " if don't provided)
+  ;;
+  ;; You can use the 'case-fold-search' to control split separate case-sensitive or not:
+  ;;
+  ;; (setq case-fold-search nil)
+  ;; (setq case-fold-search t)
+  ;;
+  (split-string "Hello emacs lisp")     ; '("Hello" "emacs" "lisp")
+
+  ;; Split by ','
+  (split-string "Hello,emacs,lisp" ",") ; '("Hello" "emacs" "lisp")
+
+  ;; Split by '\n' and ignore zero-length string (after splitted)
+  (string-split "aaa\nbbbb\n\ncccc\n\n" "\n" t)
+
+  ;; Split by '\n' and ignore zero-length string (after splitted) and trim
+  (let ((lines nil))
+  	(dolist (line (string-split " aaa \n bbbb     \n\ncccc  \n\n" "\n" t))
+  		(add-to-list 'lines (string-trim line) t))
+  	(message ">>> lines: %s" lines)
+  )
+#+END_SRC
+
+
+***  Convert between ~symbol~ and ~string~
+
+#+BEGIN_SRC emacs-lisp
+  (let (
+  	(my-symbol 'CustomSymbol)
+  	(my-symbol-string "")
+  	(temp-symbol 'aaa)
+  	)
+
+  	(message ">>> my-symbol: %s, type: %s" my-symbol (type-of my-symbol))
+
+  	;;
+  	;; 'symbol' --> 'string'
+  	;;
+  	(setq my-symbol-string (symbol-name my-symbol))
+  	(message ">>> my-symbol-string: %s, type: %s " my-symbol-string (type-of my-symbol-string))
+
+  	;;
+  	;; 'string' --> 'symbol'
+  	;;
+  	(setq temp-symbol (intern my-symbol-string))
+  	(message ">>> temp-symbol: %s, type: %s " temp-symbol (type-of temp-symbol))
+  )
+
+  ;; >>> my-symbol: CustomSymbol, type: symbol
+  ;; >>> my-symbol-string: CustomSymbol, type: string 
+  ;; >>> temp-symbol: CustomSymbol, type: symbol 
+#+END_SRC
+
+
+**  Manipulate char
+
+Char value starts with ~?~
+
+#+BEGIN_SRC emacs-lisp
+  (setq-local hex-char ?A)    ; 65
+  (setq-local hex-char ?\t)   ; 9
+  (setq-local hex-char ?\n)   ; 10
+  (setq-local hex-char ?FF)   ; It doesn't work!!!
+#+END_SRC
+
+
+***  Comparison
+
+#+BEGIN_SRC emacs-lisp
+  (char-equal ?A ?A)        ; t
+  (char-equal ?a ?A)        ; nil
+  (char-equal 65 ?A)        ; t
+#+END_SRC
+
+
+**  Format and print out
+
+For list all supported =format specifier=, just run ~describe-function~ on ~format~ function.
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Print out something via 'message'
+  ;;
+  (message "Hello world")
+  (message "Integer value: %d, float value: %f, hex value: 0x%X, sting value: %s" 88 123.123 255 "Hey")
+
+  ;;
+  ;; Format string
+  ;;
+  (setq string-value (format
+                        "Integer value: %d, float value: %f, hex value: 0x%X, sting value: %s"
+                        88
+                        123.123
+                        255
+                        "Hey"))
+  (message "string_value: %s" string-value)
+
+  ;;
+  ;; Conversion
+  ;;
+  (string-to-number "111")
+  (number-to-string 111)
+
+  ;;
+  ;; Format time string
+  ;;
+  (setq time-string-value (format-time-string "%A"))
+  (message "time-string-value: %s" time-string-value)
+#+END_SRC
+
+
+**  Manipulate list
+
+#+BEGIN_SRC emacs-lisp
+  (setq element-a "A")
+  (setq element-b "B")
+  (setq element-c "C")
+
+  ;;
+  ;; '() create a symbol list (do NOT evaluate list elements)
+  ;; 'list' create a value list 
+  ;;
+  (setq my-list (list element-a element-b element-c))
+
+  ;;
+  ;; 'car' get back the first element
+  ;;
+  (message "First element: %s" (car my-list))
+
+  ;;
+  ;; 'cdr' get back the second and the rest elements
+  ;;
+  (message "Second element: %s" (cdr my-list))
+
+  ;;
+  ;; '(last LIST &optional N)' get back elements from the end and make it becomes 'list'!!!
+  ;; - If LIST is nil, return nil.
+  ;; - If N is non-nil, return the Nth-to-last link of LIST.
+  ;; - If N is bigger than the length of LIST, return LIST.
+  ;;
+
+  ;; Get back a list with the last element: (C)
+  (message "Last element: %s" (last my-list))
+
+  ;; `nil`
+  (message "Last element: %s" (last my-list 0))
+
+  ;; Get back a list with the last element: (C)
+  (message "Last element: %s" (last my-list 1)) 
+
+  ;; Get back a list with the last 3 element: (A B C)
+  (message "Last element: %s" (last my-list 3))
+
+  ;; Get back a list with the last 3 element: (A B C), as `N` is bigger that the length of 'my-list'
+  (message "Last element: %s" (last my-list 5))
+
+  ;;
+  ;; 'nth' get back the N element, 0 basic
+  ;;
+  (message "Second element: %s" (nth 0 my-list))
+  (message "Second element: %s" (nth 1 my-list))
+  (message "Second element: %s" (nth 2 my-list))
+  (message "Second element: %s" (nth 3 my-list)) ; 'nil' as out of index
+
+  ;;
+  ;; 'add-to-list' adds the element to the beginning or end of the list:
+  ;;
+  ;; '(add-to-list LIST-VAR ELEMENT &optional APPEND COMPARE-FN)'
+  ;; - If 'APPEND' is 'nil' or missing, then add to the beginning
+  ;; - If 'APPEND' is 't', then add to the end
+  ;;
+  (add-to-list 'my-list "J" t)
+  (add-to-list 'my-list "K" t)
+  (add-to-list 'my-list "L" t)
+
+  ;;
+  ;; 'append' flatten one or more lists and return the flatten list
+  ;;
+  (setq my-list (append my-list '("M" "N") (list "O" "P" "Q")))
+  (message "my-list: %s" my-list)    ; "my-list: (A B C E F)"
+
+  ;;
+  ;; 'mapcar' does what 'map' array function in 'Javascript':
+  ;; (mapcar FUNCTION SEQUENCE)
+  ;;
+  (mapcar
+  	;;
+  	;; The function that run on every element in the given list
+  	;; and return the new list as the return value.
+  	;;
+  	(lambda (v) (+ v 1))
+  	;; The list to run the 'map' lambda function
+  	(list 6 7 8)
+  )
+  ; Output: (7 8 9)
+
+
+  ;;
+  ;; You can use 'push' to add element to the beginning and
+  ;; use 'pop' to take the first element. It makes the list
+  ;; works like a stack.
+  ;;
+
+  ;;
+  ;; Rest back to '(A B C)'
+  ;;
+  (setq my-list (list element-a element-b element-c))
+
+  (push "111" my-list) ;; Push to the stack
+  (push "222" my-list) ;; Push to the stack
+
+  (message ">>> after pushing my-list: %s" my-list)
+  ;; ">>> after pushing my-list: (222 111 A B C)"
+
+
+  (pop my-list) ;; return "222"
+  (pop my-list) ;; return "111"
+  (message
+  	">>> after poping my-list: %s, equal to '(\"A\" \"B\" \"C\"): %s"
+  	my-list
+  	(equal my-list '("A" "B" "C"))
+  )
+  ;; ">>> after poping my-list: (A B C), equal to ’(\"A\" \"B\" \"C\"): t"
+#+END_SRC
+
+Here is the link: [[http://xahlee.info/emacs/emacs/elisp_list.html][List related functions]] 
+
+
+**  Manipulate array/vector
+
+~array~ is the sequence arranges in the continuously memory which access more faster than =List=. =String= is also an array. Or you can say: ~array/vector~ is just like a fixed size ~list~, as you can't add to or remove from it!!!
+
+#+BEGIN_SRC emacs-lisp
+  ;;;
+  ;; Create vector in a different way:
+  ;; - (make-vector LENGTH INIT)
+  ;; - (vector a b etc)
+  ;; - [a b etc]
+  ;;
+  (setq-local arr_1 (make-vector 3 255))
+  (setq-local arr_2 (vector 1 2 3))
+  (setq-local arr_3 ["a" "b" "c"])
+
+  ;;
+  ;; Fill array with the given element
+  ;;
+  (fillarray arr_1 88)
+
+  ;;
+  ;; Get length
+  ;;
+  (length arr_3)
+
+  ;;
+  ;; Set element by index: (aset ARRAY IDX NEWELT)
+  ;;
+  (aset arr_3 1 "d")
+
+  ;;
+  ;; Get element by index: (aref ARRAY IDX)
+  ;;
+  (aref arr_3 1)
+#+END_SRC
+
+
+**  Manipulate association lists (aka ~alists~)
+
+~alist~: A ordered list of key val pairs. Keys may repeat. Slow for random access.
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Set a lists with 'symbol -> value' pairs, like a map/Hashmap:
+  ;;
+  ;; ((enable-this-feature . t) (show-in-buffer) (init-height . 20))
+  ;;
+  (setq my-alist '(
+                   (enable-this-feature . t) ;; It means `enable-this-feature = true`
+                   (show-in-buffer . nil)    ;; It means `show-in-buffer = false`
+                   (init-height . 20)        ;; It means `init-height = 20`
+                  )
+  )
+  (message ">>> my-alist type: %s" (type-of my-alist)) ;; >>> my-alist type: cons
+
+  ;;
+  ;; Get value by symbol
+  ;;
+  (alist-get 'enable-this-feature my-alist)      ; t
+  (alist-get 'show-in-buffer my-alist)           ; nil
+  (alist-get 'init-height my-alist)              ; 20
+  (alist-get 'non-exists my-alist)               ; nil (menas doesn't exists)
+
+  ;;
+  ;; Get pair by symbol
+  ;;
+  (assq 'enable-this-feature my-alist)      ; (enable-this-feature . t)
+  (assq 'show-in-buffer my-alist)           ; (show-in-buffer)
+  (assq 'init-height my-alist)              ; (init-height . 20) (assq 'non-exists my-alist)               ; nil (menas doesn't exists)
+
+  ;;
+  ;; Get pair by value
+  ;;
+  (rassq t my-alist)                        ; (enable-this-feature . t)
+  (rassq nil my-alist)                      ; (show-in-buffer)
+  (rassq 20 my-alist)                       ; (init-height . 20)
+  (rassq "non-exists" my-alist)             ; nil (menas doesn't exists)
+
+  ;;
+  ;; Create pair if it doesn't exists
+  ;;
+  (setf (alist-get 'my-name my-alist) "Wison Ye")
+  (alist-get 'my-name my-alist)             ; "Wison Ye"
+  (assq 'my-name my-alist)                  ; (my-name . "Wison Ye")
+#+END_SRC
+
+
+**  Manipulate property list (aka ~plist~)
+
+~plist~ is another way to represent the 'symbol - value' pair in plain text:
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Set a plist with 'symbol -> value' pairs in single list format
+  ;;
+  ;; (enable-this-feature t show-in-buffer nil init-height 20)
+  ;;
+  (setq my-plist '(
+                   enable-this-feature t
+                   show-in-buffer nil
+                   init-height 20
+                  )
+  )
+  (message ">>> my-plist type: %s" (type-of my-plist)) ;; >>> my-plist type: cons
+
+  ;;
+  ;; Get value by symbol
+  ;;
+  (plist-get my-plist 'enable-this-feature)      ; t
+  (plist-get my-plist 'show-in-buffer)           ; nil
+  (plist-get my-plist 'init-height)              ; 20
+  (plist-get my-plist 'non-exists)               ; nil (menas doesn't exists)
+
+  ;;
+  ;; Set plist value by name
+  ;;
+  (plist-put my-plist 'init-height 88)
+  (plist-get my-plist 'init-height)              ; 88
+#+END_SRC
+
+
+If want to create a ~plist~ by the given variables, you should use ~(list)~ instead of ~'()~:
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-temp-cmd-list (list "aaa" "bbb" "ccc"))
+  ;; ("aaa" "bbb" "ccc")
+
+
+  ;;
+  ;; Pay attention to the 'symbol' (start with a '), this is key to declare this is a 'plist'
+  ;; instead of the normal 'list'!!!
+  ;;
+  (setq my-plist (list
+  					'enable-this-feature t ;; key value pair, key MUST be a symbol!!!
+  					'show-in-buffer nil
+  					'init-height 20
+  					'cmd-list my-temp-cmd-list))
+  ;; (enable-this-feature t show-in-buffer nil init-height 20 cmd-list ("aaa" "bbb" "ccc"))
+
+
+  (plist-get my-plist 'cmd-list)
+  ;; ("aaa" "bbb" "ccc")
+#+END_SRC
+
+
+**  Manipulate hasmap
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; (make-hash-table &rest KEYWORD-ARGS)
+  ;;
+  ;; The :test 'equal is to specify what test to check key match. 3 possible choices are:
+  ;;
+  ;; - 'eql (the default.)
+  ;; - 'eq
+  ;; - 'equal
+  ;;
+  ;; Elisp: Equality Test
+  ;; WARNING: you cannot use 'string-equal'
+  ;;
+  ;; 💡 TIP:
+  ;; For string keys, use `'equal`.
+  ;; For symbol or integer keys, use `'eq`.
+  ;; For floating number keys, use `'eql`.
+  ;;
+
+  ;;
+  ;; Create string key hashmap (pay attention to the ':test' value!!!)
+  ;;
+  (setq string_key_map (make-hash-table :test 'equal))
+  (puthash "a" 111 string_key_map)
+  (puthash "b" 222 string_key_map)
+  (puthash "c" 333 string_key_map)
+  (message
+  	">>> string_key_map length: %d, and c's value: %d"
+  	(hash-table-count string_key_map)
+  	(gethash "c" string_key_map)
+  )
+
+  ;;
+  ;; Create symbol key hashmap (pay attention to the ':test' value!!!)
+  ;;
+  (setq symbol_key_map (make-hash-table :test 'eq))
+  (puthash :a 111 symbol_key_map)
+  (puthash :b 222 symbol_key_map)
+  (puthash :c 333 symbol_key_map)
+  (message
+  	">>> symbol_key_map length: %d, and c's value: %d"
+  	(hash-table-count symbol_key_map)
+  	(gethash :c symbol_key_map)
+  )
+
+  ;;
+  ;; Create integer key hashmap (pay attention to the ':test' value!!!)
+  ;;
+  (setq integer_key_map (make-hash-table :test 'eq))
+  (puthash 11 111 integer_key_map)
+  (puthash 22 222 integer_key_map)
+  (puthash 33 333 integer_key_map)
+  (message
+  	">>> integer_key_map length: %d, and 33's value: %d"
+  	(hash-table-count integer_key_map)
+  	(gethash 33 integer_key_map)
+  )
+
+  ;;
+  ;; Create float key hashmap (pay attention to the ':test' value!!!)
+  ;;
+  (setq float_key_map (make-hash-table :test 'eql))
+  (puthash 11.1 111 float_key_map)
+  (puthash 22.2 222 float_key_map)
+  (puthash 33.3 333 float_key_map)
+  (message
+  	">>> float_key_map length: %d, and 33.3's value: %f"
+  	(hash-table-count float_key_map)
+  	(gethash 33.3 float_key_map)
+  )
+
+
+  ;;
+  ;; Remove from hashmap
+  ;;
+  (remhash 33.3 float_key_map)
+
+
+  ;;
+  ;; Clear hashmap
+  ;;
+  (clrhash float_key_map)
+
+
+  ;;
+  ;; Get all keys
+  ;;
+  (hash-table-keys string_key_map)
+
+  ;;
+  ;; Get all values
+  ;;
+  (hash-table-values string_key_map)
+
+  ;;
+  ;; Walk through hashmap by a lambda function
+  ;;
+  (maphash
+  	(lambda(k v)
+  		(message ">>> [ string_key_map ] - %s:%d" k v)
+  	)
+  	string_key_map
+  )
+#+END_SRC
+
+
+**  Manipuldate buffers
+
+*** Open a give file into buffer
+
+#+BEGIN_SRC emacs-lisp
+  ;; Open the given file into buffer (if not loaded yet) and switch to it
+  (find-file "~/odin/temp-odin/src/main_test.odin")
+
+  ;; Open the given file into buffer (if not loaded yet) but not switch to it
+  (find-file-noselect "~/odin/temp-odin/src/main_test.odin")
+#+END_SRC
+
+
+***  Get back opened buffer list
+
+#+BEGIN_SRC emacs-lisp
+  (buffer-list)
+#+END_SRC
+
+
+***  Get back buffer info: name, filename, size, content
+
+#+BEGIN_SRC emacs-lisp
+  ;; Default to the current buffer if not given
+  (buffer-name)
+  (buffer-file-name)
+  (buffer-size)
+
+  ;;
+  ;; This return all content with text properties
+  ;;
+  (buffer-string)
+
+  ;;
+  ;; This return all content between 'start' and 'end' position WITHOUT text properties (pure text)
+  ;;
+  (buffer-substring-no-properties 1 (buffer-end 1))
+#+END_SRC
+
+
+***  Get back the given buffer instance
+
+#+BEGIN_SRC emacs-lisp
+  (current-buffer)
+
+  ;; Target to the current buffer
+  (buffer-name (current-buffer))
+  (buffer-file-name (current-buffer))
+  (buffer-size (current-buffer))
+
+  ;; Target to the given buffer
+  (get-buffer "*Messages*")
+  (buffer-name (get-buffer "*Messages*"))
+  (buffer-file-name (get-buffer "*Messages*"))
+#+END_SRC
+
+
+***  Create or get back a given buffer
+
+#+BEGIN_SRC emacs-lisp
+  (get-buffer-create "*Weather*")
+#+END_SRC
+
+
+***  Do someting in =current-buffer=
+
+- Create or get back a given buffer as =current-buffer=
+- Erase original content and write something there
+- Enable =org-mode=
+- Bind ~n~ to close the buffer and kill the window
+
+#+BEGIN_SRC emacs-lisp
+  (with-current-buffer (get-buffer-create "*Weather*")
+      (erase-buffer)
+      (insert "* Today is sunny day:)\n")
+      (insert (current-time-string))
+      (org-mode)
+      (define-key evil-normal-state-local-map (kbd "n") 'kill-buffer-and-window)
+  )
+#+END_SRC
+
+
+***  Open buffer with the following conditions
+
+- Must show in same window
+- Must show in bottom position
+- Must only have the minimal height to show the content
+
+#+BEGIN_SRC emacs-lisp
+  (setq buffer-to-show "*Weather*")
+
+  ;;
+  ;; Signature
+  ;; (pop-to-buffer BUFFER-OR-NAME &optional ACTION NORECORD)
+  ;;
+  ;; The optional ACTION argument is passed to display-buffer as its ACTION argument.
+  ;;
+  (pop-to-buffer
+  	buffer-to-show
+
+  	;;
+  	;; Signature
+  	;; (display-buffer BUFFER-OR-NAME &optional ACTION FRAME)
+  	;;
+  	;; Optional argument ACTION, if non-nil, should specify a buffer display action
+  	;; of the form (FUNCTIONS . ALIST).  FUNCTIONS is either an "action function" or
+  	;; a possibly empty list of action functions.  ALIST is a possibly empty
+  	;; "action alist".
+  	;;
+  	'(
+  		(display-buffer-at-bottom)
+  		(inhibit-same-window . t)
+  		(window-height . fit-window-to-buffer)
+  	)
+  )
+#+END_SRC
+
+
+***  Emacs related
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Get back Emacs start time duration
+  ;;
+  (emacs-init-time)
+
+  ;;
+  ;; Restart Emacs
+  ;;
+  (restart-emacs)
+#+END_SRC
+
+
+
+
+*  How to
+
+** How to get current related values
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Time related
+  ;;
+  (current-time)
+  (current-time-string)
+  (current-time-zone)
+  (format-time-string "%s")					;; Current time in seconds since 1970
+  (format-time-string "%H:%M:%S")				;; Current time
+  (format-time-string "%Y-%m-%d")				;; Current date
+  (format-time-string "%Y-%m-%d %H:%M:%S")	;; Current date and time
+
+  ;;
+  ;; Buffer related
+  ;;
+  (current-buffer)
+  (current-column)
+  (line-number-at-pos)
+
+  ;;
+  ;; Misc
+  ;;
+  (current-thread)
+  (current-cpu-time)
+  (current-message)
+#+END_SRC
+
+
+** How to move cursor in buffer, save cursor and jump back later
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; 'point' (cursor location)
+  ;;
+  (point)				;; Location of current buffer
+  (point-min)			;; The start location of current buffer ('1')
+  (point-max)			;; The last location of current buffer, use to append to the end of the buffer
+
+  ;;
+  ;; Move 'point' (cursor location)
+  ;;
+  (goto-char (point-min))		;; Move to the start of buffer
+  (beginning-of-buffer)		;; Move to the start of buffer
+
+  (goto-char (point-max))		;; Move to the end of buffer
+  (end-of-buffer)				;; Move to the end of buffer
+
+  ;;
+  ;; Move by 'char'
+  ;;
+  (forward-char 1)
+  (forward-char 5)
+  (backward-char 1)
+  (backward-char 5)
+
+  ;;
+  ;; Move by 'char'
+  ;;
+  (forward-word)
+  (backward-word)
+
+  ;;
+  ;; Save current 'point' and do something, then jump back to the saved 'point'
+  ;; 
+  ;; '(save-excursion &rest BODY)'
+  ;;
+  (save-excursion
+  	;;
+  	;; Save the current 'point' and jump to start of the buffer
+  	;;
+  	(beginning-of-buffer)
+
+  	;; Copy paragraph
+  	(kill-paragraph -1)
+
+  	;;
+  	;; Switch to 'scratch' buffer
+  	;;
+  	(with-current-buffer (get-buffer "*scratch*")
+  		;; Go to the end of the buffer
+  		(goto-char (point-max))
+
+  		;; Insert some text
+  		(insert "This is the appended text:)")
+
+  		;; Paste the copied paragraph
+  		(evil-paste-after 1)
+  	)
+
+  	;;
+  	;; Restore the saved point when exiting the 'save-excursion' function call scope)
+  	;;
+  )
+#+END_SRC
+
+
+** How to get thing under cursor location
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Current word at point
+  ;;
+  (current-word)
+
+  ;;
+  ;; Get back the 'symbol' at point (include '-'), e.g.: function name 
+  ;; The last param 't' means get back ONLY text (without text properties!!!)
+  ;;
+  (thing-at-point 'symbol t)	;; Current word  at point
+  (thing-at-point 'word t)
+  (thing-at-point 'line t)
+  (thing-at-point 'sentence t)
+  (thing-at-point 'filename t)
+  (thing-at-point 'url t)
+  (thing-at-point 'email t)
+#+END_SRC
+
+
+** How to jump back and forth between different file positions
+
+You can use the built-in =xref= package to achieve that:
+
+- Call ~(xref-push-marker-stack)~ to push the position into the global marker stack before you jump
+
+- Call ~(xref-go-back)~ to pop the the last position from global marker stack
+
+- By default, the length of global marker stack controls by ~xref-marker-ring-length~ (default value is ~16~), you can increase it when needed.
+
+This is how =LSP= (=go to definition= and =C-t=) works under the hood.
+
+
+** How to do different things based on what OS you're on
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; You can check the 'system-type' var, it supports the following values:
+  ;;
+  ;; gnu          compiled for a GNU Hurd system.
+  ;; gnu/linux    compiled for a GNU/Linux system.
+  ;; gnu/kfreebsd compiled for a GNU system with a FreeBSD kernel.
+  ;; darwin       compiled for Darwin (GNU-Darwin, macOS, ...).
+  ;; ms-dos       compiled as an MS-DOS application.
+  ;; windows-nt   compiled as a native W32 application.
+  ;; cygwin       compiled using the Cygwin library.
+  ;; haiku        compiled for a Haiku system.
+  ;; android      compiled for Android.
+  ;;
+  ;; The value type is 'symbol'!!!
+  ;;
+  (if (eql 'darwin system-type)
+  	(message ">>> You're on MacOS"))
+
+  ;;
+  ;; You can use 'string-equal' on its value as well
+  ;;
+  (if (string-equal "darwin" system-type)
+  	(message ">>> You're on MacOS"))
+
+  ;;
+  ;; Or you can do in 'if elseif elseif else' form:
+  ;;
+  (cond
+  	((eql 'gun/linux system-type)
+  		(setq os-name "Linux")
+  		(message ">>> os-name: %s" os-name))
+  	((eql 'gnu/kfreebsd system-type)
+  		(setq os-name "FreeBSD")
+  		(message ">>> os-name: %s" os-name))
+  	((eql 'darwin system-type)
+  		(setq os-name "MacOS")
+  		(message ">>> os-name: %s" os-name))
+  )
+#+END_SRC
+
+
+** How to run extenal process in asynchronously
+
+#+BEGIN_SRC emacs-lisp
+  ;;
+  ;; Enable flag
+  ;;
+  (setq my-enable-process-debug t)
+
+  ;;
+  ;; This is the ':sentinel' function that will be passed into 'make-process'.
+  ;;
+  ;; A “process sentinel” is a function that is called whenever the associated process changes status
+  ;; for any reason, including signals (whether sent by Emacs or caused by the process's own actions)
+  ;; that terminate, stop, or continue the process.
+  ;;
+  ;; The process sentinel is also called if the process exits. The sentinel receives two arguments:
+  ;; - Process itself
+  ;; - A string describing the type of event.
+  ;;
+  ;; The string describing the event looks like one of the following (but this is
+  ;; not an exhaustive list of event strings):
+  ;;
+  ;; • ‘"finished\n"’.
+  ;;
+  ;; • ‘"deleted\n"’.
+  ;;
+  ;; • ‘"exited abnormally with code EXITCODE (core dumped)\n"’.  The
+  ;;   "core dumped" part is optional, and only appears if the process
+  ;;   dumped core.
+  ;;
+  ;; • ‘"failed with code FAIL-CODE\n"’.
+  ;;
+  ;; • ‘"SIGNAL-DESCRIPTION (core dumped)\n"’.  The SIGNAL-DESCRIPTION is
+  ;;   a system-dependent textual description of a signal, e.g.,
+  ;;   ‘"killed"’ for ‘SIGKILL’.  The "core dumped" part is optional, and
+  ;;   only appears if the process dumped core.
+  ;;
+  ;; • ‘"open from HOST-NAME\n"’.
+  ;;
+  ;; • ‘"open\n"’.
+  ;;
+  ;; • ‘"run\n"’.
+  ;;
+  ;; • ‘"connection broken by remote peer\n"’.
+  ;;
+  (defun my-run-rg-sentinel (self event)
+  	(let (
+  			(callback (process-get self 'callback))
+  			(self-buffer (process-buffer self))
+  		)
+
+  		(if my-enable-process-debug
+  			(progn
+  				;; (message ">>> process type: %s, value: %s" (type-of self) self)
+  				(message
+  					">>> [ my-run-rg-sentinel ] - process-event: %s, has callback: %s"
+  					event
+  					(if callback "Yes" "No")
+  				)
+  			)
+  		)
+
+  		;;
+  		;; Succeed case
+  		;;
+  		(when (string= event "finished\n")
+  			(with-current-buffer self-buffer
+  				(if callback (funcall callback t (buffer-string)))
+  			)
+  		)
+
+  		;;
+  		;; Error case
+  		;;
+  		(when (or (string-match-p "exited" event) (string-match-p "failed" event))
+  			(with-current-buffer self-buffer
+  				(if callback (funcall callback nil (buffer-string)))
+  			)
+  		)
+
+  		;;
+  		;; Make sure to clean up the temporary process buffer
+  		;;
+  		(when (or (string= event "finished\n") (string-match-p "exited" event))
+  			(if my-enable-process-debug
+  				(progn
+  					(message ">>> [ run-rg ] - kill temp process buffer: %s" self-buffer)
+  				)
+  			)
+  			(kill-buffer self-buffer)
+  		)
+  	)
+  )
+
+  ;;
+  ;; 
+  ;;
+  (defun my-rg-search (directory search-regex callback)
+      "Doc"
+  	(let* (
+  			(process-self)
+  			(process-name (concat "rg-search-" (format-time-string "%s")))
+  			(process-buffer-name (concat "*-" process-name "-*"))
+  		)
+
+  		(if my-enable-process-debug
+  			(progn
+  				(message (concat
+  							">>> [ my-rg-search ] - {"
+  							"\n\tdirectory: %s"
+  							"\n\tsearch-regex: %s"
+  							"\n\tprocess-buffer-name: %s"
+  							"\n}"
+  					)
+  					directory
+  					search-regex
+  					process-buffer-name
+  				)
+  			)
+  		)
+
+  		(condition-case err
+  			(progn
+  				(setq
+  					process-self
+  					(make-process
+  						;;
+  						;; Unique process name 'rg-search-CURRENT_TIME_IN_SECONDS'
+  						;;
+  						:name process-name
+
+  						;;
+  						;; 'nil' means that this process is not associated with any buffer.
+  						;; can be a 'Buffer' or a buffer name string
+  						;;
+  						:buffer process-buffer-name
+
+  						;;
+  						;; Command list: (program-file-name args)
+  						;;
+  						:command (list
+  									"rg88"
+  									"--line-number"
+  									"--line-buffered"
+  									"--no-heading"
+  									search-regex
+  									directory
+  								)
+
+  						;;
+  						;; A process “filter function” is a function that receives the standard output
+  						;; from the associated process. 'All' output from that process is passed to the
+  						;; filter. The default filter simply outputs directly to the process buffer.
+  						;;
+  						;; By default, the error output from the process, if any, is also passed to the
+  						;; filter function, unless the destination for the standard error stream of the
+  						;; process was separated from the standard output when the process was created.
+  						;;
+  						;; Emacs will only call the filter function during certain function calls. 
+  						;;
+  						;; :filter (lambda (process output)
+  						;; 			(message ">>> process '%s' output: %s" process output)
+  						;; 		)
+  						;;
+  						:sentinel #'my-run-rg-sentinel))
+  				;;
+  				;; Put the 'callack' into 'process-ref' properties, otherwise, you can't access
+  				;; 'callback';; in the ':sentinel' function, as they're runing different process
+  				;; instances!!!
+  				;;
+  				(process-put process-self 'callback callback)
+  				;; (message ">>> [ rg- run ] - process-self: %s" process-self)
+  			)
+
+  			(file-missing
+  				(if my-enable-process-debug
+  					(progn
+  						(message ">>> [ my-rg-search ] - error: %s" err)
+  					)
+  				)
+  				(if callback (funcall callback nil err))
+  			)
+  			(error
+  				(if my-enable-process-debug
+  					(progn
+  						(message ">>> [ my-rg-search ] - catch everthing: %s" err)
+  					)
+  				)
+  				(if callback (funcall callback nil err))
+  			)
+  		)
+  	)
+  )
+
+  ;;
+  ;; Call it with specific callback
+  ;;
+  (my-rg-search
+  	(getenv "ODIN_ROOT")
+  	"^make_slice\\ ::\ "
+  	(lambda (success output)
+  		(if success
+  			(progn
+  				(message ">>> Got 'my-rg-search' result - Succeed, output:\n%s" output)
+  			)
+  			(progn
+  				(message ">>> Got 'my-rg-search' result - Failed, error: %s" output)
+  			)
+  		)
+  	)
+  )
+#+END_SRC
+
+
+** How to run extenal process synchronously
+
+If you want the external process to run synchronously, you should do the following:
+
+- Wait for it to finish in a while loop
+- Check the process is still alive or not by calling ~process-live-p~ function
+- If it's still alive, call ~accept-process-output~ with a small timeout to let it to run
+- Finally, check the process return state and handle the output by accessing the process' buffer
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-rg-search-sync (directory search-regex)
+  	"Run 'rg' with 'search-regex' on 'directory' in a separate process synchronously. This function
+  returns a list containing two elements in the following difference cases:
+
+  - If 'rg' runs successfully, the first element is the 'success symbol and the second element is the
+  process stdout string.
+
+  - If 'rg' runs but fails with error, the first element is the 'fail symbol and the second element is
+  the process stdout string (as error).
+
+  - If 'rg' fails to run, the first element is the 'error symbol and the second element is the error
+  message string.
+  "
+  	(let* (
+  			(process-self)
+  			(process-name (concat "rg-search-" (format-time-string "%s")))
+  			(process-buffer-name (concat "*-" process-name "-*"))
+  			(process-exit-code)
+  			(stdout)
+  		)
+
+  		(if my-enable-process-debug
+  			(progn
+  				(message (concat
+  							">>> [ my-rg-search-sync ] - {"
+  							"\n\tdirectory: %s"
+  							"\n\tsearch-regex: %s"
+  							"\n\tprocess-buffer-name: %s"
+  							"\n}"
+  					)
+  					directory
+  					search-regex
+  					process-buffer-name))
+  		)
+
+  		(condition-case err
+  			(progn
+  				(setq
+  					process-self
+  					(make-process
+  						;;
+  						;; Unique process name 'rg-search-CURRENT_TIME_IN_SECONDS'
+  						;;
+  						:name process-name
+
+  						;;
+  						;; 'nil' means that this process is not associated with any buffer.
+  						;; can be a 'Buffer' or a buffer name string
+  						;;
+  						:buffer process-buffer-name
+
+  						;;
+  						;; Command list: (program-file-name args)
+  						;;
+  						:command (list
+  									"rg"
+  									"--line-number"
+  									"--line-buffered"
+  									"--no-heading"
+  									"--with-filename"
+  									"--color=never"
+  									"--path-separator=/"
+  									"--smart-case"
+  									search-regex
+  									directory
+  								)
+
+  						;;
+  						;; Use this 'sentinel' setting to avoid adding the 'Process xxx yyy' final
+  						;; to the process's buffer!!!
+  						;;
+  						:sentinel #'ignore
+  					))
+
+  				;;
+  				;; Wait for it to finish
+  				;;
+  				(while (process-live-p process-self)
+  					(accept-process-output process-self 0.05))
+
+  				;;
+  				;; Check exit code
+  				;;
+  				(setq process-exit-code (process-exit-status process-self))
+  				(if my-enable-process-debug
+  					(message ">>> [ my-rg-search-sync ] - process-exit-code: %s" process-exit-code))
+
+  				;;
+  				;; Return different results based on the 'exit' code
+  				;;
+  				(cond
+  					((equal process-exit-code 0)
+  						(with-current-buffer (process-buffer process-self)
+  							(setq stdout (buffer-string)))
+  						;;
+  						;; It's very important to kill the process' buffer, otherwise, it has a chance
+  						;; to overlap the previous buffer's content!!!
+  						;;
+  						(kill-buffer (process-buffer process-self))
+  						;; Return the list
+  						(list 'success stdout))
+  					(t
+  						(with-current-buffer (process-buffer process-self)
+  							(setq stdout (buffer-string)))
+  						;;
+  						;; It's very important to kill the process' buffer, otherwise, it has a chance
+  						;; to overlap the previous buffer's content!!!
+  						;;
+  						(kill-buffer (process-buffer process-self))
+  						;; Return the list
+  						(list 'fail stdout))
+  				)
+  			)
+
+  			(file-missing
+  				(if my-enable-process-debug
+  					(message ">>> [ my-rg-search-sync ] - error: %s" err))
+  				;; return the list
+  				(list 'error err)
+  			)
+  			(error
+  				(if my-enable-process-debug
+  					(message ">>> [ my-rg-search-sync ] - catch everthing: %s" err))
+  				;; return the list
+  				(list 'error err)
+  			)
+  		)
+  	)
+  )
+
+  ;;
+  ;; Test it
+  ;;
+  (setq-local search-result (my-rg-search-sync
+  	;; (expand-file-name "./odin/temp-odin" (getenv "HOME"))
+  	;; (expand-file-name "./odin/odin-utils" (getenv "HOME"))
+  	(getenv "ODIN_ROOT")
+  	"^Event ::\ "
+  ))
+  (if (and (string= (type-of search-result) "cons") (equal (length search-result) 2))
+  	(let (
+  			 (result-type (car search-result))
+  			 (output (car (cdr search-result)))
+  		)
+  		(cond
+  			((eq result-type 'success)
+  				(message
+  					">>> search-result: Succeed, output: \n%s" output))
+  			((eq result-type 'fail)
+  				(message
+  					">>> search-result: Failed, output: \n%s" output))
+  			((eq result-type 'error)
+  				(message
+  					">>> search-result: Error, output: \n%s" output)))
+  	)
+  )
+#+END_SRC

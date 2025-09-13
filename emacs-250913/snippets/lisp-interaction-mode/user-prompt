@@ -1,0 +1,60 @@
+# -*- mode: snippet -*-
+# name: user-prompt
+# key: prompt
+# --
+;;
+;; Show a prompt to let user choose from a list
+;;
+(setq ${1:SELECTED_ITEM} (completing-read
+	;;
+	;; The prompt
+	;;
+	"${2:PROMPT_TITLE}"								
+
+	;;
+	;; List: can be either
+	;;
+	;; - A 'list' instance, e.g: (list "./configure.sh" "./run.sh" "./run-test.sh")
+	;; - A 'list' variable name, e.g: cmd-list
+	;; - A 'function': the function is solely responsible for performing completion; 'completion-read'
+	;;                 returns whatever this function returns. The function is called with three
+	;;                 arguments: 'string predicate nil'
+	;;
+	;;				   You can read more from 'Programmed completion':
+	;;				   https://www.gnu.org/software/emacs/manual/html_node/elisp/Programmed-Completion.html
+	;; 
+	${3:ITEM_LIST}
+
+	;;
+	;; 'PREDICATE' function (not provided)
+	;;
+	nil
+
+	;;
+	;; 'REQUIRE-MATCH': input must match in the 'List'
+	;;
+	;; - t means that the user is not allowed to exit unless the input is (or
+	;;   completes to) an element of COLLECTION or is null.
+	;;
+	;; - nil means that the user can exit with any input.
+	;;
+	;; - confirm means that the user can exit with any input, but she needs
+	;;   to confirm her choice if the input is not an element of COLLECTION.
+	;;
+	'confirm
+
+	;;
+	;; 'INIT-INPUT': simulate you type in the input area
+	;;
+	nil
+
+	;;
+	;; 'HIST': History list (not provided)
+	;;
+	nil
+
+	;;
+	;; 'DEF': Default value, put it to the top position!!!
+	;;
+	"${4:DEFAULT_VALUE}"
+))

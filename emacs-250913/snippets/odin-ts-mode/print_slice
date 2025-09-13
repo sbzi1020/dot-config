@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: print_slice
+# key: ps
+# --
+print_slice:: proc(slice_ptr: ^[]\$T, var_name_and_prefix: string) {
+    fmt.printf(
+        "\n>>> %s type: %v, len: %v, value: %#v\n",
+        var_name_and_prefix,
+        typeid_of(type_of(slice_ptr)),
+        len(slice_ptr),
+        slice_ptr^
+    )
+}

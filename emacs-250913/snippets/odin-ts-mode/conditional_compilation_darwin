@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: conditional-compilation-darwin
+# key: conditional-compilation-darwin
+# --
+when ODIN_OS == .Darwin {
+    $0
+}

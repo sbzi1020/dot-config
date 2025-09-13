@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: shell-interpreter
+# key: shell-interpreter
+# --
+#!/usr/bin/env -S run-odin.sh $0 [--static-build] [--release-build] [--disable-script-print] [--enable-util-logger] [--enable-util-ucp-frame-logger] [--link-sqlite] [--link-libuv]

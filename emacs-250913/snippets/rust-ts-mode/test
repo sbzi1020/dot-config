@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: unit test
+# key: test
+# --
+#[cfg(test)]
+mod tests {
+    // Note this useful idiom: importing names from outer (for mod tests) scope.
+    use super::*;
+
+    #[test]
+    fn $1() {
+        // assert_eq!(add(1, 2), 3);
+	$0
+    }
+}

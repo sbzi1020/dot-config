@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: for-oneline
+# key: for-oneline
+# --
+for ${1: index} := 0; ${1} < ${2: len}; ${1} +=1 do $0

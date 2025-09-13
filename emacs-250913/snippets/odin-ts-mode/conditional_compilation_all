@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: conditional-compilation-all
+# key: conditional-compilation-all
+# --
+when ODIN_OS == .Darwin {
+    $0
+}
+else when ODIN_OS == .Linux  {
+
+}
+else when ODIN_OS == .FreeBSD  {
+
+}

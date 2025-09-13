@@ -1,0 +1,32 @@
+# -*- mode: snippet -*-
+# name: tracking-allocator
+# key: tracking-allocator
+# --
+//
+// Only enable the `mem.Tracking_Allocator` in debug mode `-debug`.
+//
+when ODIN_DEBUG {
+    fmt.printf("\n>>> Tracking Allocator is activated!!!");
+
+    track: mem.Tracking_Allocator
+    mem.tracking_allocator_init(&track, context.allocator)
+    context.allocator = mem.tracking_allocator(&track)
+
+    defer {
+        if len(track.allocation_map) > 0 {
+            fmt.eprintf( "\n\n>>> === %v allocations not freed: ===\n", len(track.allocation_map))
+            for _, entry in track.allocation_map {
+                fmt.eprintf(">>> %v bytes leaked at: %v\n", entry.size, entry.location)
+            }
+        }
+
+        if len(track.bad_free_array) > 0 {
+            fmt.eprintf("\n>>> === %v incorrect frees: ===\n", len(track.bad_free_array))
+            for entry in track.bad_free_array {
+                fmt.eprintf(">>> %p double-freed at: %v\n", entry.memory, entry.location)
+            }
+        }
+
+        mem.tracking_allocator_destroy(&track)
+    }
+}

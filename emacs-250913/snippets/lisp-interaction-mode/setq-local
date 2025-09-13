@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: setq-local
+# key: setql
+# --
+(setq-local ${1:VAR} $0)

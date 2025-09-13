@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: u8_array
+# key: ua
+# --
+[_]u8$0

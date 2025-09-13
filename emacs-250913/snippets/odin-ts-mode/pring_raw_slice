@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: print_raw_slice
+# key: prs
+# --
+print_raw_slice:: proc(slice_ptr: ^[]\$T, var_name_and_prefix: string) {
+    raw_slice_ptr := cast(^runtime.Raw_Slice)slice_ptr
+    fmt.printf(
+        "\n>>> %s\n\ttype: %v\n\tstruct instance: %v\n\tslice data: %#v\n",
+        var_name_and_prefix,
+        typeid_of(type_of(raw_slice_ptr)),
+        raw_slice_ptr^,
+        slice_ptr^
+    )
+}

@@ -1,0 +1,40 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("GoLang Spec"
+    (front-context-string . "\nFunction declar")
+    (rear-context-string . "ary variables. \n")
+    (position . 76131)
+    (last-modified 26788 17030 207491 0)
+    (location . "https://go.dev/ref/spec")
+    (handler . eww-bookmark-jump))
+("Go doc"
+    (front-context-string . "Learn \n Press En")
+    (rear-context-string . "e by default\n\n* ")
+    (position . 281)
+    (last-modified 26788 16626 375607 0)
+    (location . "https://go.dev/doc/")
+    (handler . eww-bookmark-jump))
+("Hare doc"
+    (front-context-string . "An introduction ")
+    (rear-context-string)
+    (position . 1)
+    (last-modified 26788 16008 873904 0)
+    (location . "https://harelang.org/tutorials/introduction/")
+    (handler . eww-bookmark-jump))
+("Zig doc"
+    (front-context-string . "* Introduction\n*")
+    (rear-context-string . "le of Contents\n\n")
+    (position . 183)
+    (last-modified 26788 15596 62503 0)
+    (location . "https://ziglang.org/documentation/master/")
+    (handler . eww-bookmark-jump))
+("Odin overview"
+    (front-context-string . "\nThis article is")
+    (rear-context-string)
+    (position . 16)
+    (last-modified 26788 15173 724117 0)
+    (location . "https://odin-lang.org/docs/overview/#introduction")
+    (handler . eww-bookmark-jump))
+)

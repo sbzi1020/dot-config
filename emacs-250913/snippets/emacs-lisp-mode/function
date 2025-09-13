@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: function
+# key: func
+# --
+(defun ${1:FUNCTION_NAME} (${2:PARAMETER})
+    "Doc"
+    $0
+)

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: small-array
+# key: sa
+# --
+sa.Small_Array(${1: size}, ${2: type})

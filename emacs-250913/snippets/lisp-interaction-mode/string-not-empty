@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: string-not-empty
+# key: string-not-empty
+# --
+(not (string-empty-p $0))

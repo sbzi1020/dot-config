@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: match
+# key: match
+# --
+match ($1) {
+       case $0 =>;
+       case let err: errors::error => fmt::printfln(">>> error: {}", errors::strerror(err))!;
+};

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: void pointer
+# key: vp
+# --
+nullable *opaque

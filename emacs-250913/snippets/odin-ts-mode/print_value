@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: print_value
+# key: pv
+# --
+fmt.printf(
+    "\n>>> ${1: variable} type: %v, value: %#v\n",
+    typeid_of(type_of(${1})),
+    $1
+)

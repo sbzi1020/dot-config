@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: conditional-compilation-linux
+# key: conditional-compilation-linux
+# --
+when ODIN_OS == .Linux {
+    $0
+}

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: string-empty
+# key: string-empty
+# --
+(string-empty-p $0)

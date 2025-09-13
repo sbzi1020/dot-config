@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: for-range-base-<
+# key: for-range-base-<
+# --
+for ${1: index} in 0..<${2: len} {
+    $0
+}

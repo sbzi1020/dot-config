@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: string_array
+# key: sss
+# --
+[_][]const u8$0

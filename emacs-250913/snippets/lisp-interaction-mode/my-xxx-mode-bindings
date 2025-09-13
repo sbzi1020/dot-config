@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: my-xxx-mode-bindings
+# key: mb
+# --
+;;
+;; My 'MODE_NAME-mode' bindings
+;;
+(defun my-MODE_NAME-mode-bindings (map)
+    (keymap-set map "C-j" 'COMMAND_NAME)
+)

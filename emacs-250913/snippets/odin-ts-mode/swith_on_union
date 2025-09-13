@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: switch-in-union
+# key: switch-in-union
+# --
+switch ${1:var} in ${2:union} {
+	case $0:
+	case nil:
+}

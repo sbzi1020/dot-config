@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: arena-stack-allocator
+# key: arena-stack-allocator
+# --
+//
+// Create `Arena` that backs by the stack buffer
+//
+backing_buffer: [${1: stack buffer size}]u8
+arena: virtual.Arena
+arena_create_err := virtual.arena_init_buffer(&arena, backing_buffer[:])
+if arena_create_err != nil {
+    logger.fatal_log(
+        LOGGER_PREFIX,
+        \"Failed to create arena, error: %#v\",
+        arena_create_err
+    )
+}
+defer virtual.arena_destroy(&arena)
+allocator := virtual.arena_allocator(&arena)
+$0

@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: conditional-logger-print
+# key: conditional-logger-print
+# --
+when logger.ENABLE_DEBUG_LOG {
+    //logger.debug_log(
+    //    "TcpUtils",
+    //    "client_socket_fd: %v, accept_err: %v",
+    //    client_socket_fd,
+    //    accept_err
+    //)
+}

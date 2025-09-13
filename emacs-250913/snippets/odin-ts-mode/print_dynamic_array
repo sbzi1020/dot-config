@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: print_dynamic_array
+# key: pda
+# --
+print_dynamic_arr :: proc(arr_ptr: ^[dynamic]\$T, var_name_and_prefix: string) {
+    fmt.printf(
+        "\n>>> %s type: %v, capacity: %v, len: %v, value: %#v\n",
+        var_name_and_prefix,
+        typeid_of(type_of(arr_ptr)),
+        cap(arr_ptr),
+        len(arr_ptr),
+        arr_ptr^
+	)
+}
