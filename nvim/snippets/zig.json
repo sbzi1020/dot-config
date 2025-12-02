@@ -6,19 +6,19 @@
         ]
     },
     "declareBuffer": {
-        "prefix": "buffer",
+        "prefix": "buf",
         "body": [
             "var $1: [$0]u8 = undefined;"
         ]
     },
     "declareBufferAndInit": {
-        "prefix": "buffer2",
+        "prefix": "buf2",
         "body": [
             "var $1 = [_]u8 {0x00} ** $0;"
         ]
     },
     "bufPrint": {
-        "prefix": "bufPrint",
+        "prefix": "bp",
         "body": [
             "std.fmt.bufPrint(&$1, \"$2\", .{$0}) catch \"\";"
         ]
@@ -70,8 +70,8 @@
             "const allocator = arena.allocator();"
         ]
     },
-    "GPA": {
-        "prefix": "globalPurposeAllocator",
+    "globalPurposeAllocator": {
+        "prefix": "gpa",
         "body": [
             "var gpa = std.heap.GeneralPurposeAllocator(.{}){};",
             "const allocator = gpa.allocator();",
@@ -95,7 +95,7 @@
             "    fn $1(who: []const u8) void {",
             "        $0",
             "    }",
-            "}.$1"
+            "}.$1()"
         ]
     },
     "ArrayList": {
@@ -110,6 +110,58 @@
         "body": [
             "var $1 = std.StringHashMap($0).init(allocator);",
             "defer $1.deinit();"
+        ]
+    },
+    "u8_array": {
+        "prefix": "ua",
+        "body": [
+            "[_]u8$0"
+        ]
+    },
+    "string": {
+        "prefix": "ss",
+        "body": [
+            "[]const u8$0"
+        ]
+    },
+    "string_array": {
+        "prefix": "sss",
+        "body": [
+            "[_][]const u8$0"
+        ]
+    },
+    "print_memory": {
+        "prefix": "pm",
+        "body": [
+            "fn print_mem(value: anytype) void {",
+            "    const temp_type = @TypeOf(value);",
+            "    const byte_size = @sizeOf(temp_type);",
+            "    const align_size = @alignOf(temp_type);",
+            "    const ptr: [*]const u8 = @ptrCast(&value);",
+            "",
+            "    print(\"\\n>>> [ print_mem ]: {{\\n\\tvalue type: {},\\n\\tnatural_alignment size (in bytes): {},\\n\\tbyte size: {}\\n\\tpointer type: {}\", .{",
+            "        temp_type,",
+            "        align_size,",
+            "        byte_size,",
+            "        @TypeOf(ptr),",
+            "    });",
+            "",
+            "    const buf_len = byte_size * 2 + byte_size / align_size;",
+            "    var buf = [1:0]u8{0x00} ** buf_len;",
+            "    // print(\"\\n>>> [ print_mem ] - buf_len: {}\", .{buf_len});",
+            "",
+            "    var i: usize = 0;",
+            "    while (i < byte_size) {",
+            "        _ = std.fmt.bufPrint(buf[i * 2 ..], \"{X:0>2}\", .{ptr[i]}) catch \"\";",
+            "        i += 1;",
+            "",
+            "        if (i == align_size * 2 - 1) {",
+            "            // ...",
+            "            // i += 1;",
+            "        }",
+            "    }",
+            "    print(\"\\n\\tbuf: 0x{s}\\n}}\\n\", .{buf});",
+            "}"
         ]
     }
 }
