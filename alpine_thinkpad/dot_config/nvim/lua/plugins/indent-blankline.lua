@@ -1,7 +1,7 @@
 return {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
-    ft = {"c", "lua", "hare", "zig", "fish", "sh"},
+    ft = {"c", "lua", "hare", "zig", "fish", "sh", "python", "ts", "js", "tsx", "typescriptreact"},
     config = function()
 
         local highlight = {

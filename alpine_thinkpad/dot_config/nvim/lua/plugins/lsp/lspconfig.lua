@@ -24,7 +24,9 @@ return {
     -- https://github.com/neovim/nvim-lspconfig
     --
     config = function()
-        -- print(">>> nvim-lspconfig module loaded")
+
+        if vim.g.enable_vim_debug then print ">>> nvim-lspconfig module loaded" end
+
         local lspconfig = require('lspconfig')
         local mason_lspconfig = require("mason-lspconfig")
         local cmp_nvim_lsp = require('cmp_nvim_lsp')
@@ -344,42 +346,17 @@ return {
 
         mason_lspconfig.setup_handlers(lsp_handlers)
 
-        --
-        -- Because of some LSP servers are not available via `:Mason` installation,
-        -- for that case, you need to install those LSP server via `pkg` and activate
-        -- then manually!!!
-        --
-        if (vim.uv.os_uname().sysname == "FreeBSD") then
-            require('lspconfig').clangd.setup({
-                capabilities = capabilities,
-            })
+        -- Rust LSP config
+        local rust_lsp_config = {
+            cmd = { "/home/fion/.cargo/bin/rust-analyzer" },
+            filetypes = { 'rust' },
+        }
+        -- print("\n>>> rust_lsp_config: " .. vim.inspect(rust_lsp_config))
 
-            require('lspconfig').zls.setup({
-                capabilities = capabilities,
-            })
-
-            require('lspconfig').lua_ls.setup({
-                capabilities = capabilities,
-                settings = {
-                    Lua = {
-                        diagnostics = {
-                            globals = { "vim" }
-                        }
-                    }
-                }
-            })
-        elseif (string.find(vim.uv.os_uname().version, "Alpine") ~= nil) then
-            require('lspconfig').clangd.setup({
-                capabilities = capabilities,
-            })
-            require('lspconfig').denols.setup({
-                capabilities = capabilities,
-                root_dir = lspconfig.util.root_pattern('deno.json', 'deno.jsonc', '.git'),
-                init_options = {
-                    lint = true,
-                },
-            })
+        if (string.find(vim.uv.os_uname().version, "Darwin") ~= nil) then
+            rust_lsp_config.cmd = { "/Users/fion/.cargo/bin/rust-analyzer" }
         end
-
+        vim.lsp.config("rust-analyzer", rust_lsp_config)
+        vim.lsp.enable("rust-analyzer")
     end
 }

@@ -28,56 +28,43 @@ return {
         -- doas pacman --sync --refresh unzip icu npm
         --
         --]]
-        local setup_opts = {}
-        if (vim.uv.os_uname().sysname == "FreeBSD") then
-            setup_opts = {
-                --
-                -- The following LSP servers can't be installed via `Mason`:
-                -- clangd, lua_ls, zls
-                --
-                ensure_installed = {
-                    "bashls",
-                    "tsserver",
-                    "tailwindcss",
-                    "cssls",
-                    "html",
-                    "pyright",
-                },
-            }
-        elseif (string.find(vim.uv.os_uname().version, "Alpine") ~= nil) then
-            setup_opts = {
-                --
-                -- The following LSP servers can't be installed via `Mason`:
-                -- clangd, denols
-                --
-                ensure_installed = {
-                    "lua_ls",
-                    "bashls",
-                    "tsserver",
-                    "tailwindcss",
-                    "cssls",
-                    "html",
-                    "pyright",
-                    "zls",
-                },
-            }
-        else
-            setup_opts = {
-                ensure_installed = {
-                    "lua_ls",
-                    "bashls",
-                    "tsserver",
-                    "denols",
-                    "tailwindcss",
-                    "cssls",
-                    "html",
-                    "pyright",
-                    "clangd",
-                    "zls",
-                },
-            }
-        end
-
-        require("mason-lspconfig").setup(setup_opts)
+        require("mason-lspconfig").setup {
+            --
+            -- Pre-install the following language servers, fully support list:
+            --
+            -- https://github.com/williamboman/mason-lspconfig.nvim
+            -- https://github.com/neovim/nvim-lspconfig/wiki/Language-specific-plugins
+            --
+            -- LSP server installed location: ~/.local/share/nvim/mason/bin
+            --
+            -- But use the system-installed LSP server binary has higher priority!!!
+            --
+            -- For example, I've already install `~/my-shell/zig-nightly/zls` and
+            -- mason installs `~/.local/share/nvim/mason/bin/zls`.
+            --
+            -- Tnen `vim.lsp.start_client()` searchs my `zls` from `$PATH` and starts
+            -- it, you can use `:LspInfo` to confirm:
+            --
+            --   1 client(s) attached to this buffer: 
+            --   
+            --   Client: zls (id: 1, bufnr: [1])
+            --   	filetypes:       zig, zir
+            --   	autostart:       true
+            --   	root directory:  /home/wison/zig/temp
+            --   	cmd:             /home/wison/my-shell/zig-nightly/zls
+            --
+            ensure_installed = {
+                -- "lua_ls",
+                "bashls",
+                "tsserver",
+                -- "denols",
+                "tailwindcss",
+                "cssls",
+                "html",
+                "pyright",
+                -- "clangd",
+                "zls",
+            },
+        }
     end
 }
