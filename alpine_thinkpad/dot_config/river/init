@@ -3,7 +3,7 @@
 # This is the example configuration file for river.
 #
 # If you wish to edit this, you will probably want to copy it to
-# $XDG_CONFIG_HOME/river/init or $HOME/.config/river/init first.
+k $XDG_CONFIG_HOME/river/init or $HOME/.config/river/init first.
 #
 # See the river(1), riverctl(1), and rivertile(1) man pages for complete
 # documentation.
@@ -22,7 +22,7 @@ wlr-randr --output eDP-1 --mode 1920x1080 --scale 1.0 &
 # wlr-randr --output DP-1 --mode 2560x2880 --scale 1.3 --transform 270 &
 
 # LG 4K
-wlr-randr --output DP-1 --mode 3840x2160 --scale 1.4 &
+wlr-randr --output DP-1 --mode 3840x2160 --scale 1.4 --above eDP-1 &
 
 #------------------------------------------------------------------------------
 # Wallpaper
@@ -87,8 +87,11 @@ riverctl map normal Alt M swap next
 #------------------------------------------------------------------------------
 # Alt + Left Mouse Button to move views
 riverctl map-pointer normal Alt BTN_LEFT move-view
-riverctl map normal Alt minus resize horizontal -5
-riverctl map normal Alt plus resize horizontal +5
+
+riverctl map normal Alt minus spawn "riverctl send-layout-cmd rivertile \"main-ratio -0.1\""
+riverctl map normal Alt equal spawn "riverctl send-layout-cmd rivertile \"main-ratio +0.1\""
+riverctl map normal Alt M swap next
+
 
 # Alt + Right Mouse Button to resize views
 riverctl map-pointer normal Alt BTN_RIGHT resize-view
