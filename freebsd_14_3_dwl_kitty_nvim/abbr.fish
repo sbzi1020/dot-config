@@ -448,3 +448,34 @@ abbr ta "zmx attach default.1"
 #--------------------------------------------------------
 abbr jai "jai-linux"
 
+#--------------------------------------------------------
+# PF
+#--------------------------------------------------------
+abbr p "doas pfctl"
+abbr pconfig "doas nvim /etc/pf.conf"
+abbr ptest "doas pfctl -vnf /etc/pf.conf"
+# abbr preload "doas pfctl -f /etc/pf.conf"
+abbr preload "doas pfctl -F all -f /etc/pf.conf"
+abbr plist "echo -en 'NAT Rules:\n' && doas pfctl -s nat && echo -en '\nFilter Rules:\n' && doas pfctl -s rules"
+abbr plistv "doas pfctl -vs rules"
+abbr pstate "doas pfctl -s states"
+abbr pstatev "doas pfctl -vs states"
+abbr plrestart "doas rm -rf /var/log/pflog && service pflog restart"
+abbr plview "doas tcpdump -n -r /var/log/pflog"
+
+
+#--------------------------------------------------------
+# `vm_bhyve`
+#--------------------------------------------------------
+abbr vmsl "doas vm switch list"
+abbr vmsi "doas vm switch info"
+abbr vmsa "doas vm switch add"
+abbr vmsr "doas vm switch remove"
+abbr vmsd "doas vm switch destroy"
+abbr vmiso "doas vm iso"
+abbr vmlist "doas vm list"
+abbr vminfo "doas vm info"
+# abbr vmstart "doas vm start -f"
+abbr vmstart "doas vm start"
+abbr vmstop "doas vm stop"
+abbr vmconf "doas vm configure"
