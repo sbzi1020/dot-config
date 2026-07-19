@@ -1,0 +1,22 @@
+{
+  "showDashes": true,
+  "enableDailyNoteOnDoubleTap": true,
+  "dashOneThreshold": 1,
+  "dashTwoThreshold": 3,
+  "dashThreeThreshold": 5,
+  "showTime": true,
+  "timeIsoDisplay": "HH:mm:ss",
+  "showExcerpt": true,
+  "excerptLines": 2,
+  "noteSortBy": "creation-time",
+  "noteSortOrder": "ascending",
+  "weekStartDay": "monday",
+  "weekNumberDisplay": "united-states",
+  "showSunday": true,
+  "showMonday": true,
+  "showTuesday": true,
+  "showWednesday": true,
+  "showThursday": true,
+  "showFriday": true,
+  "showSaturday": true
+}

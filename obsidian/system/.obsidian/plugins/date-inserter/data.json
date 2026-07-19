@@ -1,0 +1,22 @@
+{
+  "dateFormatSpecs": [
+    {
+      "format": "mm/dd/yyyy",
+      "regex": "",
+      "minLength": 0,
+      "maxLength": 0
+    },
+    {
+      "format": "",
+      "regex": "",
+      "minLength": 0,
+      "maxLength": 0
+    }
+  ],
+  "defaultDate": "today",
+  "language": "en",
+  "weekStart": 0,
+  "weekNumbers": 0,
+  "todayHighlight": true,
+  "daysOfWeekHighlighted": {}
+}

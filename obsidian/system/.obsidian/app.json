@@ -1,0 +1,22 @@
+{
+  "vimMode": true,
+  "promptDelete": false,
+  "useTab": true,
+  "alwaysUpdateLinks": true,
+  "showLineNumber": true,
+  "trashOption": "system",
+  "defaultViewMode": "source",
+  "showFrontmatter": true,
+  "tabSize": 6,
+  "openBehavior": "new",
+  "pdfExportSettings": {
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  },
+  "propertiesInDocument": "hidden",
+  "newFileLocation": "current",
+  "attachmentFolderPath": "Screenshot",
+  "deleteUnlinkedAttachments": "ask"
+}

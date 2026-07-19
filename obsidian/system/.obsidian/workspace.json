@@ -1,0 +1,350 @@
+{
+  "main": {
+    "id": "642ee06a22b57335",
+    "type": "split",
+    "children": [
+      {
+        "id": "52a7aa5ed3a2acd9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cf9ae35a508a7171",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "FreeBSD.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "FreeBSD"
+            }
+          },
+          {
+            "id": "25c7e32fc2063e43",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Common operations.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Common operations"
+            }
+          },
+          {
+            "id": "3613c181440547d2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "ZFS.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "ZFS"
+            }
+          },
+          {
+            "id": "3965f15331742e4d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Untitled.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Untitled"
+            }
+          },
+          {
+            "id": "3e4e01598bdabe73",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Kernel Book.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Kernel Book"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5be17a59439e890f",
+    "type": "split",
+    "children": [
+      {
+        "id": "d7eb16f048b7703f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7e83c21ed092efab",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "53f34799403a02f8",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "season",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "07946f593d64e460",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200,
+    "collapsed": true
+  },
+  "right": {
+    "id": "9a9a52765005af6e",
+    "type": "split",
+    "children": [
+      {
+        "id": "af5ba41a80682e86",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6af2f2312fc2f261",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Personal/2025(39)/2025-01-23.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 2025-01-23"
+            }
+          },
+          {
+            "id": "84ecc5bfbe6b8bc8",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Personal/2025(39)/2025-01-23.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 2025-01-23"
+            }
+          },
+          {
+            "id": "527dfe49dd7c3363",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "2ecbbdb47718d780",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Kernel Book.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Kernel Book"
+            }
+          },
+          {
+            "id": "c484f2a0b4f9513d",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "advanced-tables-toolbar"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 374.5,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": true,
+      "canvas:Create new canvas": false,
+      "templates:Insert template": true,
+      "command-palette:Open command palette": false,
+      "audio-recorder:Start/stop recording": false,
+      "workspaces:Manage workspace layouts": true,
+      "obsidian-excalidraw-plugin:New Excalidraw drawing": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "tasknotes:Open mini calendar view": false,
+      "tasknotes:Open calendar view": false,
+      "tasknotes:Open tasks view": false,
+      "tasknotes:Open agenda view": false,
+      "tasknotes:Open Kanban board": false,
+      "tasknotes:Open Pomodoro timer": false,
+      "tasknotes:Open Pomodoro statistics": false,
+      "tasknotes:Create new task": false
+    }
+  },
+  "active": "cf9ae35a508a7171",
+  "lastOpenFiles": [
+    "Common operations.md",
+    "Kernel Book.md",
+    "Untitled 3.md",
+    "Untitled 1.md",
+    "Untitled.md",
+    "ZFS.md",
+    "bhyve vm.md",
+    "Untitled 2.md",
+    "FreeBSD.md",
+    "Keys.md",
+    "Daily use.md",
+    "TaskNotes/Views/relationships.base",
+    "TaskNotes/Views/pomodoro-stats.base",
+    "TaskNotes/Views/agenda-default.base",
+    "TaskNotes/Views/calendar-default.base",
+    "TaskNotes/Views/tasks-default.base",
+    "TaskNotes/Views/kanban-default.base",
+    "TaskNotes/Views/mini-calendar-default.base",
+    "TaskNotes/Views",
+    "TaskNotes",
+    "Zathura PDF Viewer.md",
+    "101 labs.md",
+    "1. FTP(File Transfer Protocol).md",
+    "2. SSH(Secure Shell).md",
+    "river-keybindings.md",
+    "Screenshot/Screenshot 2026-06-29 at 1.01.58 PM.png",
+    "Screenshot/Screenshot 2026-06-29 at 1.00.47 PM.png",
+    "Screenshot/Screenshot 2026-06-29 at 12.55.24 PM.png",
+    "Screenshot/Screenshot 2026-06-29 at 12.53.44 PM.png",
+    "Screenshot/Screenshot 2026-06-29 at 12.48.15 PM.png",
+    "Screenshot/Screenshot 2026-06-29 at 12.42.16 PM.png",
+    "Screenshot/Screenshot 2026-06-29 at 12.36.46 PM.png",
+    "Screenshot",
+    "Azure Book.md",
+    "Azure - AZ104.md",
+    "TaskNotes/Tasks/Untitled.md",
+    "TaskNotes/Tasks/DCE02.2 Assessment-3 August 2026.md",
+    "03/Live Video Note.md",
+    "Azure/Azure - AI900.md",
+    "Plan.md",
+    "TaskNotes/Tasks/AZ104.md",
+    "Azure/AZ900 basic.md",
+    "Azure/AZ-104T00-A Microsoft Azure Administrator.md",
+    "Excalidraw/Drawing 2026-06-21 18.37.17.excalidraw.svg",
+    "Untitled.canvas",
+    "Screenshot/Pasted image 20260606162803.png",
+    "Screenshot/Screenshot 2026-06-08 at 12.01.30 PM.png"
+  ]
+}
