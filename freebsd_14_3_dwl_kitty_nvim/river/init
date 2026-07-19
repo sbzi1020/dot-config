@@ -1,0 +1,105 @@
+#!/usr/local/bin/bash
+
+#=============================
+# Monitors resolution
+#=============================
+# LG 4k
+# wlr-randr --output HDMI-A-1 --mode 3840x2160 --scale 1.4
+
+# LG dual
+# Horizontal
+# wlr-randr --output HDMI-A-1 --mode 2560x2880 --scale 1.3 --transform 270
+
+# vertical
+wlr-randr --output HDMI-A-1 --mode 2560x2880 --scale 1.3
+
+#=============================
+# Keys
+#=============================
+# open browser
+riverctl map normal Alt B spawn "dbus-run-session chrome"
+
+# open terminal
+riverctl map normal Alt Return spawn "kitty"
+
+# Close the focused view
+riverctl map normal Alt Q close
+
+# Float and full scrren
+riverctl map normal Alt F toggle-fullscreen
+riverctl map normal Alt+Shift F toggle-float
+
+# Move focus and swap next
+riverctl map normal Alt+Shift H focus-view next
+riverctl map normal Alt+Shift L focus-view previous
+
+riverctl map normal Alt M swap next
+
+# Mouse to move and resize
+riverctl map-pointer normal Alt BTN_LEFT move-view
+riverctl map-pointer normal Alt BTN_RIGHT resize-view
+
+# Resize master window
+riverctl map normal Alt+Shift equal spawn "riverctl send-layout-cmd rivertile \"main-ratio +0.1\""
+riverctl map normal Alt+Shift minus spawn "riverctl send-layout-cmd rivertile \"main-ratio -0.1\""
+
+# take screenshot (full screen)
+riverctl map normal Alt+Control P spawn "grim \"\$HOME/Screenshots/screeshot_\$(date +%Y%m%d_%H%M%S).png\""
+
+# take screenshot (select area)
+riverctl map normal Alt+Shift P spawn "grim -g \"\$(slurp)\" \"\$HOME/Screenshots/screeshot_\$(date +%Y%m%d_%H%M%S).png\""
+
+# jumping around monitor
+riverctl map normal Alt Period focus-output next
+riverctl map normal Alt Comma focus-output previous
+
+# moving around monitor
+riverctl map normal Alt+Shift Period send-to-output next
+riverctl map normal Alt+Shift Comma send-to-output previous
+
+#------------------------------------------------------------------------------
+# Tags (workspaces) related
+#------------------------------------------------------------------------------
+for i in $(seq 1 9)
+do
+    tags=$((1 << ($i - 1)))
+
+    # Alt+[1-9] to focus tag [0-8]
+    riverctl map normal Alt $i set-focused-tags $tags
+
+    # Alt+Shift+[1-9] to tag focused view with tag [0-8]
+    riverctl map normal Alt+Shift $i set-view-tags $tags
+
+    # Alt+Control+[1-9] to toggle focus of tag [0-8]
+    riverctl map normal Alt+Control $i toggle-focused-tags $tags
+
+    # Alt+Shift+Control+[1-9] to toggle tag [0-8] of focused view
+    riverctl map normal Alt+Shift+Control $i toggle-view-tags $tags
+done
+
+# Alt+0 to focus all tags
+# Alt+Shift+0 to tag focused view with all tags
+all_tags=$(((1 << 32) - 1))
+riverctl map normal Alt 0 set-focused-tags $all_tags
+riverctl map normal Alt+Shift 0 set-view-tags $all_tags
+
+
+#------------------------------------------------------------------------------
+# apparence
+#------------------------------------------------------------------------------
+# riverctl background-color $river_background
+riverctl border-color-focused 0xfda0ffff
+riverctl border-width 8
+# riverctl border-color-unfocused 
+
+reverctl set-repeat 50 250
+
+# default app floating
+riverctl rule-add -app-id 'one.alynx.showmethekey' float
+
+# stack layout and padding/margin
+riverctl default-layout rivertile
+rivertile -view-padding 8 -outer-padding 8 &
+
+
+

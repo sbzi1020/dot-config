@@ -1,0 +1,20 @@
+{
+  "highlighterStyle": "rounded",
+  "highlighterMethods": "inline-styles",
+  "highlighters": {
+    "Pink": "#FFB8EBA6",
+    "purple": "#FF00F7A6",
+    "red": "#FF0000",
+    "green": "#00FF05",
+    "gold": "#FFC900",
+    "blue": "#0097FF"
+  },
+  "highlighterOrder": [
+    "purple",
+    "red",
+    "green",
+    "gold",
+    "Pink",
+    "blue"
+  ]
+}

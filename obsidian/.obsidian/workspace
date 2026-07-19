@@ -1,0 +1,160 @@
+{
+  "main": {
+    "id": "14c3da57f5d72b3d",
+    "type": "split",
+    "children": [
+      {
+        "id": "c07b8d0b1a662492",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Security/Login&logout&Register(React Redux).md",
+            "mode": "source",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "924442b94572adc9",
+    "type": "split",
+    "children": [
+      {
+        "id": "098f5f6fd16bfe1a",
+        "type": "tabs",
+        "dimension": 78.09419496166484,
+        "children": [
+          {
+            "id": "a1ecac3d8273216f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "63eded4443b52a12",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "session",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "0b2b1d888a2e9a6e",
+        "type": "tabs",
+        "dimension": 21.905805038335156,
+        "children": [
+          {
+            "id": "a38bd9a19ff4b859",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 172.5
+  },
+  "right": {
+    "id": "8d4808a9f43efaac",
+    "type": "split",
+    "children": [
+      {
+        "id": "ad47fb90449b1744",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "673b3b584ec35ade",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Security/Login&logout&Register(React Redux).md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "1a3855e307506ca2",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Security/Login&logout&Register(React Redux).md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "84b094fd896d9347",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Security/Login&logout&Register(React Redux).md"
+              }
+            }
+          },
+          {
+            "id": "64dcf2c53417c059",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": false
+              }
+            }
+          },
+          {
+            "id": "19b033967dd606fe",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "c07b8d0b1a662492",
+  "lastOpenFiles": [
+    "Security/Login&Register.md",
+    "Security/Login&logout&Register(React Redux).md",
+    "Logger.md",
+    "Login/logout/Register(React Redux).md",
+    "Security/Authentication.md",
+    "Security/Check Password validation.md",
+    "Security/Security.md",
+    "Security/JWT.md",
+    "z.Obsidian/images/firestore-default-data.png",
+    "z.Obsidian/images/login-successfully.png"
+  ]
+}

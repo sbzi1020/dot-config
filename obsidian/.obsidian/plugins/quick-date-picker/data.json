@@ -1,0 +1,42 @@
+{
+  "triggerChar": "@",
+  "defaultFormat": {
+    "name": "Standard",
+    "dateFormat": "YYYY-MM-DD",
+    "prefix": "",
+    "suffix": ""
+  },
+  "favoriteFormats": [
+    {
+      "name": "Wiki Link",
+      "dateFormat": "YYYY-MM-DD",
+      "prefix": "[[",
+      "suffix": "]]"
+    },
+    {
+      "name": "Chinese",
+      "dateFormat": "YYYY年MM月DD日",
+      "prefix": "",
+      "suffix": ""
+    },
+    {
+      "name": "US Date",
+      "dateFormat": "MMM D, YYYY",
+      "prefix": "",
+      "suffix": ""
+    },
+    {
+      "name": "US Numeric",
+      "dateFormat": "MM/DD/YYYY",
+      "prefix": "",
+      "suffix": ""
+    }
+  ],
+  "rememberLastFormat": true,
+  "lastUsedFormat": {
+    "name": "Standard",
+    "dateFormat": "YYYY-MM-DD",
+    "prefix": "",
+    "suffix": ""
+  }
+}
