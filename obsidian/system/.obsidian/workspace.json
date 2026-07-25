@@ -8,7 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "cf9ae35a508a7171",
+            "id": "3e4e01598bdabe73",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -32,12 +32,12 @@
             }
           },
           {
-            "id": "25c7e32fc2063e43",
+            "id": "d6098df587d65f98",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Common operations.md",
+                "file": "Kernel Book.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -52,35 +52,11 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Common operations"
+              "title": "Kernel Book"
             }
           },
           {
-            "id": "3613c181440547d2",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "ZFS.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "ZFS"
-            }
-          },
-          {
-            "id": "3965f15331742e4d",
+            "id": "ec5cd97fa270490f",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -104,12 +80,12 @@
             }
           },
           {
-            "id": "3e4e01598bdabe73",
+            "id": "14dd2d48d9fa6abc",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Kernel Book.md",
+                "file": "Zathura PDF Viewer.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -124,10 +100,35 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Kernel Book"
+              "title": "Zathura PDF Viewer"
+            }
+          },
+          {
+            "id": "5c7319c421d8a9ba",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "ZFS.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "ZFS"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -180,13 +181,11 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "9a9a52765005af6e",
@@ -250,13 +249,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Kernel Book.md",
+                "file": "FreeBSD.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Kernel Book"
+              "title": "Outline of FreeBSD"
             }
           },
           {
@@ -297,17 +296,20 @@
       "tasknotes:Create new task": false
     }
   },
-  "active": "cf9ae35a508a7171",
+  "active": "5c7319c421d8a9ba",
   "lastOpenFiles": [
-    "Common operations.md",
-    "Kernel Book.md",
-    "Untitled 3.md",
+    "Zathura PDF Viewer.md",
     "Untitled 1.md",
     "Untitled.md",
-    "ZFS.md",
-    "bhyve vm.md",
-    "Untitled 2.md",
+    "Kernel Book.md",
     "FreeBSD.md",
+    "Git Master References.md",
+    "Common operations.md",
+    "Excalidraw/Drawing 2026-07-20 12.46.51.excalidraw.md",
+    "Excalidraw",
+    "ZFS.md",
+    "Untitled 3.md",
+    "bhyve vm.md",
     "Keys.md",
     "Daily use.md",
     "TaskNotes/Views/relationships.base",
@@ -319,7 +321,6 @@
     "TaskNotes/Views/mini-calendar-default.base",
     "TaskNotes/Views",
     "TaskNotes",
-    "Zathura PDF Viewer.md",
     "101 labs.md",
     "1. FTP(File Transfer Protocol).md",
     "2. SSH(Secure Shell).md",
@@ -331,7 +332,6 @@
     "Screenshot/Screenshot 2026-06-29 at 12.48.15 PM.png",
     "Screenshot/Screenshot 2026-06-29 at 12.42.16 PM.png",
     "Screenshot/Screenshot 2026-06-29 at 12.36.46 PM.png",
-    "Screenshot",
     "Azure Book.md",
     "Azure - AZ104.md",
     "TaskNotes/Tasks/Untitled.md",
@@ -341,7 +341,6 @@
     "Plan.md",
     "TaskNotes/Tasks/AZ104.md",
     "Azure/AZ900 basic.md",
-    "Azure/AZ-104T00-A Microsoft Azure Administrator.md",
     "Excalidraw/Drawing 2026-06-21 18.37.17.excalidraw.svg",
     "Untitled.canvas",
     "Screenshot/Pasted image 20260606162803.png",

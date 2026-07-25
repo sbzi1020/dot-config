@@ -15,8 +15,9 @@ ifconfig # find your nic in VM with an IP address
 # set it use DHCP
 sysrc ifconfig_em0="DHCP"
 ```
-#### SSH, doas, fish, nvim and all other initial setup
+#### initial setup: SSH, doas, git, fish, nvim and all other 
 Check the [[FreeBSD]] initial setup
+[[Git Master References]]
 #### Updating the System
 ```bash
 doas freebsd-update fetch install
@@ -66,7 +67,30 @@ It will be in `/usr/src`
 doas git clone --branch releng/14.3 --depth 1 https://git.FreeBSD.org/src.git /usr/src
 ls -lht /usr/src/sys # Kernel lives, like `dev`, `kern`, `net` and `vm`
 ```
+Double check
+```bash
+freebsd-version -k
+```
+#### Backups and Snapshots
+Note: ==Important! Important! Important!== Safely ==close all your VMs== before taking snapshot!!!!
+```bash
+[I] fion@freebsd ~> zfs list
+NAME                            USED  AVAIL  REFER  MOUNTPOINT
+zroot/vm                       10.8G   440G  4.63G  /home/fion/vm
+zroot/vm/my-bsd                4.20G   440G  4.20G  /home/fion/vm/my-bsd
+zroot/vm/my-linux              1.95G   440G  1.95G  /home/fion/vm/my-linux
 
+# only snapshot what you want, if you want snapshot the `zroot/vm`, you use `-r` to recursively take all VMs under vm
+# zfs snapshot -r zroot@clean-install
+doas zfs snapshot zroot/vm/my-bsd@clean-install
+
+[I] fion@freebsd ~> zfs list -t snapshot
+NAME                                           USED  AVAIL  REFER  MOUNTPOINT
+zroot/vm/my-bsd@clean-install                 3.05M      -  4.20G  -
+
+# Roll back instantly
+doas zfs rollback zroot/vm/my-bsd@clean-install
+```
 ## Chapter 3 — A Gentle Introduction to UNIX
 
 ### Reader Guidance: How to Use This Chapter

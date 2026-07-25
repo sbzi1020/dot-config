@@ -18,5 +18,6 @@
   "propertiesInDocument": "hidden",
   "newFileLocation": "current",
   "attachmentFolderPath": "Screenshot",
-  "deleteUnlinkedAttachments": "ask"
+  "deleteUnlinkedAttachments": "ask",
+  "readableLineLength": false
 }
